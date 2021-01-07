@@ -1,37 +1,33 @@
 package org.github.jrds.server;
 
-public class Message {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
+@JsonTypeInfo(
+  use = JsonTypeInfo.Id.NAME, 
+  include = JsonTypeInfo.As.PROPERTY, 
+  property = "_type")
+@JsonSubTypes({ 
+  @Type(value = ChatMessage.class, name = "chat"), 
+  @Type(value = SessionEndMessage.class, name = "sessionEnd") 
+})
+
+public abstract class Message {
     
     private String from;
     private String to;
-    private String text;
 
-    public Message() {
-        // For Jackson deserialisation
-    }
-
-    public Message(String from, String to, String msg) {
+    public Message(String from, String to) {
         this.from = from;
         this.to = to;
-        this.text = msg;
     }
 
 	public String getFrom() {
 		return from;
 	}
 
-	public String getText() {
-		return text;
-	}
-
-    public String getTo() {
+	public String getTo() {
         return to;
-    }
-
-    @Override
-    public String toString() {
-        return "Message [from=" + from  + ", to=" + to + ", text=" + text+ "]";
-    }
-
-    
+    }    
 }

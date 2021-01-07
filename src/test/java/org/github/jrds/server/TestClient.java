@@ -51,7 +51,7 @@ public class TestClient {
 
     public void disconnect() {
         try {
-            session.getBasicRemote().sendText("Goodbye");
+            sendSessionEndMessage();
             // Wait for remote to close
             clientWebSocket.awaitClosure();
             // Close session
@@ -62,19 +62,14 @@ public class TestClient {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
-
-        // TODO - should Lifecycle.stop be called?
     }
 
-    public void sendMessage(String msg, String to) {
-        Message message = new Message(id, to, msg);
-        try {
-            String json = mapper.writeValueAsString(message);
-            session.getBasicRemote().sendText(json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // System.out.println(id + " : " + msg);
+    public void sendChatMessage(String msg, String to) {
+        sendMessage(new ChatMessage(id, to, msg));
+    }
+
+    public void sendSessionEndMessage() {
+        sendMessage(new SessionEndMessage(id));
     }
 
     public Message getMessageReceived() {
@@ -83,6 +78,15 @@ public class TestClient {
 
     public String getId() {
         return id;
+    }
+
+    private void sendMessage(Message message) {
+        try {
+            String json = mapper.writeValueAsString(message);
+            session.getBasicRemote().sendText(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -2,7 +2,6 @@ package org.github.jrds.server;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -16,9 +15,12 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ServerEndpoint(value = "/messages/")
 public class MessageSocket {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);  
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
@@ -26,21 +28,23 @@ public class MessageSocket {
     @OnOpen
     public void onWebSocketConnect(Session sess)
     {
-        System.out.println("Socket Connected: " + sess);
+        LOGGER.info("Socket Connected: " + sess);
         userSessions.put(sess.getUserPrincipal().getName(), sess);
     }
 
     @OnMessage
     public void onWebSocketText(Session sess, String message) throws IOException
     {
-        System.out.println("Received TEXT message: " + message);
+        Message msg = mapper.readValue(message, Message.class);
+        LOGGER.info("Received message: " + msg);
 
-        if (message.toLowerCase(Locale.US).contains("bye"))
+        if (msg instanceof SessionEndMessage)
         {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
+            userSessions.remove(sess.getUserPrincipal().getName());
         }
         else {
-            Message msg = mapper.readValue(message, Message.class);
+            
             Session to = userSessions.get(msg.getTo());
             to.getBasicRemote().sendText(message);
         }
@@ -49,7 +53,7 @@ public class MessageSocket {
     @OnClose
     public void onWebSocketClose(CloseReason reason)
     {
-        System.out.println("Socket Closed: " + reason);
+        LOGGER.info("Socket Closed: " + reason);
         closureLatch.countDown();
     }
 
@@ -61,7 +65,7 @@ public class MessageSocket {
 
     public void awaitClosure() throws InterruptedException
     {
-        System.out.println("Awaiting closure from remote");
+        LOGGER.info("Awaiting closure from remote");
         closureLatch.await();
     }
 }
