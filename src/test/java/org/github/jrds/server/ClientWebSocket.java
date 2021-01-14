@@ -34,7 +34,9 @@ public class ClientWebSocket extends Endpoint {
     private void handleTextMessage(Session sess, String message) {
         try {
             Message msg = mapper.readValue(message, Message.class);
+            System.out.println("Message queue before message added: " + messagesReceived);
             messagesReceived.add(msg);
+            System.out.println("Message queue after message added: " + messagesReceived);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

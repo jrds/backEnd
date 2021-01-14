@@ -46,7 +46,8 @@ public class Main {
         UserStore userStore = new UserStore();
         userStore.addUser("Learner 1", new Password("pw"), new String[] { "user"});
         userStore.addUser("Educator", new Password("pw"), new String[] { "user"});
-        
+        userStore.addUser("Learner 2", new Password("pw"), new String[] { "user"});
+
         HashLoginService l = new HashLoginService();
         l.setUserStore(userStore);
         l.setName("realm");

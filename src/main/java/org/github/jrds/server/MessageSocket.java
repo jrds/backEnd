@@ -46,7 +46,7 @@ public class MessageSocket {
         else {
             
             Session to = userSessions.get(msg.getTo());
-            to.getBasicRemote().sendText(message);
+            to.getAsyncRemote().sendText(message);
         }
     }
 
