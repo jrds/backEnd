@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ServerEndpoint(value = "/messages/")
+@ServerEndpoint(value = "/lesson/{lessonId}")
 public class MessageSocket {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);  
     private static Map<String, Session> userSessions = new HashMap<>();
@@ -30,6 +30,8 @@ public class MessageSocket {
     {
         LOGGER.info("Socket Connected: " + sess);
         userSessions.put(sess.getUserPrincipal().getName(), sess);
+        String lessonId = sess.getPathParameters().get("lessonId");
+        System.out.println(lessonId + "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     }
 
     @OnMessage

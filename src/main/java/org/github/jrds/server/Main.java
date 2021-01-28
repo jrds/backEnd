@@ -1,5 +1,9 @@
 package org.github.jrds.server;
 
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
+
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -28,6 +32,7 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setSecurityHandler(auth());
         context.setContextPath("/");
+        context.addFilter(AuthorisationFilter.class, "/lesson/*", EnumSet.allOf(DispatcherType.class));
         server.setHandler(context);
 
         WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
@@ -47,6 +52,8 @@ public class Main {
         userStore.addUser("Learner 1", new Password("pw"), new String[] { "user"});
         userStore.addUser("Educator", new Password("pw"), new String[] { "user"});
         userStore.addUser("Learner 2", new Password("pw"), new String[] { "user"});
+        userStore.addUser("Learner 99", new Password("pw"), new String[] { "user"});
+
 
         HashLoginService l = new HashLoginService();
         l.setUserStore(userStore);

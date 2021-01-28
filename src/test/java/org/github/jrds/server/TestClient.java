@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TestClient {
 
-    private static final URI uri = URI.create("ws://localhost:8080/messages/");
+    private static final URI uri = URI.create("ws://localhost:8080/lesson/2905");
 
     private String id;
     private ClientWebSocket clientWebSocket;
