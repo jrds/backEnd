@@ -64,8 +64,9 @@ public class TestClient {
         }
     }
 
-    public void sendChatMessage(String msg, String to) {
-        sendMessage(new ChatMessage(id, to, msg));
+    public void sendChatMessage(String msg, String to) { 
+        ChatMessage c = new ChatMessage(id, to, msg);
+        sendMessage(c);
     }
 
     public void sendSessionEndMessage() {

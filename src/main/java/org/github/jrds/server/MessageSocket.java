@@ -24,7 +24,7 @@ public class MessageSocket {
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
-
+    
     @OnOpen
     public void onWebSocketConnect(Session sess)
     {
@@ -68,4 +68,5 @@ public class MessageSocket {
         LOGGER.info("Awaiting closure from remote");
         closureLatch.await();
     }
+
 }
