@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class AuthorisationFilter implements Filter {
 
+    //Main.lessonStore - to access the lesson store
+    //TODO - 3 change "Learner 99" to look up on lesson store
    
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

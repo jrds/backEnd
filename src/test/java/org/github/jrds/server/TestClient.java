@@ -46,7 +46,6 @@ public class TestClient {
         } catch (DeploymentException | IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void disconnect() {

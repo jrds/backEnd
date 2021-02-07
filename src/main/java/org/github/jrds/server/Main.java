@@ -19,6 +19,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 
 public class Main {
 
+    public static LessonStore lessonStore = new LessonStore();
     private Server server;
 
     public void start() {
@@ -47,13 +48,15 @@ public class Main {
         }
     }
 
+    // TODO - method to fill all stores (user, lesson etc)
+
     private SecurityHandler auth() {
         UserStore userStore = new UserStore();
         userStore.addUser("Learner 1", new Password("pw"), new String[] { "user"});
         userStore.addUser("Educator", new Password("pw"), new String[] { "user"});
         userStore.addUser("Learner 2", new Password("pw"), new String[] { "user"});
         userStore.addUser("Learner 99", new Password("pw"), new String[] { "user"});
-
+        // TODO - once the application user store is established, then it can iterate through that user store to add the users the auth user store
 
         HashLoginService l = new HashLoginService();
         l.setUserStore(userStore);

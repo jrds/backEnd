@@ -32,7 +32,10 @@ public class MessageSocket {
         userSessions.put(sess.getUserPrincipal().getName(), sess);
         String lessonId = sess.getPathParameters().get("lessonId");
         System.out.println(lessonId + "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        // TODO - lessonID should be used to create an attendaces for the user joining - linked to lesson store too - At to tests
     }
+
+    //TODO - Add functionality to query attendance (message to request attendance, and response) - At to tests
 
     @OnMessage
     public void onWebSocketText(Session sess, String message) throws IOException
