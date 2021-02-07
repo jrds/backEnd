@@ -11,34 +11,35 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class AuthorisationFilter implements Filter {
 
-    //Main.lessonStore - to access the lesson store
-    //TODO - 3 change "Learner 99" to look up on lesson store
+
+public class AuthorisationFilter implements Filter {
    
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String user = ((HttpServletRequest)request).getUserPrincipal().getName();
-        if(user.equals("Learner 99")){
-            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
+        String[] urlInfo = ((HttpServletRequest) request).getRequestURI().split("/");
+        String lessonId = urlInfo[(urlInfo.length-1)];
+
+        // TODO - QUESTION = YES (test to confirm) - should I have a layer of if() checking if the lesson is present in lesson store?
+        // in the else if doesn't connect return a different error - e.g. 400 - Bad Request
+        if(Main.lessonStore.getLesson(lessonId).canConnect(user)){
+            //carry on with the request
+            chain.doFilter(request, response);   
         }
         else {
-            //carry on with the request
-            chain.doFilter(request, response);
+            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
         }
+        //switched the if and else logic since previous commit 
     }
 
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // TODO Auto-generated method stub
-
     }
 
      @Override
     public void destroy() {
-        // TODO Auto-generated method stub
-
     }
 
     

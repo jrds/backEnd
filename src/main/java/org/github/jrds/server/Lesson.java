@@ -31,12 +31,12 @@ public class Lesson {
         learners.add(learner);
     }
 
-    public boolean checkForALearner(String learner) {
-        if (learners.contains(learner)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isRegisteredLearner(String learner) {
+        return learners.contains(learner);
+    }
+
+    public boolean canConnect(String user) {
+        return isRegisteredLearner(user) || educator.equals(user);
     }
 
 }

@@ -1,6 +1,9 @@
 package org.github.jrds.server;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
@@ -36,20 +39,21 @@ public class Main {
         context.addFilter(AuthorisationFilter.class, "/lesson/*", EnumSet.allOf(DispatcherType.class));
         server.setHandler(context);
 
+
         WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
             wsContainer.addEndpoint(MessageSocket.class);
         });
 
         try {
+            fillLessonStore();   // TODO - method will evolve to fill ALL stores (user, lesson etc)
             server.start();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-    // TODO - method to fill all stores (user, lesson etc)
-
+    
     private SecurityHandler auth() {
         UserStore userStore = new UserStore();
         userStore.addUser("Learner 1", new Password("pw"), new String[] { "user"});
@@ -87,4 +91,18 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+
+    private void fillLessonStore(){
+        Set<String> learners2905 = new HashSet<String>();
+        learners2905.addAll(Arrays.asList(new String[] {"Learner 1", "Learner 2"}));  
+
+        Set<String> learners5029 = new HashSet<String>();
+        learners5029.addAll(Arrays.asList(new String[] {"Learner 1", "Learner 2", "Learner 99"}));  
+
+        Lesson l1 = new Lesson("2905", "Educator", learners2905);
+        Lesson l2 = new Lesson("5029", "Educator", learners5029);
+
+        lessonStore.saveLesson(l1);
+        lessonStore.saveLesson(l2);
+    }; 
 }
