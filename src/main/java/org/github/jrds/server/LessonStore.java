@@ -8,12 +8,15 @@ public class LessonStore {
     private Map<String, Lesson> lessonStore = new HashMap<>();
 
     public Lesson getLesson(String lessonId) {
-        //TODO 1 
-        return null;
-    } 
-
-    public void saveLesson(Lesson lesson){
-        //TODO 2
+        if (lessonStore.containsKey(lessonId)) {
+            return lessonStore.get(lessonId);
+        } else {
+            return null;
+        }
     }
-    
+
+    public void saveLesson(Lesson lesson) {
+        lessonStore.put(lesson.getId(), lesson);
+    }
+
 }
