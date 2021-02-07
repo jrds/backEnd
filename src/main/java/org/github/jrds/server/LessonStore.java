@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class LessonStore {
 
-    private Map<String, Lesson> lessonStore = new HashMap<>();
+    private Map<String, Lesson> lessonStore;
 
     public Lesson getLesson(String lessonId) {
         if (lessonStore.containsKey(lessonId)) {
@@ -19,4 +19,11 @@ public class LessonStore {
         lessonStore.put(lesson.getId(), lesson);
     }
 
+    public LessonStore() {
+        lessonStore = new HashMap<>();
+    }
+
+    public Map<String, Lesson> getLessonStore() {
+        return lessonStore;
+    } 
 }

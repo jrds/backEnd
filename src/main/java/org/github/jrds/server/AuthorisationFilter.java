@@ -20,17 +20,21 @@ public class AuthorisationFilter implements Filter {
         String user = ((HttpServletRequest)request).getUserPrincipal().getName();
         String[] urlInfo = ((HttpServletRequest) request).getRequestURI().split("/");
         String lessonId = urlInfo[(urlInfo.length-1)];
-
-        // TODO - QUESTION = YES (test to confirm) - should I have a layer of if() checking if the lesson is present in lesson store?
-        // in the else if doesn't connect return a different error - e.g. 400 - Bad Request
-        if(Main.lessonStore.getLesson(lessonId).canConnect(user)){
-            //carry on with the request
-            chain.doFilter(request, response);   
+       
+        if(Main.lessonStore.getLessonStore().containsKey(lessonId)){
+            if(Main.lessonStore.getLesson(lessonId).canConnect(user)){
+                //carry on with the request
+                chain.doFilter(request, response);   
+            }
+            else {
+                ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+            //switched the if and else logic since previous commit 
         }
         else {
-            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
-        //switched the if and else logic since previous commit 
+
     }
 
 
