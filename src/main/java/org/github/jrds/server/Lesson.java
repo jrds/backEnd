@@ -39,4 +39,9 @@ public class Lesson {
         return isRegisteredLearner(user) || educator.equals(user);
     }
 
+    @Override
+    public String toString() {
+        return "Lesson [educator=" + educator + ", id=" + id + ", learners=" + learners + "]";
+    }
+
 }

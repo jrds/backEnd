@@ -23,6 +23,7 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 public class Main {
 
     public static LessonStore lessonStore = new LessonStore();
+    public static AttendanceStore attendanceStore = new AttendanceStore();
     private Server server;
 
     public void start() {

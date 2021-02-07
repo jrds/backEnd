@@ -34,8 +34,6 @@ public class LessonTest extends ApplicationTest {
             connect(l1, "Lesson_non_existent");
         }
         catch(Exception e){
-            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            System.out.println(e);
             Throwable rootCause = findRootCause(e);
             Assert.assertTrue(rootCause instanceof UpgradeException);
             Assert.assertEquals(400, ((UpgradeException)rootCause).getResponseStatusCode());
