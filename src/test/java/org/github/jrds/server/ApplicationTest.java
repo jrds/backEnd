@@ -14,6 +14,8 @@ public abstract class ApplicationTest {
     protected String l1 = "Learner 1";
     protected String l2 = "Learner 2";
     protected String l99 = "Learner 99";
+    protected String lesson1 = "2905";
+    protected String lesson2 = "5029";
     private List<TestClient> testClients = new ArrayList<TestClient>();
 
     @Before
@@ -30,9 +32,9 @@ public abstract class ApplicationTest {
         server.stop();
     }
 
-    protected TestClient connect(String userName){
+    protected TestClient connect(String userName, String lessonId){
         TestClient c = new TestClient(userName);
-        c.connect();
+        c.connect(lessonId);
         testClients.add(c);
         return c;
     }

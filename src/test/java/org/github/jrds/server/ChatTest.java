@@ -12,8 +12,8 @@ public class ChatTest extends ApplicationTest {
 
     @Test
     public void sendAndReceive() {
-        TestClient c1 = connect(edu);
-        TestClient c2 = connect(l1);
+        TestClient c1 = connect(edu, lesson1);
+        TestClient c2 = connect(l1, lesson1);
 
         c2.sendChatMessage(msg, c1.getId());
         Message received = c1.getMessageReceived();
@@ -25,9 +25,9 @@ public class ChatTest extends ApplicationTest {
         String msg1 = "Learner 1 - Test message";
         String msg2 = "Learner 2 - Test message";
 
-        TestClient c1 = connect(edu);
-        TestClient c2 = connect(l1);
-        TestClient c3 = connect(l2);
+        TestClient c1 = connect(edu, lesson1);
+        TestClient c2 = connect(l1, lesson1);
+        TestClient c3 = connect(l2, lesson1);
 
         c2.sendChatMessage(msg1, c1.getId());
         c3.sendChatMessage(msg2, c1.getId());
@@ -41,8 +41,8 @@ public class ChatTest extends ApplicationTest {
     public void educatorReceivesMessageAndResponds() {
         String response = "Educator response - Test message";
 
-        TestClient c1 = connect(edu);
-        TestClient c2 = connect(l1);
+        TestClient c1 = connect(edu, lesson1);
+        TestClient c2 = connect(l1, lesson1);
 
         c2.sendChatMessage(msg, c1.getId());
         Message received = c1.getMessageReceived();
@@ -60,9 +60,9 @@ public class ChatTest extends ApplicationTest {
         String response1 = "Educator response to Learner 1 - Test message";
         String response2 = "Educator response to Learner 2 - Test message";
 
-        TestClient c1 = connect(edu);
-        TestClient c2 = connect(l1);
-        TestClient c3 = connect(l2);
+        TestClient c1 = connect(edu, lesson1);
+        TestClient c2 = connect(l1, lesson1);
+        TestClient c3 = connect(l2, lesson1);
 
         c2.sendChatMessage(msg1, c1.getId());
         c3.sendChatMessage(msg2, c1.getId());
