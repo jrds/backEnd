@@ -26,6 +26,20 @@ public class AttendanceTest extends ApplicationTest {
         Assert.assertEquals(lesson2, Main.attendanceStore.getAttendance(key2).getLessonID());
     }
 
+    // TODO - a test to ensure a user can't be added twice - need to potentially throw an error// handle this situation on the server side. 
+
+    @Test
+    public void userCantRegisterAttendanceForTheSameLessonTwice(){
+        connect(l1, lesson1);
+        try {
+            connect(l1, lesson1);
+            Assert.fail("Expected connection to fail, because learner 1 is already connnected/attending this lesson");
+            //might need an if... to check if the user is already in attendance in connect method to resolve this. 
+        } catch(Exception e){
+            System.out.println("£££££££££££££££££££££££££££££££££££££££££££££££££££££ " + e);
+        }
+    }
+
     @Test
     public void unregisteredStudentAttendanceNotRecorded() {
         connect(l1, lesson1);
@@ -65,12 +79,47 @@ public class AttendanceTest extends ApplicationTest {
         connect(l2, lesson1);
         Assert.assertFalse(Main.attendanceStore.educatorConnected(lesson1));
     }
-    
-    // TODO FIRST
-    // this is failing because right now it's finding the edu connection from above
-    // as right now I think it's getting it from the test above. Can use print statement to check. 
-    // implication is the attendance needs to be removed when a user (session) disconnects
-    // the idea could be that it rights to something with time stamps within attendanceStore
-    // so would be something to go to a DB. 
+ 
+ 
+    // TODO - some code is duplicated accross these tests - need to review this
 
+    @Test
+    public void attendanceRemovedFromStoreAfterDisconnect(){
+        TestClient c1 = connect(l1, lesson1);
+        String key1 = l1 + lesson1;
+        Assert.assertEquals(l1, Main.attendanceStore.getAttendance(key1).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key1).getLessonID());
+        disconnect(c1);
+        Assert.assertNull(Main.attendanceStore.getAttendance(key1));
+    }
+
+    @Test
+    public void attenedanceRemovedAndReaddedUponDisconnectAndReconnnect(){
+        TestClient c1 = connect(l1, lesson1);
+        String key1 = l1 + lesson1;
+        Assert.assertEquals(l1, Main.attendanceStore.getAttendance(key1).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key1).getLessonID());
+        disconnect(c1);
+        Assert.assertNull(Main.attendanceStore.getAttendance(key1));
+        connect(l1,lesson1);
+        Assert.assertEquals(l1, Main.attendanceStore.getAttendance(key1).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key1).getLessonID());
+    }
+    
+
+    @Test
+    public void otherAttendancesNotImpactedWhenAnotherIsRemoved(){
+        TestClient c1 = connect(l1, lesson1);
+        TestClient c2 = connect(l2, lesson1); // TODO - QUESTION - I don't need this to be a TestClient, but is it better for consistency? 
+        String key1 = l1 + lesson1;
+        String key2 = l2 + lesson1;
+        Assert.assertEquals(l1, Main.attendanceStore.getAttendance(key1).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key1).getLessonID());
+        Assert.assertEquals(l2, Main.attendanceStore.getAttendance(key2).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key2).getLessonID());
+        disconnect(c1);
+        Assert.assertNull(Main.attendanceStore.getAttendance(key1));
+        Assert.assertEquals(l2, Main.attendanceStore.getAttendance(key2).getUserID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(key2).getLessonID());
+    }
 }

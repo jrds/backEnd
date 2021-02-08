@@ -1,23 +1,28 @@
 package org.github.jrds.server;
 
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class AttendanceStore {
 
     private Map<String, Attendance> attendanceStore;
-    // TODO CONSIDER if 2 construcors of attendance then:
-    // Key attendance = (userId, lessonId)
-    // Value attendance = (userId, lessonId, instance)
+    private Set<String[]> toBeReplaceWithDB;
 
     public AttendanceStore() {
         attendanceStore = new HashMap<>();
+        toBeReplaceWithDB = new HashSet<>();
     }
 
     public void addAttendance(String userId, String lessonId){
         Attendance a = new Attendance(userId, lessonId);
         String key = a.toString();
         attendanceStore.put(key, a); 
+
+        String[] attendanceToBeStored = {"Joined", userId, lessonId, (Instant.now().toString())};
+        toBeReplaceWithDB.add(attendanceToBeStored);
     }
 
     public Attendance getAttendance(String key){
@@ -34,6 +39,9 @@ public class AttendanceStore {
         return attendanceStore.containsKey(key);
     }
 
-    // TODO - CONSIDER - is attendance a documentation of each connection to a lesson or just 1 per lesson ? 
-    // I don't think I want to remove attendance if someone leaves the session ?
+    public void removeAttendance(Attendance attendance){
+        String[] attendanceToBeStored = {"Disconnected", attendance.getUserID(), attendance.getLessonID(), (Instant.now().toString())};
+        attendanceStore.remove(attendance.toString());
+        toBeReplaceWithDB.add(attendanceToBeStored);
+    }
 }

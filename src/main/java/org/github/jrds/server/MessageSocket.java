@@ -24,6 +24,7 @@ public class MessageSocket {
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
+    
 
     @OnOpen
     public void onWebSocketConnect(Session sess) {
@@ -44,6 +45,11 @@ public class MessageSocket {
 
         if (msg instanceof SessionEndMessage) {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
+            String userId = sess.getUserPrincipal().getName();
+            String lessonId = sess.getPathParameters().get("lessonId");
+            Attendance a = new Attendance(userId, lessonId);
+            Main.attendanceStore.removeAttendance(a);
+            // TODO - QUESTION - should this be recieving the two IDs as strings, or as is? 
             userSessions.remove(sess.getUserPrincipal().getName());
         } else {
 
