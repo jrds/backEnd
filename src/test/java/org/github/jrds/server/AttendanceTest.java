@@ -52,4 +52,25 @@ public class AttendanceTest extends ApplicationTest {
         Assert.assertNull(Main.attendanceStore.getAttendance(key2));
     }
 
+    @Test
+    public void educatorConnectionVerificationProvided() {
+        connect(edu, lesson1);
+        connect(l1, lesson1);
+        Assert.assertTrue(Main.attendanceStore.educatorConnected(lesson1));
+    }
+
+    @Test
+    public void educatorConnectionVerificationDenied() {
+        connect(l1, lesson1);
+        connect(l2, lesson1);
+        Assert.assertFalse(Main.attendanceStore.educatorConnected(lesson1));
+    }
+    
+    // TODO FIRST
+    // this is failing because right now it's finding the edu connection from above
+    // as right now I think it's getting it from the test above. Can use print statement to check. 
+    // implication is the attendance needs to be removed when a user (session) disconnects
+    // the idea could be that it rights to something with time stamps within attendanceStore
+    // so would be something to go to a DB. 
+
 }

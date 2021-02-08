@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TestClient {
 
     //private static final URI uri = URI.create("ws://localhost:8080/lesson/2905");
-    // TODO - Question previously this was here, changed and moved it to connect to be able to pass in the class id, is this okay/need to consider why it was static before. 
+    // TODO - QUESTION previously this was here, changed and moved it to connect to be able to pass in the class id, is this okay/need to consider why it was static before. 
 
     private String id;
     private ClientWebSocket clientWebSocket;
