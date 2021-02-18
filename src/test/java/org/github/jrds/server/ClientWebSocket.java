@@ -57,7 +57,7 @@ public class ClientWebSocket extends Endpoint {
 
     public void awaitClosure() throws InterruptedException {
         System.out.println("Client Awaiting closure from remote");
-        closureLatch.await();
+        closureLatch.await(20, TimeUnit.SECONDS);
     }
 
     Message nextMessageFromQueue() {

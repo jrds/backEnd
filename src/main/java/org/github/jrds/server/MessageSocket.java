@@ -31,7 +31,7 @@ public class MessageSocket {
         LOGGER.info("Socket Connected: " + sess);
         userSessions.put(userId, sess);
         String lessonId = sess.getPathParameters().get("lessonId");
-        if (!Main.attendanceStore.attendanceRegistered(userId + lessonId)) {
+        if (!Main.attendanceStore.attendanceRegistered(userId, lessonId)) {
             Main.attendanceStore.addAttendance(userId, lessonId);
         } else {
             throw new Exception();

@@ -69,16 +69,16 @@ public class TestClient {
             if(session.isOpen()){
                 sendSessionEndMessage();
                 // Wait for remote to close
-                // clientWebSocket.awaitClosure();
+                clientWebSocket.awaitClosure();
                 // Close session
                 session.close();
             }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-       // } catch (InterruptedException e) {
-         //   Thread.currentThread().interrupt();
-           // throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 

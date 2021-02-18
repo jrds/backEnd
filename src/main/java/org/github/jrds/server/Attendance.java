@@ -12,11 +12,6 @@ public class Attendance {
         this.lessonId = lessonId;
     }
 
-     @Override
-    public String toString() {
-        return userId + lessonId;
-    }
-
     public String getUserID() {
         return userId;
     }
