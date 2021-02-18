@@ -23,7 +23,6 @@ public class AttendanceTest extends ApplicationTest {
         Assert.assertEquals(lesson2, Main.attendanceStore.getAttendance(l2, lesson2).getLessonID());
     }
 
-    // TODO - a test to ensure a user can't be added twice - need to potentially throw an error// handle this situation on the server side. 
 
     @Test
     public void userCantRegisterAttendanceForTheSameLessonTwice(){
@@ -31,14 +30,14 @@ public class AttendanceTest extends ApplicationTest {
              connect(l1, lesson1);
         }
         catch(Exception e){
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            // Expected
         }
         try {
             connect(l1, lesson1);
             Assert.fail("Expected connection to fail, because learner 1 is already connnected/attending this lesson");
             //might need an if... to check if the user is already in attendance in connect method to resolve this. 
         } catch(Exception e){
-            System.out.println("£££££££££££££££££££££££££££££££££££££££££££££££££££££ " + e);
+            // Expected
         }
     }
 
@@ -78,8 +77,6 @@ public class AttendanceTest extends ApplicationTest {
         Assert.assertFalse(Main.attendanceStore.attendanceRegistered(edu,lesson1));
     }
  
- 
-    // TODO - some code is duplicated accross these tests - need to review this
 
     @Test
     public void attendanceRemovedFromStoreAfterDisconnect(){

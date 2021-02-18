@@ -9,11 +9,11 @@ import java.util.Set;
 public class AttendanceStore {
 
     private Map<AttendanceKey, Attendance> attendanceStore;
-    private Set<String[]> toBeReplaceWithDB;
+    private Set<String[]> toBeReplacedWithDB;
 
     public AttendanceStore() {
         attendanceStore = new HashMap<>();
-        toBeReplaceWithDB = new HashSet<>();
+        toBeReplacedWithDB = new HashSet<>();
     }
 
     public void addAttendance(String userId, String lessonId){
@@ -22,7 +22,7 @@ public class AttendanceStore {
         attendanceStore.put(keyFor(a), a); 
 
         String[] attendanceToBeStored = {"Joined", userId, lessonId, (Instant.now().toString())};
-        toBeReplaceWithDB.add(attendanceToBeStored);
+        toBeReplacedWithDB.add(attendanceToBeStored);
     }
 
     public Attendance getAttendance(String userId, String lessonId){
@@ -47,11 +47,11 @@ public class AttendanceStore {
     //     return attendanceStore.containsKey(keyFor(learnerId, lessonId));
     // }
 
-    public void removeAttendance(Attendance attendance){
-        String[] attendanceToBeStored = {"Disconnected", attendance.getUserID(), attendance.getLessonID(), (Instant.now().toString())};
+    public void removeAttendance(String userId, String lessonId){
+        String[] attendanceToBeStored = {"Disconnected", userId, lessonId, (Instant.now().toString())};
         
-        attendanceStore.remove(keyFor(attendance));
-        toBeReplaceWithDB.add(attendanceToBeStored);
+        attendanceStore.remove(keyFor(userId, lessonId));
+        toBeReplacedWithDB.add(attendanceToBeStored);
     }
 
     public boolean attendanceRegistered(String userId, String lessonId){

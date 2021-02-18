@@ -11,10 +11,6 @@ public class LessonTest extends ApplicationTest {
         connect(l1, lesson1);
     }
 
-    // TODO - QUESTION - realistically should there be 2 conext methods one granting the access to the application and one to the lesson? 
-    // Right now this test and the one below, seen to be doing the same thing, since being changed that connect takes the class too. 
-    // As an educator it's likely you would want to log on without goining to join a specific class
-    // but not as much as a need for students. 
 
     @Test 
     public void invalidUserDeniedAccess(){

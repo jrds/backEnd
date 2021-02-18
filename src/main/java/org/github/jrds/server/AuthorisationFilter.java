@@ -20,10 +20,6 @@ public class AuthorisationFilter implements Filter {
         String user = ((HttpServletRequest)request).getUserPrincipal().getName();
         String[] urlInfo = ((HttpServletRequest) request).getRequestURI().split("/");
         String lessonId = urlInfo[(urlInfo.length-1)];
-
-        // TODO - make it fail earlier - wont rely on the test sockey being closed 
-        // TODO - better = act of connecting from the server, you get back a positive response saying the session is established. e.g. hello message
-            // if you don't get it in a set amount of time, then consider the connection to be failed. 
        
         if(Main.lessonStore.getLessonStore().containsKey(lessonId)){
             if(Main.lessonStore.getLesson(lessonId).canConnect(user)){

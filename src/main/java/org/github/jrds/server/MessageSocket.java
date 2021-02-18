@@ -40,9 +40,6 @@ public class MessageSocket {
         // the same time.
     }
 
-    // TODO - Add functionality to query attendance (message to request attendance,
-    // and response) - At to tests
-
     @OnMessage
     public void onWebSocketText(Session sess, String message) throws IOException {
         Message msg = mapper.readValue(message, Message.class);
@@ -52,9 +49,7 @@ public class MessageSocket {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
             String userId = sess.getUserPrincipal().getName();
             String lessonId = sess.getPathParameters().get("lessonId");
-            Attendance a = new Attendance(userId, lessonId);
-            Main.attendanceStore.removeAttendance(a);
-            // TODO - QUESTION - should this be recieving the two IDs as strings, or as is?
+            Main.attendanceStore.removeAttendance(userId, lessonId);
             userSessions.remove(sess.getUserPrincipal().getName());
         } else {
 
