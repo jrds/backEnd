@@ -44,4 +44,8 @@ public class AttendanceStore {
         attendanceStore.remove(attendance.toString());
         toBeReplaceWithDB.add(attendanceToBeStored);
     }
+
+    public Boolean attendanceRegistered(String key){
+        return attendanceStore.containsKey(key);
+    }
 }

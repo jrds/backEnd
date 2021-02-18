@@ -47,7 +47,18 @@ public class TestClient {
             ClientEndpointConfig clientConfig = ClientEndpointConfig.Builder.create()
                 .configurator(configurator)
                 .build();
-            session = container.connectToServer(clientWebSocket, clientConfig, uri);
+            Session newSession = container.connectToServer(clientWebSocket, clientConfig, uri);
+            try{
+                Thread.sleep(2000);
+            } catch (InterruptedException e){
+
+            }
+            if (!newSession.isOpen()){
+                throw new RuntimeException("Failed to open session");
+            }
+            else {
+                session = newSession;
+            }
         } catch (DeploymentException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,16 +66,19 @@ public class TestClient {
 
     public void disconnect() {
         try {
-            sendSessionEndMessage();
-            // Wait for remote to close
-            clientWebSocket.awaitClosure();
-            // Close session
-            session.close();
+            if(session.isOpen()){
+                sendSessionEndMessage();
+                // Wait for remote to close
+                // clientWebSocket.awaitClosure();
+                // Close session
+                session.close();
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+       // } catch (InterruptedException e) {
+         //   Thread.currentThread().interrupt();
+           // throw new RuntimeException(e);
         }
     }
 

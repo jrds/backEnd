@@ -24,15 +24,20 @@ public class MessageSocket {
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
-    
 
     @OnOpen
-    public void onWebSocketConnect(Session sess) {
+    public void onWebSocketConnect(Session sess) throws Exception {
+        String userId = sess.getUserPrincipal().getName();
         LOGGER.info("Socket Connected: " + sess);
-        String userID = sess.getUserPrincipal().getName();
-        userSessions.put(userID, sess);
+        userSessions.put(userId, sess);
         String lessonId = sess.getPathParameters().get("lessonId");
-        Main.attendanceStore.addAttendance(userID, lessonId);
+        if (!Main.attendanceStore.attendanceRegistered(userId + lessonId)) {
+            Main.attendanceStore.addAttendance(userId, lessonId);
+        } else {
+            throw new Exception();
+        }
+        // TODO add to assumptions documentation that a user will not have 2 classes at
+        // the same time.
     }
 
     // TODO - Add functionality to query attendance (message to request attendance,
@@ -49,7 +54,7 @@ public class MessageSocket {
             String lessonId = sess.getPathParameters().get("lessonId");
             Attendance a = new Attendance(userId, lessonId);
             Main.attendanceStore.removeAttendance(a);
-            // TODO - QUESTION - should this be recieving the two IDs as strings, or as is? 
+            // TODO - QUESTION - should this be recieving the two IDs as strings, or as is?
             userSessions.remove(sess.getUserPrincipal().getName());
         } else {
 

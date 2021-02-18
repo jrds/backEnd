@@ -8,6 +8,12 @@ import org.junit.Test;
 
 public class ChatTest extends ApplicationTest {
 
+    // TODO - IMPORTANT!!!! Tests only pass when this file is run seperateley.
+    // when all tests are run they all fail. 
+    // need to investigate. might have to clear all server info pre each test file
+    // this might be a method on applicationtest?
+    
+     
     private String msg = "Test message";
 
     @Test

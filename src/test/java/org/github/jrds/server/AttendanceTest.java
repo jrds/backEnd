@@ -30,7 +30,12 @@ public class AttendanceTest extends ApplicationTest {
 
     @Test
     public void userCantRegisterAttendanceForTheSameLessonTwice(){
-        connect(l1, lesson1);
+        try {
+             connect(l1, lesson1);
+        }
+        catch(Exception e){
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        }
         try {
             connect(l1, lesson1);
             Assert.fail("Expected connection to fail, because learner 1 is already connnected/attending this lesson");
@@ -110,7 +115,7 @@ public class AttendanceTest extends ApplicationTest {
     @Test
     public void otherAttendancesNotImpactedWhenAnotherIsRemoved(){
         TestClient c1 = connect(l1, lesson1);
-        TestClient c2 = connect(l2, lesson1); // TODO - QUESTION - I don't need this to be a TestClient, but is it better for consistency? 
+        connect(l2, lesson1);
         String key1 = l1 + lesson1;
         String key2 = l2 + lesson1;
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(key1).getUserID());

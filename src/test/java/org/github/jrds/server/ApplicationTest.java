@@ -32,10 +32,12 @@ public abstract class ApplicationTest {
         server.stop();
     }
 
-    protected TestClient connect(String userName, String lessonId){
+    protected TestClient connect(String userName, String lessonId) {
         TestClient c = new TestClient(userName);
-        c.connect(lessonId);
-        testClients.add(c);
+        if (!testClients.contains(c)){
+            c.connect(lessonId);
+            testClients.add(c);
+        }
         return c;
     }
 
