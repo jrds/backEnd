@@ -9,7 +9,7 @@ public class AttendanceTest extends ApplicationTest {
     public void oneAttendanceRecordedCorrectly() {
         connect(l1, lesson1);
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(l1,lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1,lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1,lesson1).getLesson().getId());
     }
 
     @Test
@@ -18,9 +18,9 @@ public class AttendanceTest extends ApplicationTest {
         connect(l2, lesson2);
  
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(l1, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLesson().getId());
         Assert.assertEquals(l2, Main.attendanceStore.getAttendance(l2, lesson2).getUserID());
-        Assert.assertEquals(lesson2, Main.attendanceStore.getAttendance(l2, lesson2).getLessonID());
+        Assert.assertEquals(lesson2, Main.attendanceStore.getAttendance(l2, lesson2).getLesson().getId());
     }
 
 
@@ -82,7 +82,7 @@ public class AttendanceTest extends ApplicationTest {
     public void attendanceRemovedFromStoreAfterDisconnect(){
         TestClient c1 = connect(l1, lesson1);
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(l1, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLesson().getId());
         
         disconnect(c1);
         Assert.assertNull(Main.attendanceStore.getAttendance(l1, lesson1));
@@ -95,7 +95,7 @@ public class AttendanceTest extends ApplicationTest {
         
         connect(l1,lesson1);
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(l1, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLesson().getId());
     }
     
 
@@ -105,13 +105,13 @@ public class AttendanceTest extends ApplicationTest {
         connect(l2, lesson1);
     
         Assert.assertEquals(l1, Main.attendanceStore.getAttendance(l1, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1, lesson1).getLesson().getId());
         Assert.assertEquals(l2, Main.attendanceStore.getAttendance(l2, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2, lesson1).getLesson().getId());
         
         disconnect(c1);
         Assert.assertNull(Main.attendanceStore.getAttendance(l1, lesson1));
         Assert.assertEquals(l2, Main.attendanceStore.getAttendance(l2, lesson1).getUserID());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2, lesson1).getLessonID());
+        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2, lesson1).getLesson().getId());
     }
 }

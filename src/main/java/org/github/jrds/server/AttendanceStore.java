@@ -35,7 +35,7 @@ public class AttendanceStore {
 
     
     private AttendanceKey keyFor(Attendance attendance){
-        return keyFor(attendance.getUserID(),attendance.getLessonID());
+        return keyFor(attendance.getUserID(),attendance.getLesson().getId());
     }
 
     // TODO - AFTER USER CREATED - these will be testing for the presence of a role or subClass of user once it's implemented. 

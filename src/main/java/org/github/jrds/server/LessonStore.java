@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class LessonStore {
 
-    private Map<String, Lesson> lessonStore;
+    Map<String, Lesson> lessonStore;
 
     public Lesson getLesson(String lessonId) {
         if (lessonStore.containsKey(lessonId)) {
