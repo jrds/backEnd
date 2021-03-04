@@ -8,9 +8,9 @@ public class Lesson {
     private String educator; // TODO - (not yet) user eventually ?, user & userStore classes
     private Set<String> learners; // TODO - (not yet) user not string
 
-    public Lesson(String id, String educator, Set<String> learners) {
+    public Lesson(String id, String educatorId, Set<String> learners) {
         this.id = id;
-        this.educator = educator;
+        this.educator = educatorId;
         this.learners = learners;
     }
 

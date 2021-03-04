@@ -19,13 +19,15 @@ public class TestClient {
 
     private static final String BASE_URL = "ws://localhost:8080/lesson/";
 
-    private String id;
+    private String id; // TODO - REVIEW - added name, so that userStrore & authStore (which treat id as u1900 etc, are the same as what id constitutes here)
+    private String name; // TODO - will be useful when sending messages, as humans need names not ID, but ID is the unique identifier
     private ClientWebSocket clientWebSocket;
     private Session session;
     private ObjectMapper mapper = new ObjectMapper();
 
-    public TestClient(String id) {
+    public TestClient(String id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public void connect(String lessonId) {
@@ -94,6 +96,10 @@ public class TestClient {
 
     public String getId() {
         return id;
+    }
+
+    public String getName(){
+        return name;
     }
 
     private void sendMessage(Message message) {

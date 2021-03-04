@@ -17,13 +17,15 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 public class Main {
 
     public static LessonStore lessonStore = new LessonStore();
+    public static UsersStore usersStore = new UsersStore();
     public static AttendanceStore attendanceStore = new AttendanceStore();
+    public static UserStore authUserStore = new UserStore();
+
     private Server server;
 
     public void start() {
@@ -47,7 +49,8 @@ public class Main {
         });
 
         try {
-            fillLessonStore();   // TODO - method will evolve to fill ALL stores (user, lesson etc)
+            fillLessonStore(); 
+            fillUsersStore();  // TODO - method will evolve to fill ALL stores (user, lesson etc)
             server.start();
 
         } catch (Exception e) {
@@ -56,15 +59,9 @@ public class Main {
     }
     
     private SecurityHandler auth() {
-        UserStore userStore = new UserStore();
-        userStore.addUser("Learner 1", new Password("pw"), new String[] { "user"});
-        userStore.addUser("Educator", new Password("pw"), new String[] { "user"});
-        userStore.addUser("Learner 2", new Password("pw"), new String[] { "user"});
-        userStore.addUser("Learner 99", new Password("pw"), new String[] { "user"});
-        // TODO - once the application user store is established, then it can iterate through that user store to add the users the auth user store
 
         HashLoginService l = new HashLoginService();
-        l.setUserStore(userStore);
+        l.setUserStore(authUserStore);
         l.setName("realm");
         
         Constraint constraint = new Constraint();
@@ -95,15 +92,25 @@ public class Main {
 
     private void fillLessonStore(){
         Set<String> learners2905 = new HashSet<String>();
-        learners2905.addAll(Arrays.asList(new String[] {"Learner 1", "Learner 2"}));  
+        learners2905.addAll(Arrays.asList(new String[] {"u1900", "u1901"}));  
 
         Set<String> learners5029 = new HashSet<String>();
-        learners5029.addAll(Arrays.asList(new String[] {"Learner 1", "Learner 2", "Learner 99"}));  
+        learners5029.addAll(Arrays.asList(new String[] {"u1900", "u1901", "u9999"}));  
 
-        Lesson l1 = new Lesson("2905", "Educator", learners2905);
-        Lesson l2 = new Lesson("5029", "Educator", learners5029);
+        Lesson l1 = new Lesson("2905", "e0001", learners2905);
+        Lesson l2 = new Lesson("5029", "e0001", learners5029);
 
         lessonStore.saveLesson(l1);
         lessonStore.saveLesson(l2);
     }; 
+
+    private void fillUsersStore() {
+
+        usersStore.addUser("u1900", "Jordan"); // TODO - NOTE - these match to the strings defined in application test
+        usersStore.addUser("e0001", "Educator Rebecca");
+        usersStore.addUser("u1901", "Savanna");
+        usersStore.addUser("u9999", "Jack");
+        // TODO - once the application user store is established, then it can iterate through that user store to add the users the auth user store
+    }
+
 }
