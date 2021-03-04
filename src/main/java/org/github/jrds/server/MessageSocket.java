@@ -83,3 +83,15 @@ public class MessageSocket {
     }
 
 }
+
+
+//TODO - clean up
+
+//TODO - tests to new scenarios
+//TODO - full scenario, break it down, keep extending
+// e.g writes code that compiles, write code that doesn't compile
+// lesson is initated and instructions are sent
+// educator prepares instructions in advance, and are released meaning 
+// lesson will have instructions, and there's a new messsage type e.g lessonMessage or InstructionMessage.
+// will need some trigger/message from the educator
+
