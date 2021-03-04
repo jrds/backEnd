@@ -4,8 +4,7 @@ package org.github.jrds.server;
 public class Attendance {
     private User user; 
     private Lesson lesson; 
-    //TODO - WHEN USER IS MADE - add role, which would be learner or educator, queried from the lesson.
-    private String role; // this could be a boolean e.g isStudent ? 
+    private String role;  
 
     public Attendance(String userId, String lessonId) {
         this.user = Main.usersStore.getUser(userId);
@@ -14,10 +13,10 @@ public class Attendance {
                                                             // I thought that the client should just be passing in the lesson ID
                                                             //they don't/shouldn't need to know what a lesson is.
         if (user.getId().startsWith("u") || user.getId().startsWith("U")){
-            this.role = "Learner";
+            this.role = "LEARNER";
         }
         else if (user.getId().startsWith("e") || user.getId().startsWith("E")){
-            this.role = "Educator";
+            this.role = "EDUCATOR";
         }
         else {
             System.out.println("User ID isn't correclty formatted");

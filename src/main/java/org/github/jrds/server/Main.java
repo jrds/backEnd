@@ -21,8 +21,8 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 
 public class Main {
 
-    public static LessonStore lessonStore = new LessonStore();
     public static UsersStore usersStore = new UsersStore();
+    public static LessonStore lessonStore = new LessonStore();
     public static AttendanceStore attendanceStore = new AttendanceStore();
     public static UserStore authUserStore = new UserStore();
 
@@ -49,8 +49,7 @@ public class Main {
         });
 
         try {
-            fillLessonStore(); 
-            fillUsersStore();  // TODO - method will evolve to fill ALL stores (user, lesson etc)
+            fillAllStores();
             server.start();
 
         } catch (Exception e) {
@@ -90,15 +89,21 @@ public class Main {
         }
     }
 
+    private void fillAllStores() {
+        //fillUserStore MUST always be run before fillLessonStore
+        fillUsersStore();  
+        fillLessonStore(); 
+    }
+
     private void fillLessonStore(){
-        Set<String> learners2905 = new HashSet<String>();
-        learners2905.addAll(Arrays.asList(new String[] {"u1900", "u1901"}));  
+        Set<User> learners2905 = new HashSet<User>();
+        learners2905.addAll(Arrays.asList(new User[] {usersStore.getUser("u1900"), usersStore.getUser("u1901")}));  
 
-        Set<String> learners5029 = new HashSet<String>();
-        learners5029.addAll(Arrays.asList(new String[] {"u1900", "u1901", "u9999"}));  
+        Set<User> learners5029 = new HashSet<User>();
+        learners5029.addAll(Arrays.asList(new User[] {usersStore.getUser("u1900"), usersStore.getUser("u1901"), usersStore.getUser("u9999")}));  
 
-        Lesson l1 = new Lesson("2905", "e0001", learners2905);
-        Lesson l2 = new Lesson("5029", "e0001", learners5029);
+        Lesson l1 = new Lesson("2905", usersStore.getUser("e0001"), learners2905);
+        Lesson l2 = new Lesson("5029", usersStore.getUser("e0001"), learners5029);
 
         lessonStore.saveLesson(l1);
         lessonStore.saveLesson(l2);
@@ -110,7 +115,6 @@ public class Main {
         usersStore.addUser("e0001", "Educator Rebecca");
         usersStore.addUser("u1901", "Savanna");
         usersStore.addUser("u9999", "Jack");
-        // TODO - once the application user store is established, then it can iterate through that user store to add the users the auth user store
     }
 
 }

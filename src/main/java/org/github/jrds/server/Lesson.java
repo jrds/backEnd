@@ -5,12 +5,12 @@ import java.util.Set;
 public class Lesson {
 
     private String id;
-    private String educator; // TODO - (not yet) user eventually ?, user & userStore classes
-    private Set<String> learners; // TODO - (not yet) user not string
+    private User educator;
+    private Set<User> learners; 
 
-    public Lesson(String id, String educatorId, Set<String> learners) {
-        this.id = id;
-        this.educator = educatorId;
+    public Lesson(String id, User educator, Set<User> learners) { 
+        this.id = id;                                                 
+        this.educator = educator;
         this.learners = learners;
     }
 
@@ -18,30 +18,29 @@ public class Lesson {
         return id;
     }
 
-    public String getEducator() {
+    public User getEducator() {
         return educator;
     }
 
-    public Set<String> getLearners() {
+    public Set<User> getLearners() {
         return learners;
     }
 
-    public void addLearner(String learner) { // TODO this will eventually by passing in user, and user.getName
-                                             // user.getID etc will be used
+    public void addLearner(User learner) { // could pass in other detail to construct user??
         learners.add(learner);
     }
 
     public boolean isRegisteredLearner(String learner) {
-        return learners.contains(learner);
+        return learners.contains(Main.usersStore.getUser(learner));
     }
 
     public boolean canConnect(String user) {
-        return isRegisteredLearner(user) || educator.equals(user);
+        return isRegisteredLearner(user) || educator.getId().equals(user);
     }
 
     @Override
     public String toString() {
-        return "Lesson [educator=" + educator + ", id=" + id + ", learners=" + learners + "]";
+        return "Lesson [Educator Name =" + educator.getName() + ", Lesson id=" + id + ", learners=" + learners + "]";
     }
 
 }

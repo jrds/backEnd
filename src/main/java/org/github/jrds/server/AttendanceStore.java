@@ -21,7 +21,7 @@ public class AttendanceStore {
 
         attendanceStore.put(keyFor(a), a); 
 
-        String[] attendanceToBeStored = {"Joined", userId, lessonId, (Instant.now().toString())};
+        String[] attendanceToBeStored = {"Joined", userId, lessonId, a.getRole(), (Instant.now().toString())};
         toBeReplacedWithDB.add(attendanceToBeStored);
     }
 
@@ -38,14 +38,14 @@ public class AttendanceStore {
         return keyFor(attendance.getUser().getId(),attendance.getLesson().getId());
     }
 
-    // TODO - AFTER USER CREATED - these will be testing for the presence of a role or subClass of user once it's implemented. 
-    // public Boolean educatorConnected(String lessonId){
-    //     return attendanceStore.containsKey(keyFor("Educator", lessonId));
-    // }
-
-    // public Boolean specificLearnerConnected(String learnerId, String lessonId){
-    //     return attendanceStore.containsKey(keyFor(learnerId, lessonId));
-    // }
+    // TODO - NEXT - Create tests for this 
+    public Boolean educatorConnected(String educatorId, String lessonId){
+        return attendanceStore.get(keyFor(educatorId, lessonId)).getRole().equals("EDUCATOR");
+    }
+ 
+    public Boolean specificLearnerConnected(String learnerId, String lessonId){
+        return attendanceStore.get(keyFor(learnerId, lessonId)).getRole().equals("LEARNER");
+    }
 
     public void removeAttendance(String userId, String lessonId){
         String[] attendanceToBeStored = {"Disconnected", userId, lessonId, (Instant.now().toString())};
