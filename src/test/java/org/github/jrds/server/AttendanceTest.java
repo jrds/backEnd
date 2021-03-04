@@ -8,8 +8,8 @@ public class AttendanceTest extends ApplicationTest {
     @Test
     public void oneAttendanceRecordedCorrectly() {
         connect(l1Id, l1Name, lesson1);
-        Assert.assertEquals(l1Id, Main.attendanceStore.getAttendance(l1Id,lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1Id,lesson1).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id,lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id,lesson1).getLesson().getId());
     }
 
     @Test
@@ -17,10 +17,10 @@ public class AttendanceTest extends ApplicationTest {
         connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson2);
  
-        Assert.assertEquals(l1Id, Main.attendanceStore.getAttendance(l1Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1Id, lesson1).getLesson().getId());
-        Assert.assertEquals(l2Id, Main.attendanceStore.getAttendance(l2Id, lesson2).getUser().getId());
-        Assert.assertEquals(lesson2, Main.attendanceStore.getAttendance(l2Id, lesson2).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
+        Assert.assertEquals(l2Id, getAttendance(l2Id, lesson2).getUser().getId());
+        Assert.assertEquals(lesson2, getAttendance(l2Id, lesson2).getLesson().getId());
     }
 
 
@@ -49,7 +49,7 @@ public class AttendanceTest extends ApplicationTest {
             //expected
         } 
 
-        Assert.assertNull(Main.attendanceStore.getAttendance(l99Id, lesson1));
+        Assert.assertNull(getAttendance(l99Id, lesson1));
     }
 
     @Test
@@ -60,32 +60,32 @@ public class AttendanceTest extends ApplicationTest {
             //expected
         } 
      
-        Assert.assertNull(Main.attendanceStore.getAttendance(l1Id, "9999"));
+        Assert.assertNull(getAttendance(l1Id, "9999"));
     }
 
     @Test
     public void educatorConnectionVerificationProvided() {
         connect(eduId, eduName, lesson1);
         connect(l1Id, l1Name, lesson1);
-        Assert.assertTrue(Main.attendanceStore.attendanceRegistered(eduId, lesson1));
+        Assert.assertNotNull(getAttendance(eduId, lesson1));
     }
 
     @Test
     public void educatorConnectionVerificationDenied() {
         connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson1);
-        Assert.assertFalse(Main.attendanceStore.attendanceRegistered(eduId,lesson1));
+        Assert.assertNull(getAttendance(eduId, lesson1));
     }
  
 
     @Test
     public void attendanceRemovedFromStoreAfterDisconnect(){
         TestClient c1 = connect(l1Id, l1Name ,lesson1);
-        Assert.assertEquals(l1Id, Main.attendanceStore.getAttendance(l1Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1Id, lesson1).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
         
         disconnect(c1);
-        Assert.assertNull(Main.attendanceStore.getAttendance(l1Id, lesson1));
+        Assert.assertNull(getAttendance(l1Id, lesson1));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class AttendanceTest extends ApplicationTest {
         disconnect(c1);
         
         connect(l1Id, l1Name, lesson1);
-        Assert.assertEquals(l1Id, Main.attendanceStore.getAttendance(l1Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1Id, lesson1).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
     }
     
 
@@ -104,14 +104,14 @@ public class AttendanceTest extends ApplicationTest {
         TestClient c1 = connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson1);
     
-        Assert.assertEquals(l1Id, Main.attendanceStore.getAttendance(l1Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l1Id, lesson1).getLesson().getId());
-        Assert.assertEquals(l2Id, Main.attendanceStore.getAttendance(l2Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2Id, lesson1).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
+        Assert.assertEquals(l2Id, getAttendance(l2Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l2Id, lesson1).getLesson().getId());
         
         disconnect(c1);
-        Assert.assertNull(Main.attendanceStore.getAttendance(l1Id, lesson1));
-        Assert.assertEquals(l2Id, Main.attendanceStore.getAttendance(l2Id, lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, Main.attendanceStore.getAttendance(l2Id, lesson1).getLesson().getId());
+        Assert.assertNull(getAttendance(l1Id, lesson1));
+        Assert.assertEquals(l2Id, getAttendance(l2Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l2Id, lesson1).getLesson().getId());
     }
 }

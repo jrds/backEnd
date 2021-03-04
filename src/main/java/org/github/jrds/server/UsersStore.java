@@ -1,16 +1,25 @@
 package org.github.jrds.server;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.jetty.util.security.Password;
+import org.eclipse.jetty.security.UserStore;
 
 public class UsersStore {
 
-    Map<String, User> usersStore;
+    private UserStore authUserStore = new UserStore();
+    private Map<String, User> usersStore;
 
     public UsersStore() {
         this.usersStore = new HashMap<>();
+        // Mocked up user store for prototype 
+        // These match to the strings defined in ApplicationTest.java
+        storeUser(new User("u1900", "Jordan")); 
+        storeUser(new User("e0001", "Educator Rebecca"));
+        storeUser(new User("u1901", "Savanna"));
+        storeUser(new User("u9999", "Jack"));
     }
     
     public User getUser(String userId) {
@@ -21,23 +30,17 @@ public class UsersStore {
         }
     }
 
-    public void addUser(String id, String name) {
-        usersStore.put(id, new User(id, name));
-        Main.authUserStore.addUser(id, new Password("pw"), new String[] { "user"});
+    public void storeUser(User user) {
+        usersStore.put(user.getId(), user);
+        authUserStore.addUser(user.getId(), user.getCredential(), new String[] { "user"});
     }
 
-    // TODO - QUESTION 0 - I have approached this differently to Lesson, 
-    // here userStore is incharge of creating the user, and adding it to both the userStore and authStore
-    // not sure if lesson should be the same for continuity ?   
-
-
-    // This is just to have the option of not using the default password.
-    public void addUser(String id, String name, String password) {
-        usersStore.put(id, new User(id, name));
-        Main.authUserStore.addUser(id, new Password(password), new String[] { "user"});
+    public Set<User> getAllUsers() {
+        return new HashSet<>(usersStore.values());
     } 
 
-    public Map<String, User> getUsersStore() {
-        return usersStore;
+    public UserStore getAuthUserStore() {
+        return authUserStore;
     } 
+
 }

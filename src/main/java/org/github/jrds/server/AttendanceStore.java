@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AttendanceStore {
 
@@ -16,17 +17,25 @@ public class AttendanceStore {
         toBeReplacedWithDB = new HashSet<>();
     }
 
-    public void addAttendance(String userId, String lessonId){
-        Attendance a = new Attendance(userId, lessonId);
+    public void storeAttendance(Attendance attendance){
+        attendanceStore.put(keyFor(attendance), attendance); 
 
-        attendanceStore.put(keyFor(a), a); 
-
-        String[] attendanceToBeStored = {"Joined", userId, lessonId, a.getRole(), (Instant.now().toString())};
+        String[] attendanceToBeStored = {"Joined", attendance.getUser().getId(), attendance.getLesson().getId(), attendance.getRole().toString(), (Instant.now().toString())};
         toBeReplacedWithDB.add(attendanceToBeStored);
     }
 
-    public Attendance getAttendance(String userId, String lessonId){
-        return attendanceStore.get(keyFor(userId, lessonId));
+    public Attendance getAttendance(User user, Lesson lesson){
+        return attendanceStore.get(keyFor(user.getId(), lesson.getId()));
+    }
+
+    public Set<Attendance> getAllAttendances(){
+        return new HashSet<>(attendanceStore.values());
+    }
+    
+    public Set<Attendance> getAttendancesForALesson(Lesson lesson){
+        return attendanceStore.values().stream()
+            .filter(a -> lesson.equals(a.getLesson()))
+            .collect(Collectors.toSet());
     }
 
     private AttendanceKey keyFor(String userId, String lessonId){
@@ -38,24 +47,11 @@ public class AttendanceStore {
         return keyFor(attendance.getUser().getId(),attendance.getLesson().getId());
     }
 
-    // TODO - NEXT - Create tests for this 
-    public Boolean educatorConnected(String educatorId, String lessonId){
-        return attendanceStore.get(keyFor(educatorId, lessonId)).getRole().equals("EDUCATOR");
-    }
- 
-    public Boolean specificLearnerConnected(String learnerId, String lessonId){
-        return attendanceStore.get(keyFor(learnerId, lessonId)).getRole().equals("LEARNER");
-    }
-
-    public void removeAttendance(String userId, String lessonId){
-        String[] attendanceToBeStored = {"Disconnected", userId, lessonId, (Instant.now().toString())};
+    public void removeAttendance(Attendance attendance){
+        String[] attendanceToBeStored = {"Disconnected", attendance.getUser().getId(), attendance.getLesson().getId(), (Instant.now().toString())};
         
-        attendanceStore.remove(keyFor(userId, lessonId));
+        attendanceStore.remove(keyFor(attendance));
         toBeReplacedWithDB.add(attendanceToBeStored);
-    }
-
-    public boolean attendanceRegistered(String userId, String lessonId){
-        return attendanceStore.containsKey(keyFor(userId, lessonId));
     }
 
     private static class AttendanceKey {

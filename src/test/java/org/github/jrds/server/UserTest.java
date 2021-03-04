@@ -6,13 +6,24 @@ import org.junit.Test;
 public class UserTest extends ApplicationTest {
 
     @Test
-    public void userCreatedSuccessfully(){
-        String id = "u19011";
-        String name = l1Id; 
+    public void learnerIdentified(){
+        connect(l1Id, l1Name, lesson1);
 
-        User u1 = new User(id, name); 
-        Assert.assertEquals(id, u1.getId());
-        Assert.assertEquals(name, u1.getName());
+        Assert.assertEquals(Role.LEARNER, getAttendance(l1Id, lesson1).getRole());
+    }
+
+    @Test
+    public void educatorIdentified(){
+        connect(l1Id, l1Name, lesson1);
+        connect(eduId, eduName, lesson1);
+        Assert.assertEquals(Role.LEARNER, getAttendance(l1Id, lesson1).getRole());
+        Assert.assertEquals(Role.EDUCATOR, getAttendance(eduId, lesson1).getRole());
+    }
+
+    @Test
+    public void nonStandardIDnotAssignedRole(){       
+        // TODO - unsure on how to test this as they don't get passed the auth stage
+        // feels wrong to add a "bad user" to the auth
     }
     
 }

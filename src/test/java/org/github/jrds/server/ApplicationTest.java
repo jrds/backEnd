@@ -59,4 +59,12 @@ public abstract class ApplicationTest {
         return rootCause;
     }
 
+    protected Attendance getAttendance(String userId, String lessonId){
+        return Main.attendanceStore.getAllAttendances().stream()
+            .filter(a -> a.getUser().getId().equals(userId))
+            .filter(a -> a.getLesson().getId().equals(lessonId))
+            .findFirst()
+            .orElse(null);
+    }
+
 }

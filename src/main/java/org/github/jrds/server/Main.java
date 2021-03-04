@@ -1,9 +1,6 @@
 package org.github.jrds.server;
 
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
@@ -11,7 +8,6 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -22,9 +18,8 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 public class Main {
 
     public static UsersStore usersStore = new UsersStore();
-    public static LessonStore lessonStore = new LessonStore();
+    public static LessonStore lessonStore = new LessonStore(usersStore);
     public static AttendanceStore attendanceStore = new AttendanceStore();
-    public static UserStore authUserStore = new UserStore();
 
     private Server server;
 
@@ -49,7 +44,6 @@ public class Main {
         });
 
         try {
-            fillAllStores();
             server.start();
 
         } catch (Exception e) {
@@ -60,7 +54,7 @@ public class Main {
     private SecurityHandler auth() {
 
         HashLoginService l = new HashLoginService();
-        l.setUserStore(authUserStore);
+        l.setUserStore(usersStore.getAuthUserStore());
         l.setName("realm");
         
         Constraint constraint = new Constraint();
@@ -88,33 +82,4 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-
-    private void fillAllStores() {
-        //fillUserStore MUST always be run before fillLessonStore
-        fillUsersStore();  
-        fillLessonStore(); 
-    }
-
-    private void fillLessonStore(){
-        Set<User> learners2905 = new HashSet<User>();
-        learners2905.addAll(Arrays.asList(new User[] {usersStore.getUser("u1900"), usersStore.getUser("u1901")}));  
-
-        Set<User> learners5029 = new HashSet<User>();
-        learners5029.addAll(Arrays.asList(new User[] {usersStore.getUser("u1900"), usersStore.getUser("u1901"), usersStore.getUser("u9999")}));  
-
-        Lesson l1 = new Lesson("2905", usersStore.getUser("e0001"), learners2905);
-        Lesson l2 = new Lesson("5029", usersStore.getUser("e0001"), learners5029);
-
-        lessonStore.saveLesson(l1);
-        lessonStore.saveLesson(l2);
-    }; 
-
-    private void fillUsersStore() {
-
-        usersStore.addUser("u1900", "Jordan"); // TODO - NOTE - these match to the strings defined in application test
-        usersStore.addUser("e0001", "Educator Rebecca");
-        usersStore.addUser("u1901", "Savanna");
-        usersStore.addUser("u9999", "Jack");
-    }
-
 }

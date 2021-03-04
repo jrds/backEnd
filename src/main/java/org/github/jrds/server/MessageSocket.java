@@ -3,6 +3,7 @@ package org.github.jrds.server;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import javax.websocket.CloseReason;
@@ -24,17 +25,25 @@ public class MessageSocket {
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
+    private Map<String, Attendance> sessionAttendances = new HashMap<>(); 
 
     @OnOpen
     public void onWebSocketConnect(Session sess) throws Exception {
-        String userId = sess.getUserPrincipal().getName();
         LOGGER.info("Socket Connected: " + sess);
+
+        String userId = sess.getUserPrincipal().getName();
+        User user = Main.usersStore.getUser(userId);
         userSessions.put(userId, sess);
+        
         String lessonId = sess.getPathParameters().get("lessonId");
-        if (!Main.attendanceStore.attendanceRegistered(userId, lessonId)) {
-            Main.attendanceStore.addAttendance(userId, lessonId);
+        Lesson lesson = Main.lessonStore.getLesson(lessonId);
+
+        if (Main.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user))) {
+            Attendance attendance = new Attendance(user, lesson);
+            Main.attendanceStore.storeAttendance(attendance);
+            sessionAttendances.put(sess.getId(), attendance);
         } else {
-            throw new Exception();
+            throw new IllegalStateException("Attendance already in existance for this user, in this lesson");
         }
         // TODO add to assumptions documentation that a user will not have 2 classes at
         // the same time.
@@ -44,15 +53,14 @@ public class MessageSocket {
     public void onWebSocketText(Session sess, String message) throws IOException {
         Message msg = mapper.readValue(message, Message.class);
         LOGGER.info("Received message: " + msg);
+        Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
 
         if (msg instanceof SessionEndMessage) {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-            String userId = sess.getUserPrincipal().getName();
-            String lessonId = sess.getPathParameters().get("lessonId");
-            Main.attendanceStore.removeAttendance(userId, lessonId);
+            Main.attendanceStore.removeAttendance(attendance);
             userSessions.remove(sess.getUserPrincipal().getName());
+            sessionAttendances.remove(sess.getId());
         } else {
-
             Session to = userSessions.get(msg.getTo());
             to.getAsyncRemote().sendText(message);
         }
