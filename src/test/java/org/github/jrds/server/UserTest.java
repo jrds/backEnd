@@ -1,5 +1,6 @@
 package org.github.jrds.server;
 
+import org.github.jrds.server.domain.Role;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,5 +1,7 @@
-package org.github.jrds.server;
+package org.github.jrds.server.domain;
 
+
+import org.github.jrds.server.Main;
 
 import java.util.ArrayList;
 import java.util.List;

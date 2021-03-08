@@ -1,11 +1,11 @@
-package org.github.jrds.server;
+package org.github.jrds.server.domain;
 
 import java.util.Objects;
 
 public class Attendance {
-    private User user; 
-    private Lesson lesson; 
-    private Role role;  
+    private User user;
+    private Lesson lesson;
+    private Role role;
 
     public Attendance(User user, Lesson lesson) {
         this.user = Objects.requireNonNull(user, "Invalid user");

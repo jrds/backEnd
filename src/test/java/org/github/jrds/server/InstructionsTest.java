@@ -1,5 +1,7 @@
 package org.github.jrds.server;
 
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.User;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -16,6 +16,9 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,7 @@ public class MessageSocket {
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
-    private Map<String, Attendance> sessionAttendances = new HashMap<>(); 
+    private Map<String, Attendance> sessionAttendances = new HashMap<>();
 
     @OnOpen
     public void onWebSocketConnect(Session sess) throws Exception {

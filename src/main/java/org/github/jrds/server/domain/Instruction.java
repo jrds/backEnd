@@ -1,4 +1,4 @@
-package org.github.jrds.server;
+package org.github.jrds.server.domain;
 
 public class Instruction {
 
@@ -7,7 +7,7 @@ public class Instruction {
     private User author;
 
     
-    public Instruction(String title, String body, User author) {
+    Instruction(String title, String body, User author) {
         this.title = title;
         this.body = body;
         this.author = author;
@@ -18,18 +18,12 @@ public class Instruction {
         return title;
     }
 
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-
     public String getBody() {
         return body;
     }
 
     
-    public void setBody(String body) {
+    void setBody(String body) {
         this.body = body;
     }
 

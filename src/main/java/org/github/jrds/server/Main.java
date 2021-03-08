@@ -14,6 +14,9 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.github.jrds.server.persistence.AttendanceStore;
+import org.github.jrds.server.persistence.LessonStore;
+import org.github.jrds.server.persistence.UsersStore;
 
 public class Main {
 

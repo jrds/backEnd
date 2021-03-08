@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.github.jrds.server.domain.Attendance;
 import org.junit.After;
 import org.junit.Before;
 

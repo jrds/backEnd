@@ -1,4 +1,4 @@
-package org.github.jrds.server;
+package org.github.jrds.server.domain;
 
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.security.Password;
