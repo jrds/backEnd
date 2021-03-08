@@ -1,5 +1,10 @@
 package org.github.jrds.server;
 
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Lesson {
@@ -7,6 +12,7 @@ public class Lesson {
     private String id;
     private User educator;
     private Set<User> learners; 
+    private Map<String, Instruction> instructions = new HashMap<>();
 
     public Lesson(String id, User educator, Set<User> learners) { 
         this.id = id;                                                 
@@ -49,6 +55,40 @@ public class Lesson {
             return Role.NONE;
         }
     }
+
+    public void createInstruction(String title, String body, User author){
+        if(author.equals(educator)){
+            if (!instructions.containsKey(title)) {
+                storeInstruction(new Instruction(title, body, author)); // it's already established that author and educator are equal, is there any reason to use one over the other? 
+            }
+            else {
+                //TODO - test this
+                System.out.println("This title already exists"); //Could swap the if else to make it more readable?
+            }
+        }
+        else {
+            //TODO - test this
+            System.out.println("Only the educator of this lesson can add instructions");
+        }
+    }
+
+    private void storeInstruction(Instruction i) {
+        instructions.put(i.getTitle(), i);
+    }
+
+    public Instruction getInstruction(String instructionTitle) {
+        if (instructions.containsKey(instructionTitle)) { 
+            return instructions.get(instructionTitle);
+        } else {
+            return null;
+        }
+    }
+
+    public List<Instruction> getAllInstructions(){
+        return new ArrayList<>(instructions.values());
+    }   
+
+    //TODO - how to edit and remove instructions when the storeInstruction is private, should these be too?
 
     @Override
     public String toString() {
