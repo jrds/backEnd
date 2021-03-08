@@ -62,13 +62,11 @@ public class Lesson {
                 storeInstruction(new Instruction(title, body, author)); // it's already established that author and educator are equal, is there any reason to use one over the other? 
             }
             else {
-                //TODO - test this
-                System.out.println("This title already exists"); //Could swap the if else to make it more readable?
+                throw new IllegalArgumentException("This title already exists");
             }
         }
         else {
-            //TODO - test this
-            System.out.println("Only the educator of this lesson can add instructions");
+            throw new IllegalArgumentException("Only the educator of this lesson can add instructions");
         }
     }
 
@@ -88,11 +86,45 @@ public class Lesson {
         return new ArrayList<>(instructions.values());
     }   
 
-    //TODO - how to edit and remove instructions when the storeInstruction is private, should these be too?
+    public void editInstructionTitle(String currentTitle, String newTitle, User u) {
+        if (u.equals(educator)) {
+            if (instructions.containsKey(currentTitle)) {
+                instructions.put(newTitle, new Instruction(newTitle, instructions.get(currentTitle).getBody(), instructions.get(currentTitle).getAuthor()));
+                instructions.remove(currentTitle);
+            }
+            else {
+                System.out.println("This title already exists.");
+            }
+        }
+        else {
+            System.out.println("Only the educator of the class can edit the instruction.");
+        }
+    }
+
+    
+    public void editInstructionBody(String instructionTitle, String instructionBody, User u) {
+        if (u.equals(educator)) {
+            if (instructions.containsKey(instructionTitle)) {
+                instructions.get(instructionTitle).setBody(instructionBody);
+            }
+            else {
+                System.out.println("This title does not exists.");
+            }
+        }
+        else {
+            System.out.println("Only the educator of the class can edit the instruction.");
+        }
+    }
+
+
+    public void removeInstruction(String instructionTitle) {
+        instructions.remove(instructionTitle);
+    }
 
     public void removeAllInstructions(){
         instructions.clear();
     }
+    
 
     @Override
     public String toString() {
@@ -123,4 +155,5 @@ public class Lesson {
             return false;
         return true;
     }
+
 }
