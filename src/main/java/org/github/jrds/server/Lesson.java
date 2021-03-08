@@ -2,17 +2,17 @@ package org.github.jrds.server;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class Lesson {
 
     private String id;
     private User educator;
     private Set<User> learners; 
-    private Map<String, Instruction> instructions = new HashMap<>();
+    private Map<String, Instruction> instructions = new TreeMap<>();
 
     public Lesson(String id, User educator, Set<User> learners) { 
         this.id = id;                                                 
@@ -89,6 +89,10 @@ public class Lesson {
     }   
 
     //TODO - how to edit and remove instructions when the storeInstruction is private, should these be too?
+
+    public void removeAllInstructions(){
+        instructions.clear();
+    }
 
     @Override
     public String toString() {
