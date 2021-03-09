@@ -27,7 +27,6 @@ public class Instruction {
         this.body = body;
     }
 
-
     public User getAuthor() {
         return author;
     }
