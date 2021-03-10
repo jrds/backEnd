@@ -201,12 +201,15 @@ public class InstructionsTest extends ApplicationTest {
 
         c1.startLesson();
         Message received1 = c2.getMessageReceived();
-        Message received2 = c2.getMessageReceived();
-        Message received3 = c3.getMessageReceived();
+        Message received2 = c3.getMessageReceived();
 
-        Assert.assertEquals(testTitle1, received1);
-        Assert.assertEquals(testBody1, received2);
-        Assert.assertEquals(testTitle1, received3);
+        Assert.assertTrue(received1 instanceof InstructionMessage);
+        Assert.assertTrue(received2 instanceof InstructionMessage);
+
+        Assert.assertEquals(testTitle1, ((InstructionMessage)received1).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage)received1).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage)received2).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage)received2).getBody());
     }
 
 
