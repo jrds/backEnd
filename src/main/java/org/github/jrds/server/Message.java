@@ -4,63 +4,47 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 
+import java.util.Objects;
+
 @JsonTypeInfo(
-  use = JsonTypeInfo.Id.NAME, 
-  include = JsonTypeInfo.As.PROPERTY, 
-  property = "_type")
-@JsonSubTypes({ 
-  @Type(value = ChatMessage.class, name = "chat"), 
-  @Type(value = SessionEndMessage.class, name = "sessionEnd") 
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "_type")
+@JsonSubTypes({
+        @Type(value = ChatMessage.class, name = "chat"),
+        @Type(value = SessionEndMessage.class, name = "sessionEnd"),
+        @Type(value = InstructionMessage.class, name = "instruction"),
+        @Type(value = LessonStartMessage.class, name = "lessonStart")
 })
 
 public abstract class Message {
-    
+
     private String from;
     private String to;
 
     public Message(String from, String to) {
-        this.from = from;
+        this.from = Objects.requireNonNull(from);
         this.to = to;
     }
 
     public String getFrom() {
-	    return from;
+        return from;
     }
 
-	public String getTo() {
+    public String getTo() {
         return to;
     }
 
     @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((from == null) ? 0 : from.hashCode());
-      result = prime * result + ((to == null) ? 0 : to.hashCode());
-      return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Message message = (Message) o;
+        return from.equals(message.from) && Objects.equals(to, message.to);
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (obj == null)
-        return false;
-      if (getClass() != obj.getClass())
-        return false;
-      Message other = (Message) obj;
-      if (from == null) {
-        if (other.from != null)
-          return false;
-      } else if (!from.equals(other.from))
-        return false;
-      if (to == null) {
-        if (other.to != null)
-          return false;
-      } else if (!to.equals(other.to))
-        return false;
-      return true;
+    public int hashCode() {
+        return Objects.hash(from, to);
     }
-
-    
 }

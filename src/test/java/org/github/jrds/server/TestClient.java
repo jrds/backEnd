@@ -13,7 +13,12 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.github.jrds.server.domain.Instruction;
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.User;
 
 public class TestClient {
 
@@ -23,7 +28,9 @@ public class TestClient {
     private String name; // TODO - will be useful when sending messages, as humans need names not ID, but ID is the unique identifier
     private ClientWebSocket clientWebSocket;
     private Session session;
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+
 
     public TestClient(String id, String name) {
         this.id = id;
@@ -86,6 +93,11 @@ public class TestClient {
         sendMessage(c);
     }
 
+
+    public void startLesson(){
+        sendMessage(new LessonStartMessage(id));
+    }
+
     public void sendSessionEndMessage() {
         sendMessage(new SessionEndMessage(id));
     }
@@ -110,5 +122,4 @@ public class TestClient {
             throw new RuntimeException(e);
         }
     }
-
 }

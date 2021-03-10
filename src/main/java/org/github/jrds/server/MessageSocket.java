@@ -14,9 +14,13 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
@@ -27,7 +31,7 @@ public class MessageSocket {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();//.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);;
     private Map<String, Attendance> sessionAttendances = new HashMap<>();
 
     @OnOpen
@@ -63,9 +67,29 @@ public class MessageSocket {
             Main.attendanceStore.removeAttendance(attendance);
             userSessions.remove(sess.getUserPrincipal().getName());
             sessionAttendances.remove(sess.getId());
-        } else {
-            Session to = userSessions.get(msg.getTo());
-            to.getAsyncRemote().sendText(message);
+        }
+        else if (msg instanceof LessonStartMessage){
+            Lesson l = attendance.getLesson();
+            for (Instruction i : l.getAllInstructions()) {
+                for (User learner : l.getLearners()) {
+                    InstructionMessage iM = new InstructionMessage(l.getEducator(), learner, i);
+                    sendMessage(iM);
+                }
+            }
+        }
+        else {
+            sendMessage(msg);
+        }
+    }
+
+    private void sendMessage(Message message)
+    {
+        try {
+            Session to = userSessions.get(message.getTo());
+            String json = mapper.writeValueAsString(message);
+            to.getAsyncRemote().sendText(json);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
         }
     }
 

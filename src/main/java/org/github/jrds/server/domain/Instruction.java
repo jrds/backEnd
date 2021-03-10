@@ -1,13 +1,19 @@
 package org.github.jrds.server.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Instruction {
 
     private String title;
     private String body;
     private User author;
 
-    
-    Instruction(String title, String body, User author) {
+
+    @JsonCreator
+    public Instruction(@JsonProperty("title") String title,
+                       @JsonProperty("body") String body,
+                       @JsonProperty("author") User author) {
         this.title = title;
         this.body = body;
         this.author = author;

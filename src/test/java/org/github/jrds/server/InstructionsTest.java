@@ -1,5 +1,6 @@
 package org.github.jrds.server;
 
+import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.junit.Assert;
@@ -185,12 +186,37 @@ public class InstructionsTest extends ApplicationTest {
         
     }
 
+    @Test
+    public void sendAndReceiveInstruction() {
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l2Id, l2Name, lesson1);
+
+        User u = Main.usersStore.getUser(eduId);
+        Lesson l = Main.lessonStore.getLesson(lesson1);
+
+        l.removeAllInstructions();
+        l.createInstruction(testTitle1, testBody1, u);
+        l.createInstruction(testTitle2, testBody2, u);
+
+        c1.startLesson();
+        Message received1 = c2.getMessageReceived();
+        Message received2 = c2.getMessageReceived();
+        Message received3 = c3.getMessageReceived();
+
+        Assert.assertEquals(testTitle1, received1);
+        Assert.assertEquals(testBody1, received2);
+        Assert.assertEquals(testTitle1, received3);
+    }
+
 
     @Test
     public void instructionsArePresentAfterEducatorDisconnectsAndReconnects(){
-        // some sort of permance needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
+        // some sort of permanence needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
         // potentially add to the set up/initialisation ? // Needs more thought. 
         Assert.assertTrue(false);
 
     }
+
+
 }
