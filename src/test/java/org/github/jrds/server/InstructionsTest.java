@@ -1,12 +1,10 @@
 package org.github.jrds.server;
 
-import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 
 public class InstructionsTest extends ApplicationTest {
     private String testTitle1 = "Instruction Test 1";
@@ -20,7 +18,7 @@ public class InstructionsTest extends ApplicationTest {
     @Test
     public void educatorCreatesInstructionToLesson(){
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1); //Should I move these out above like the Strings?
+        Lesson l = Main.lessonStore.getLesson(lesson1);
         User u = Main.usersStore.getUser(eduId);
 
         l.removeAllInstructions();

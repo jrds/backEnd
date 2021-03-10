@@ -50,8 +50,7 @@ public class MessageSocket {
         } else {
             throw new IllegalStateException("Attendance already in existance for this user, in this lesson");
         }
-        // TODO add to assumptions documentation that a user will not have 2 classes at
-        // the same time.
+        // TODO add to assumptions documentation that a user will not have 2 classes at the same time.
     }
 
     @OnMessage
@@ -65,6 +64,8 @@ public class MessageSocket {
             Main.attendanceStore.removeAttendance(attendance);
             userSessions.remove(sess.getUserPrincipal().getName());
             sessionAttendances.remove(sess.getId());
+            //TODO - REVIEW - session end message shouldn't send a success message because we've removed it already.
+            //Or could be a success message at the start of this if.
         }
         else if (msg instanceof LessonStartMessage){
             if (msg.getFrom().equals(attendance.getLesson().getEducator().getId())){
@@ -74,20 +75,21 @@ public class MessageSocket {
                         if(Main.attendanceStore.getAttendance(learner,lesson) != null) {
                             InstructionMessage iM = new InstructionMessage(lesson.getEducator(), learner, i);
                             sendMessage(iM);
+                            sendMessage(new SuccessMessage(msg.getFrom()));
                         }
                         else {
-                            FailureMessage fM = new FailureMessage(msg.getFrom(), "There is no registered attendance for " + learner.getName() + "in this lesson");
-                            sendMessage(fM);
+                            sendMessage(new FailureMessage(msg.getFrom(), "Learner: "+ learner.getId() + "has no registered attendance"));
+                            // TODO - consider how to test this - as there could be several messages (mainly success) in the educators queue.
                         }
                     }
                 }
             } else {
-                FailureMessage fM = new FailureMessage(msg.getFrom(), "Learner cannot start a lesson");
-                sendMessage(fM);
+                sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson"));
             }
         }
         else {
             sendMessage(msg);
+            sendMessage(new SuccessMessage(msg.getFrom()));
         }
     }
 
