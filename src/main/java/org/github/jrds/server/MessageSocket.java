@@ -57,7 +57,7 @@ public class MessageSocket {
     }
 
     @OnMessage
-    public void onWebSocketText(Session sess, String message) throws IOException {
+    public void onWebSocketText(Session sess, String message) throws IOException, IllegalCallerException {
         Message msg = mapper.readValue(message, Message.class);
         LOGGER.info("Received message: " + msg);
         Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
@@ -69,12 +69,21 @@ public class MessageSocket {
             sessionAttendances.remove(sess.getId());
         }
         else if (msg instanceof LessonStartMessage){
-            Lesson l = attendance.getLesson();
-            for (Instruction i : l.getAllInstructions()) {
-                for (User learner : l.getLearners()) {
-                    InstructionMessage iM = new InstructionMessage(l.getEducator(), learner, i);
-                    sendMessage(iM);
+            if (msg.getFrom().equals(attendance.getLesson().getEducator().getId())){
+                Lesson lesson = attendance.getLesson();
+                for (Instruction i : lesson.getAllInstructions()) {
+                    for (User learner : lesson.getLearners()) {
+                        if(Main.attendanceStore.getAttendance(learner,lesson) != null) {
+                            InstructionMessage iM = new InstructionMessage(lesson.getEducator(), learner, i);
+                            sendMessage(iM);
+                        }
+                        else {
+                           //TODO - decide how to handle users not being online
+                        }
+                    }
                 }
+            } else {
+                //TODO - handle error - look up with websockets throw new IllegalCallerException("Learner cannot start a lesson");
             }
         }
         else {

@@ -187,7 +187,7 @@ public class InstructionsTest extends ApplicationTest {
     }
 
     @Test
-    public void sendAndReceiveInstruction() {
+    public void startLessonSendsOneInstructionToAllLearners() {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l2Id, l2Name, lesson1);
@@ -197,7 +197,6 @@ public class InstructionsTest extends ApplicationTest {
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
-        l.createInstruction(testTitle2, testBody2, u);
 
         c1.startLesson();
         Message received1 = c2.getMessageReceived();
@@ -212,6 +211,76 @@ public class InstructionsTest extends ApplicationTest {
         Assert.assertEquals(testBody1, ((InstructionMessage)received2).getBody());
     }
 
+
+    @Test
+    public void startLessonSendsMultipleInstructionsToAllLearners() {
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l2Id, l2Name, lesson1);
+
+        User u = Main.usersStore.getUser(eduId);
+        Lesson l = Main.lessonStore.getLesson(lesson1);
+
+        l.removeAllInstructions();
+        l.createInstruction(testTitle1, testBody1, u);
+        l.createInstruction(testTitle2, testBody2, u);
+
+        c1.startLesson();
+        Message received1 = c2.getMessageReceived();
+        Message received2 = c2.getMessageReceived();
+
+        Message received3 = c3.getMessageReceived();
+        Message received4 = c3.getMessageReceived();
+
+        Assert.assertEquals(testTitle1, ((InstructionMessage)received1).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage)received1).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage)received3).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage)received3).getBody());
+
+        Assert.assertEquals(testTitle2, ((InstructionMessage)received2).getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage)received2).getBody());
+        Assert.assertEquals(testTitle2, ((InstructionMessage)received4).getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage)received4).getBody());
+    }
+
+    @Test
+    public void learnerNotInClassDoesntReceiveInstructions(){
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l99Id, l99Name, lesson2);
+
+        User u = Main.usersStore.getUser(eduId);
+        Lesson l = Main.lessonStore.getLesson(lesson1);
+
+        l.removeAllInstructions();
+        l.createInstruction(testTitle1, testBody1, u);
+
+        c1.startLesson();
+
+        Assert.assertNotNull(c2.getMessageReceived());
+        Assert.assertNull(c3.getMessageReceived());
+    }
+
+    //TODO how does the educator see the instructions, he's able to access, edit and create, but isn't sent the instruction message
+
+    @Test
+    public void studentCannotStartLesson(){
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+
+        User u = Main.usersStore.getUser(eduId);
+        Lesson l = Main.lessonStore.getLesson(lesson1);
+
+        l.removeAllInstructions();
+        l.createInstruction(testTitle1, testBody1, u);
+
+        try {
+            c2.startLesson();
+            Assert.fail("Expected IllegalCallerException");
+        } catch(IllegalCallerException e) {
+            Assert.assertEquals("Learner cannot start a lesson", e.getMessage());
+        }
+    }
 
     @Test
     public void instructionsArePresentAfterEducatorDisconnectsAndReconnects(){
