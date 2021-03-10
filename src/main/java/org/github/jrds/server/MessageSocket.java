@@ -14,8 +14,6 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,7 +29,7 @@ public class MessageSocket {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);
     private static Map<String, Session> userSessions = new HashMap<>();
     private CountDownLatch closureLatch = new CountDownLatch(1);
-    private ObjectMapper mapper = new ObjectMapper();//.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);;
+    private ObjectMapper mapper = new ObjectMapper();
     private Map<String, Attendance> sessionAttendances = new HashMap<>();
 
     @OnOpen
@@ -57,7 +55,7 @@ public class MessageSocket {
     }
 
     @OnMessage
-    public void onWebSocketText(Session sess, String message) throws IOException, IllegalCallerException {
+    public void onWebSocketText(Session sess, String message) throws IOException {
         Message msg = mapper.readValue(message, Message.class);
         LOGGER.info("Received message: " + msg);
         Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
@@ -78,12 +76,14 @@ public class MessageSocket {
                             sendMessage(iM);
                         }
                         else {
-                           //TODO - decide how to handle users not being online
+                            FailureMessage fM = new FailureMessage(msg.getFrom(), "There is no registered attendance for " + learner.getName() + "in this lesson");
+                            sendMessage(fM);
                         }
                     }
                 }
             } else {
-                //TODO - handle error - look up with websockets throw new IllegalCallerException("Learner cannot start a lesson");
+                FailureMessage fM = new FailureMessage(msg.getFrom(), "Learner cannot start a lesson");
+                sendMessage(fM);
             }
         }
         else {

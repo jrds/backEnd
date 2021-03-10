@@ -14,7 +14,9 @@ import java.util.Objects;
         @Type(value = ChatMessage.class, name = "chat"),
         @Type(value = SessionEndMessage.class, name = "sessionEnd"),
         @Type(value = InstructionMessage.class, name = "instruction"),
-        @Type(value = LessonStartMessage.class, name = "lessonStart")
+        @Type(value = LessonStartMessage.class, name = "lessonStart"),
+        @Type(value = SuccessMessage.class, name = "success"),
+        @Type(value = FailureMessage.class, name = "failed")
 })
 
 public abstract class Message {
@@ -23,7 +25,7 @@ public abstract class Message {
     private String to;
 
     public Message(String from, String to) {
-        this.from = Objects.requireNonNull(from);
+        this.from = from;
         this.to = to;
     }
 
@@ -40,7 +42,7 @@ public abstract class Message {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Message message = (Message) o;
-        return from.equals(message.from) && Objects.equals(to, message.to);
+        return Objects.equals(from, message.from) && Objects.equals(to, message.to);
     }
 
     @Override

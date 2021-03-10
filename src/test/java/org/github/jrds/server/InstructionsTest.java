@@ -6,6 +6,8 @@ import org.github.jrds.server.domain.User;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class InstructionsTest extends ApplicationTest {
     private String testTitle1 = "Instruction Test 1";
     private String testBody1 = "Body of Test Instruction 1";
@@ -13,6 +15,7 @@ public class InstructionsTest extends ApplicationTest {
     private String testBody2 = "Body of Test Instruction 2";
     private String testTitle3 = "Instruction Test 3";
     private String testBody3 = "Body of Test Instruction 3";
+
 
     @Test
     public void educatorCreatesInstructionToLesson(){
@@ -274,12 +277,13 @@ public class InstructionsTest extends ApplicationTest {
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
-        try {
-            c2.startLesson();
-            Assert.fail("Expected IllegalCallerException");
-        } catch(IllegalCallerException e) {
-            Assert.assertEquals("Learner cannot start a lesson", e.getMessage());
-        }
+        c2.startLesson();
+        Message msg = c2.getMessageReceived();
+
+        Assert.assertNotNull(msg);
+        Assert.assertTrue(msg instanceof FailureMessage);
+        Assert.assertEquals("Learner cannot start a lesson", ((FailureMessage) msg).getFailureReason());
+
     }
 
     @Test
