@@ -4,8 +4,11 @@ import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.github.jrds.server.messages.FailureMessage;
 import org.github.jrds.server.messages.InstructionMessage;
+import org.github.jrds.server.messages.Response;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 public class InstructionsTest extends ApplicationTest {
@@ -29,9 +32,9 @@ public class InstructionsTest extends ApplicationTest {
         l.createInstruction(testTitle1, testBody1, u);
 
         Assert.assertFalse(l.getAllInstructions().isEmpty());
-        Assert.assertNotNull(l.getInstruction(testTitle1)); // TODO - REVIEW this proves the title is as expected so don't need a seperate test for this.
-        Assert.assertTrue(l.getInstruction(testTitle1).getBody().equals(testBody1));
-        Assert.assertTrue(l.getInstruction(testTitle1).getAuthor().equals(u));
+        Assert.assertNotNull(l.getInstruction(testTitle1)); // TODO - REVIEW this proves the title is as expected so don't need a separate test for this.
+        Assert.assertEquals(testBody1, l.getInstruction(testTitle1).getBody());
+        Assert.assertEquals(u, l.getInstruction(testTitle1).getAuthor());
     }
 
 
@@ -95,7 +98,7 @@ public class InstructionsTest extends ApplicationTest {
     
     @Test
     public void educatorCanRemoveAllInstructions(){
-        // already proven in other tests - is it good to seperate it out? 
+        // already proven in other tests - is it good to separate it out?
         connect(eduId, eduName, lesson1);
         Lesson l = Main.lessonStore.getLesson(lesson1);
         User u = Main.usersStore.getUser(eduId);
@@ -164,7 +167,7 @@ public class InstructionsTest extends ApplicationTest {
 
         try {
             l.createInstruction(testTitle1, testBody1, u);
-            Assert.fail("Expected Illegal Argument Exception");
+            fail("Expected Illegal Argument Exception");
         } catch (IllegalArgumentException e){
             Assert.assertEquals("Only the educator of this lesson can add instructions", e.getMessage());
         }
@@ -182,7 +185,7 @@ public class InstructionsTest extends ApplicationTest {
         l.createInstruction(testTitle1, testBody1, u);
         try {
             l.createInstruction(testTitle1, testBody2, u);
-            Assert.fail("Expected illegal arguement exception");
+            fail("Expected illegal argument exception");
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("This title already exists", e.getMessage());
         }
@@ -281,7 +284,7 @@ public class InstructionsTest extends ApplicationTest {
         Message msg = c2.getMessageReceived();
 
         Assert.assertNotNull(msg);
-        Assert.assertTrue(msg instanceof FailureMessage);
+        Assert.assertEquals(Response.FAILED, Main.messageHistory.get(msg.getId()).getConfirmationResponse());
         Assert.assertEquals("Learner cannot start a lesson", ((FailureMessage) msg).getFailureReason());
 
     }
@@ -290,8 +293,7 @@ public class InstructionsTest extends ApplicationTest {
     public void instructionsArePresentAfterEducatorDisconnectsAndReconnects(){
         // some sort of permanence needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
         // potentially add to the set up/initialisation ? // Needs more thought. 
-        Assert.assertTrue(false);
-
+        fail();
     }
 
 

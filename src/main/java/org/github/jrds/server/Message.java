@@ -26,7 +26,7 @@ public abstract class Message {
     private String to;
     private int id;
     private Response confirmationResponse = Response.NONE;
-    private static int idCounter;
+    static int idCounter = 1;
 
 
     public Message(String from, String to) {

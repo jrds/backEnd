@@ -14,6 +14,7 @@ import javax.websocket.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.messages.FailureMessage;
+import org.github.jrds.server.messages.LessonStartMessage;
 import org.github.jrds.server.messages.Response;
 import org.github.jrds.server.messages.SuccessMessage;
 
@@ -39,9 +40,16 @@ public class ClientWebSocket extends Endpoint {
             Message msg = mapper.readValue(message, Message.class);
             if (msg instanceof SuccessMessage){
                 Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.SUCCESSFUL);
+                if (Main.messageHistory.get(msg.getId()) instanceof LessonStartMessage){
+                    messagesReceived.add(msg);
+                }
             }
             else if (msg instanceof FailureMessage) {
                 Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.FAILED);
+
+                if (Main.messageHistory.get(msg.getId()) instanceof LessonStartMessage){
+                    messagesReceived.add(msg);
+                }
             }
             else {
                 messagesReceived.add(msg);
