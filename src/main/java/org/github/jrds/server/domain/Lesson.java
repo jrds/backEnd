@@ -35,12 +35,12 @@ public class Lesson {
         learners.add(learner);
     }
 
-    public boolean isRegisteredLearner(String learner) {
-        return learners.contains(Main.usersStore.getUser(learner));
+    public boolean isRegisteredLearner(User learner) {
+        return learners.contains(learner);
     }
 
-    public boolean canConnect(String user) {
-        return isRegisteredLearner(user) || educator.getId().equals(user);
+    public boolean canConnect(User user) {
+        return isRegisteredLearner(user) || educator.equals(user);
     }
 
     public Role getUserRole(User user){

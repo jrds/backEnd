@@ -12,10 +12,7 @@ public class Instruction {
     private User author;
 
 
-    @JsonCreator
-    public Instruction(@JsonProperty("title") String title,
-                       @JsonProperty("body") String body,
-                       @JsonProperty("author") User author) {
+    Instruction(String title, String body, User author) {
         this.title = Objects.requireNonNull(title);
         this.body = body;
         this.author = Objects.requireNonNull(author);

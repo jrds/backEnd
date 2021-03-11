@@ -29,24 +29,29 @@ import org.slf4j.LoggerFactory;
 public class MessageSocket {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);
     private static Map<String, Session> userSessions = new HashMap<>();
+    private final Main server;
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private ObjectMapper mapper = new ObjectMapper();
     private Map<String, Attendance> sessionAttendances = new HashMap<>();
+
+    public MessageSocket() {
+        this.server = Main.defaultInstance;
+    }
 
     @OnOpen
     public void onWebSocketConnect(Session sess) throws Exception {
         LOGGER.info("Socket Connected: " + sess);
 
         String userId = sess.getUserPrincipal().getName();
-        User user = Main.usersStore.getUser(userId);
+        User user = server.usersStore.getUser(userId);
         userSessions.put(userId, sess);
-        
-        String lessonId = sess.getPathParameters().get("lessonId");
-        Lesson lesson = Main.lessonStore.getLesson(lessonId);
 
-        if (Main.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user))) {
+        String lessonId = sess.getPathParameters().get("lessonId");
+        Lesson lesson = server.lessonStore.getLesson(lessonId);
+
+        if (server.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user))) {
             Attendance attendance = new Attendance(user, lesson);
-            Main.attendanceStore.storeAttendance(attendance);
+            server.attendanceStore.storeAttendance(attendance);
             sessionAttendances.put(sess.getId(), attendance);
         } else {
             throw new IllegalStateException("Attendance already in existence for this user, in this lesson");
@@ -62,23 +67,21 @@ public class MessageSocket {
 
         if (msg instanceof SessionEndMessage) {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-            Main.attendanceStore.removeAttendance(attendance);
+            server.attendanceStore.removeAttendance(attendance);
             userSessions.remove(sess.getUserPrincipal().getName());
             sessionAttendances.remove(sess.getId());
             //TODO - REVIEW - session end message shouldn't send a success message because we've removed it already.
             //Or could be a success message at the start of this if.
-        }
-        else if (msg instanceof LessonStartMessage){
-            if (msg.getFrom().equals(attendance.getLesson().getEducator().getId())){
+        } else if (msg instanceof LessonStartMessage) {
+            if (msg.getFrom().equals(attendance.getLesson().getEducator().getId())) {
                 Lesson lesson = attendance.getLesson();
                 for (Instruction i : lesson.getAllInstructions()) {
                     for (User learner : lesson.getLearners()) {
-                        if(Main.attendanceStore.getAttendance(learner,lesson) != null) {
+                        if (server.attendanceStore.getAttendance(learner, lesson) != null) {
                             InstructionMessage iM = new InstructionMessage(lesson.getEducator(), learner, i);
                             sendMessage(iM);
                             sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
-                        }
-                        else {
+                        } else {
                             sendMessage(new FailureMessage(msg.getFrom(), "Learner has no registered attendance", msg.getId()));
                             // TODO - consider how to test this - as there could be several messages (mainly success) in the educators queue.
                         }
@@ -87,15 +90,13 @@ public class MessageSocket {
             } else {
                 sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson", msg.getId()));
             }
-        }
-        else {
+        } else {
             sendMessage(msg);
             sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
         }
     }
 
-    private void sendMessage(Message message)
-    {
+    private void sendMessage(Message message) {
         try {
             Session to = userSessions.get(message.getTo());
             String json = mapper.writeValueAsString(message);

@@ -13,6 +13,7 @@ import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
@@ -22,13 +23,18 @@ import org.github.jrds.server.persistence.LessonStore;
 import org.github.jrds.server.persistence.UsersStore;
 
 public class Main {
+    public static Main defaultInstance;
 
-    public static UsersStore usersStore = new UsersStore();
-    public static LessonStore lessonStore = new LessonStore(usersStore);
-    public static AttendanceStore attendanceStore = new AttendanceStore();
+    public UsersStore usersStore = new UsersStore();
+    public LessonStore lessonStore = new LessonStore(usersStore);
+    public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;
 
+    public Main()
+    {
+        defaultInstance = this;
+    }
 
     public void start() {
         server = new Server();
@@ -41,7 +47,7 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setSecurityHandler(auth());
         context.setContextPath("/");
-        context.addFilter(AuthorisationFilter.class, "/lesson/*", EnumSet.allOf(DispatcherType.class));
+        context.addFilter(new FilterHolder(new AuthorisationFilter(this)), "/lesson/*", EnumSet.allOf(DispatcherType.class));
         server.setHandler(context);
 
 

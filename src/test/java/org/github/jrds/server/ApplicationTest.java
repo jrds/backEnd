@@ -31,9 +31,11 @@ public abstract class ApplicationTest {
 
     @After
     public void tearDown() {
+        System.out.println("DISCONNECTING");
         while(!testClients.isEmpty()){
             disconnect(testClients.get(0));
         }
+        System.out.println("STOPPING SERVER");
         server.stop();
     }
 
@@ -46,8 +48,13 @@ public abstract class ApplicationTest {
         return c;
     }
 
+    //TODO - if time, look at how this was running prior to 11/03/21, using the if to check the status of the client
     protected void disconnect(TestClient testClient){
-        testClient.disconnect();
+        try {
+            testClient.disconnect();
+        } catch (Exception e) {
+            // Ignore assuming connection is no longer usable
+        }
         testClients.remove(testClient);
     }
 
@@ -61,7 +68,7 @@ public abstract class ApplicationTest {
     }
 
     protected Attendance getAttendance(String userId, String lessonId){
-        return Main.attendanceStore.getAllAttendances().stream()
+        return server.attendanceStore.getAllAttendances().stream()
             .filter(a -> a.getUser().getId().equals(userId))
             .filter(a -> a.getLesson().getId().equals(lessonId))
             .findFirst()

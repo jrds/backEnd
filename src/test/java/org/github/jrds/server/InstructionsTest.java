@@ -4,6 +4,7 @@ import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.github.jrds.server.messages.*;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.internal.runners.statements.Fail;
 
@@ -25,10 +26,10 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void educatorCreatesInstructionToLesson(){
+    public void educatorCreatesInstructionToLesson() {
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
         l.removeAllInstructions();
         Assert.assertEquals(0, l.getAllInstructions().size());
@@ -43,11 +44,11 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void educatorCanCreateMultipleInstructions(){
+    public void educatorCanCreateMultipleInstructions() {
 
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -58,26 +59,26 @@ public class InstructionsTest extends ApplicationTest {
 
         Assert.assertNotNull(l.getInstruction(testTitle1));
         Assert.assertNotNull(l.getInstruction(testTitle2));
-        Assert.assertNotNull(l.getInstruction(testTitle3)); 
-        
+        Assert.assertNotNull(l.getInstruction(testTitle3));
+
         Assert.assertEquals(testBody1, l.getAllInstructions().get(0).getBody());
         Assert.assertEquals(testBody2, l.getAllInstructions().get(1).getBody());
         Assert.assertEquals(testBody3, l.getAllInstructions().get(2).getBody());
-         
+
         Assert.assertEquals(u, l.getAllInstructions().get(0).getAuthor());
         Assert.assertEquals(u, l.getAllInstructions().get(1).getAuthor());
-        Assert.assertEquals(u, l.getAllInstructions().get(2).getAuthor());    
+        Assert.assertEquals(u, l.getAllInstructions().get(2).getAuthor());
     }
 
     //TODO - Create some test for the ordering.
     //Once removing is also a concept will need tests to check they contain the expected instruction.
 
     @Test
-    public void educatorCanRemoveAnInstruction(){
+    public void educatorCanRemoveAnInstruction() {
 
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -89,23 +90,23 @@ public class InstructionsTest extends ApplicationTest {
         Assert.assertEquals(2, l.getAllInstructions().size());
 
         Assert.assertNotNull(l.getInstruction(testTitle1));
-        Assert.assertNotNull(l.getInstruction(testTitle3)); 
+        Assert.assertNotNull(l.getInstruction(testTitle3));
         Assert.assertNull(l.getInstruction(testTitle2));
-        
+
         Assert.assertEquals(testBody1, l.getAllInstructions().get(0).getBody());
         Assert.assertEquals(testBody3, l.getAllInstructions().get(1).getBody());
-         
+
         Assert.assertEquals(u, l.getAllInstructions().get(0).getAuthor());
-        Assert.assertEquals(u, l.getAllInstructions().get(1).getAuthor());   
+        Assert.assertEquals(u, l.getAllInstructions().get(1).getAuthor());
     }
 
-    
+
     @Test
-    public void educatorCanRemoveAllInstructions(){
+    public void educatorCanRemoveAllInstructions() {
         // already proven in other tests - is it good to separate it out?
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
         l.removeAllInstructions();
 
@@ -120,71 +121,70 @@ public class InstructionsTest extends ApplicationTest {
         Assert.assertEquals(0, l.getAllInstructions().size());
     }
 
-    
+
     @Test
-    public void educatorCanEditInstructionTitle(){
+    public void educatorCanEditInstructionTitle() {
 
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();     
+        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
         Assert.assertEquals(testTitle1, l.getInstruction(testTitle1).getTitle());
 
         l.editInstructionTitle(testTitle1, testTitle2, u);
-        Assert.assertNotNull(l.getInstruction(testTitle2)); 
+        Assert.assertNotNull(l.getInstruction(testTitle2));
         Assert.assertNull(l.getInstruction(testTitle1));
         Assert.assertEquals(testBody1, l.getInstruction(testTitle2).getBody());
         Assert.assertEquals(u, l.getInstruction(testTitle2).getAuthor());
     }
 
     @Test
-    public void educatorCanEditInstructionBody(){
+    public void educatorCanEditInstructionBody() {
 
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();     
+        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
         Assert.assertEquals(testBody1, l.getInstruction(testTitle1).getBody());
 
         l.editInstructionBody(testTitle1, testBody2, u);
-        Assert.assertNotNull(l.getInstruction(testTitle1)); 
+        Assert.assertNotNull(l.getInstruction(testTitle1));
         Assert.assertEquals(testBody2, l.getInstruction(testTitle1).getBody());
         Assert.assertNotEquals(testBody1, l.getInstruction(testTitle1).getBody());
         Assert.assertEquals(u, l.getInstruction(testTitle1).getAuthor());
     }
-    
 
 
     @Test
-    public void studentCantCreateInstructionToLesson(){
+    public void studentCantCreateInstructionToLesson() {
         connect(l1Id, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(l1Id);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(l1Id);
 
-        l.removeAllInstructions();     
+        l.removeAllInstructions();
 
         try {
             l.createInstruction(testTitle1, testBody1, u);
             fail("Expected Illegal Argument Exception");
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             Assert.assertEquals("Only the educator of this lesson can add instructions", e.getMessage());
         }
     }
 
 
-    @Test 
-    public void instructionsCantHaveTheSameTitle(){
+    @Test
+    public void instructionsCantHaveTheSameTitle() {
         connect(eduId, eduName, lesson1);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
-        User u = Main.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();     
+        l.removeAllInstructions();
 
         l.createInstruction(testTitle1, testBody1, u);
         try {
@@ -193,7 +193,7 @@ public class InstructionsTest extends ApplicationTest {
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("This title already exists", e.getMessage());
         }
-        
+
     }
 
     @Test
@@ -202,8 +202,8 @@ public class InstructionsTest extends ApplicationTest {
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
-        User u = Main.usersStore.getUser(eduId);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -215,10 +215,10 @@ public class InstructionsTest extends ApplicationTest {
         Assert.assertTrue(received1 instanceof InstructionMessage);
         Assert.assertTrue(received2 instanceof InstructionMessage);
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage)received1).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage)received1).getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage)received2).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage)received2).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received2).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received2).getBody());
     }
 
 
@@ -228,8 +228,8 @@ public class InstructionsTest extends ApplicationTest {
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
-        User u = Main.usersStore.getUser(eduId);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -242,25 +242,25 @@ public class InstructionsTest extends ApplicationTest {
         Message received3 = c3.getMessageReceived();
         Message received4 = c3.getMessageReceived();
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage)received1).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage)received1).getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage)received3).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage)received3).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received3).getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received3).getBody());
 
-        Assert.assertEquals(testTitle2, ((InstructionMessage)received2).getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage)received2).getBody());
-        Assert.assertEquals(testTitle2, ((InstructionMessage)received4).getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage)received4).getBody());
+        Assert.assertEquals(testTitle2, ((InstructionMessage) received2).getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage) received2).getBody());
+        Assert.assertEquals(testTitle2, ((InstructionMessage) received4).getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage) received4).getBody());
     }
 
     @Test
-    public void learnerNotInClassDoesntReceiveInstructions(){
+    public void learnerNotInClassDoesntReceiveInstructions() {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l99Id, l99Name, lesson2);
 
-        User u = Main.usersStore.getUser(eduId);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -278,8 +278,8 @@ public class InstructionsTest extends ApplicationTest {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
 
-        User u = Main.usersStore.getUser(eduId);
-        Lesson l = Main.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
+        Lesson l = server.lessonStore.getLesson(lesson1);
 
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
@@ -292,7 +292,8 @@ public class InstructionsTest extends ApplicationTest {
     }
 
     @Test
-    public void instructionsArePresentAfterEducatorDisconnectsAndReconnects(){
+    @Ignore
+    public void instructionsArePresentAfterEducatorDisconnectsAndReconnects() {
         // some sort of permanence needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
         // potentially add to the set up/initialisation ? // Needs more thought. 
         fail();
