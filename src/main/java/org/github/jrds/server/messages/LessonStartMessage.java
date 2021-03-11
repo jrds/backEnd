@@ -2,9 +2,8 @@ package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.github.jrds.server.Message;
 
-public class LessonStartMessage extends Message {
+public class LessonStartMessage extends Request {
 
 
 

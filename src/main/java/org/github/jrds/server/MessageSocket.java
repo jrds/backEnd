@@ -49,7 +49,7 @@ public class MessageSocket {
             Main.attendanceStore.storeAttendance(attendance);
             sessionAttendances.put(sess.getId(), attendance);
         } else {
-            throw new IllegalStateException("Attendance already in existance for this user, in this lesson");
+            throw new IllegalStateException("Attendance already in existence for this user, in this lesson");
         }
         // TODO add to assumptions documentation that a user will not have 2 classes at the same time.
     }

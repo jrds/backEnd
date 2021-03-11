@@ -2,9 +2,8 @@ package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.github.jrds.server.Message;
 
-public class FailureMessage extends Message {
+public class FailureMessage extends Response {
 
     private String failureReason;
 
@@ -14,7 +13,7 @@ public class FailureMessage extends Message {
             @JsonProperty("failureReason") String failureReason,
             @JsonProperty("id") int id)
     {
-        super(null, to, id);
+        super(to, id);
         this.failureReason = failureReason;
     }
 

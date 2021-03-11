@@ -16,6 +16,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.github.jrds.server.messages.Message;
 import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStore;
 import org.github.jrds.server.persistence.UsersStore;
@@ -25,10 +26,9 @@ public class Main {
     public static UsersStore usersStore = new UsersStore();
     public static LessonStore lessonStore = new LessonStore(usersStore);
     public static AttendanceStore attendanceStore = new AttendanceStore();
-    public static Map<Integer, Message> messageHistory = new HashMap<>();
-
 
     private Server server;
+
 
     public void start() {
         server = new Server();

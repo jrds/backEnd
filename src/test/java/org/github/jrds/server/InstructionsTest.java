@@ -2,11 +2,10 @@ package org.github.jrds.server;
 
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
-import org.github.jrds.server.messages.FailureMessage;
-import org.github.jrds.server.messages.InstructionMessage;
-import org.github.jrds.server.messages.Response;
+import org.github.jrds.server.messages.*;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.internal.runners.statements.Fail;
 
 import static org.junit.Assert.fail;
 
@@ -280,12 +279,15 @@ public class InstructionsTest extends ApplicationTest {
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
-        c2.startLesson();
+        Request msg1 = c2.startLesson();
+
         Message msg = c2.getMessageReceived();
 
-        Assert.assertNotNull(msg);
-        Assert.assertEquals(Response.FAILED, Main.messageHistory.get(msg.getId()).getConfirmationResponse());
-        Assert.assertEquals("Learner cannot start a lesson", ((FailureMessage) msg).getFailureReason());
+        Assert.assertTrue(msg1.getResponse() instanceof FailureMessage);
+        FailureMessage response = (FailureMessage) msg1.getResponse();
+
+        Assert.assertNull(msg);
+        Assert.assertEquals("Learner cannot start a lesson", (response.getFailureReason()));
 
     }
 

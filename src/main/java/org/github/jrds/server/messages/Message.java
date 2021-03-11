@@ -1,9 +1,8 @@
-package org.github.jrds.server;
+package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import org.github.jrds.server.messages.*;
 
 import java.util.Objects;
 
@@ -11,22 +10,19 @@ import java.util.Objects;
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
         property = "_type")
+
 @JsonSubTypes({
-        @Type(value = ChatMessage.class, name = "chat"),
-        @Type(value = SessionEndMessage.class, name = "sessionEnd"),
-        @Type(value = InstructionMessage.class, name = "instruction"),
-        @Type(value = LessonStartMessage.class, name = "lessonStart"),
-        @Type(value = SuccessMessage.class, name = "success"),
-        @Type(value = FailureMessage.class, name = "failed")
+        @Type(value = Request.class, name = "request"),
+        @Type(value = Response.class, name = "response")
 })
 
 public abstract class Message {
 
+    protected static int idCounter = 1;
+
     private String from;
     private String to;
     private int id;
-    private Response confirmationResponse = Response.NONE;
-    static int idCounter = 1;
 
 
     public Message(String from, String to) {
@@ -51,24 +47,16 @@ public abstract class Message {
 
     public int getId() { return id; }
 
-    public Response getConfirmationResponse() {
-        return confirmationResponse;
-    }
-
-    public void setConfirmationResponse(Response confirmationResponse) {
-        this.confirmationResponse = confirmationResponse;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Message message = (Message) o;
-        return Objects.equals(from, message.from) && Objects.equals(to, message.to);
+        return id == message.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(from, to);
+        return Objects.hash(id);
     }
 }

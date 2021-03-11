@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.github.jrds.server.messages.ChatMessage;
+import org.github.jrds.server.messages.Message;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,8 +51,8 @@ public class ChatTest extends ApplicationTest {
         Assert.assertEquals(new ChatMessage(l1Id, eduId, msg), received);
 
         c1.sendChatMessage(response, c2.getId());
-        Message responceReceived = c2.getMessageReceived();
-        Assert.assertEquals(new ChatMessage(eduId, l1Id, response), responceReceived);
+        Message responseReceived = c2.getMessageReceived();
+        Assert.assertEquals(new ChatMessage(eduId, l1Id, response), responseReceived);
     }
 
     @Test

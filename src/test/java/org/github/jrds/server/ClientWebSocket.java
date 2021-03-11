@@ -1,6 +1,8 @@
 package org.github.jrds.server;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,15 +15,13 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.github.jrds.server.messages.FailureMessage;
-import org.github.jrds.server.messages.LessonStartMessage;
-import org.github.jrds.server.messages.Response;
-import org.github.jrds.server.messages.SuccessMessage;
+import org.github.jrds.server.messages.*;
 
 public class ClientWebSocket extends Endpoint {
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
     private ObjectMapper mapper = new ObjectMapper();
+    private Map<Integer, Request> messagesWithoutResponse = new HashMap<>();
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
@@ -38,20 +38,12 @@ public class ClientWebSocket extends Endpoint {
     private void handleTextMessage(Session sess, String message) {
         try {
             Message msg = mapper.readValue(message, Message.class);
-            if (msg instanceof SuccessMessage){
-                Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.SUCCESSFUL);
-                if (Main.messageHistory.get(msg.getId()) instanceof LessonStartMessage){
-                    messagesReceived.add(msg);
-                }
-            }
-            else if (msg instanceof FailureMessage) {
-                Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.FAILED);
-
-                if (Main.messageHistory.get(msg.getId()) instanceof LessonStartMessage){
-                    messagesReceived.add(msg);
-                }
-            }
-            else {
+            int msgId = msg.getId();
+            if (msg instanceof SuccessMessage || msg instanceof FailureMessage){
+                messagesWithoutResponse.get(msgId).setResponse((Response) msg);
+                // TODO remove casting
+                messagesWithoutResponse.remove(msgId);
+            } else {
                 messagesReceived.add(msg);
             }
         } catch (IOException e) {
@@ -83,4 +75,9 @@ public class ClientWebSocket extends Endpoint {
             return null;
         }
     }
+
+    public void addRequest(Request message) {
+        messagesWithoutResponse.put(message.getId(), message);
+    }
+
 }

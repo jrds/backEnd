@@ -13,9 +13,8 @@ import javax.websocket.WebSocketContainer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.github.jrds.server.messages.ChatMessage;
-import org.github.jrds.server.messages.LessonStartMessage;
-import org.github.jrds.server.messages.SessionEndMessage;
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.messages.*;
 
 public class TestClient {
 
@@ -84,18 +83,24 @@ public class TestClient {
         }
     }
 
-    public void sendChatMessage(String msg, String to) { 
-        ChatMessage c = new ChatMessage(id, to, msg);
-        sendMessage(c);
+    public ChatMessage sendChatMessage(String msg, String to) {
+        ChatMessage m = new ChatMessage(id, to, msg);
+        sendMessage(m);
+
+        return m;
     }
 
 
-    public void startLesson(){
-        sendMessage(new LessonStartMessage(id));
+    public LessonStartMessage startLesson(){
+        LessonStartMessage m = new LessonStartMessage(id);
+        sendMessage(m);
+        return m;
     }
 
-    public void sendSessionEndMessage() {
-        sendMessage(new SessionEndMessage(id));
+    public SessionEndMessage sendSessionEndMessage() {
+        SessionEndMessage m = new SessionEndMessage(id);
+        sendMessage(m);
+        return m;
     }
 
     public Message getMessageReceived() {
@@ -114,8 +119,10 @@ public class TestClient {
         try {
             String json = mapper.writeValueAsString(message);
             session.getBasicRemote().sendText(json);
-            Main.messageHistory.put(message.getId(),message);
-            // TODO - issue with lesson start message is there is one outward message and potentially several responses - need to consider how to handle this.
+            if (message instanceof Request){
+                clientWebSocket.addRequest((Request) message);
+                // Todo as request??
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
