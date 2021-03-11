@@ -13,6 +13,9 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.github.jrds.server.messages.FailureMessage;
+import org.github.jrds.server.messages.Response;
+import org.github.jrds.server.messages.SuccessMessage;
 
 public class ClientWebSocket extends Endpoint {
     private CountDownLatch closureLatch = new CountDownLatch(1);
@@ -34,13 +37,18 @@ public class ClientWebSocket extends Endpoint {
     private void handleTextMessage(Session sess, String message) {
         try {
             Message msg = mapper.readValue(message, Message.class);
-            System.out.println("Message queue before message added: " + messagesReceived);
-            messagesReceived.add(msg);
-            System.out.println("Message queue after message added: " + messagesReceived);
+            if (msg instanceof SuccessMessage){
+                Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.SUCCESSFUL);
+            }
+            else if (msg instanceof FailureMessage) {
+                Main.messageHistory.get(msg.getId()).setConfirmationResponse(Response.FAILED);
+            }
+            else {
+                messagesReceived.add(msg);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         System.out.println("Client Received TEXT message: " + message);
     }
 

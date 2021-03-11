@@ -21,6 +21,7 @@ import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+import org.github.jrds.server.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

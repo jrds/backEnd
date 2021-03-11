@@ -2,6 +2,8 @@ package org.github.jrds.server;
 
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+import org.github.jrds.server.messages.FailureMessage;
+import org.github.jrds.server.messages.InstructionMessage;
 import org.junit.Assert;
 import org.junit.Test;
 

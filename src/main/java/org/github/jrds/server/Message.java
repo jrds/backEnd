@@ -3,6 +3,7 @@ package org.github.jrds.server;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import org.github.jrds.server.messages.*;
 
 import java.util.Objects;
 
@@ -24,7 +25,9 @@ public abstract class Message {
     private String from;
     private String to;
     private int id;
+    private Response confirmationResponse = Response.NONE;
     private static int idCounter;
+
 
     public Message(String from, String to) {
         this.from = from;
@@ -47,6 +50,14 @@ public abstract class Message {
     }
 
     public int getId() { return id; }
+
+    public Response getConfirmationResponse() {
+        return confirmationResponse;
+    }
+
+    public void setConfirmationResponse(Response confirmationResponse) {
+        this.confirmationResponse = confirmationResponse;
+    }
 
     @Override
     public boolean equals(Object o) {

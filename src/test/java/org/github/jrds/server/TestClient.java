@@ -2,10 +2,7 @@ package org.github.jrds.server;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -16,9 +13,9 @@ import javax.websocket.WebSocketContainer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.Lesson;
-import org.github.jrds.server.domain.User;
+import org.github.jrds.server.messages.ChatMessage;
+import org.github.jrds.server.messages.LessonStartMessage;
+import org.github.jrds.server.messages.SessionEndMessage;
 
 public class TestClient {
 
@@ -29,7 +26,6 @@ public class TestClient {
     private ClientWebSocket clientWebSocket;
     private Session session;
     private ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
 
 
     public TestClient(String id, String name) {
@@ -118,6 +114,8 @@ public class TestClient {
         try {
             String json = mapper.writeValueAsString(message);
             session.getBasicRemote().sendText(json);
+            Main.messageHistory.put(message.getId(),message);
+            // TODO - issue with lesson start message is there is one outward message and potentially several responses - need to consider how to handle this.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

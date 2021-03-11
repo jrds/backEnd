@@ -3,6 +3,7 @@ package org.github.jrds.server;
 import java.util.Arrays;
 import java.util.List;
 
+import org.github.jrds.server.messages.ChatMessage;
 import org.junit.Assert;
 import org.junit.Test;
 

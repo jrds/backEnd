@@ -1,7 +1,8 @@
-package org.github.jrds.server;
+package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.github.jrds.server.Message;
 import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.User;
 

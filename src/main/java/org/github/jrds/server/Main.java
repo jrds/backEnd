@@ -1,6 +1,8 @@
 package org.github.jrds.server;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.DispatcherType;
 
@@ -23,6 +25,8 @@ public class Main {
     public static UsersStore usersStore = new UsersStore();
     public static LessonStore lessonStore = new LessonStore(usersStore);
     public static AttendanceStore attendanceStore = new AttendanceStore();
+    public static Map<Integer, Message> messageHistory = new HashMap<>();
+
 
     private Server server;
 
