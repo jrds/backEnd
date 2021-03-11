@@ -31,34 +31,15 @@ public class Attendance {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((lesson == null) ? 0 : lesson.hashCode());
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Attendance that = (Attendance) o;
+        return user.equals(that.user) && lesson.equals(that.lesson);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Attendance other = (Attendance) obj;
-        if (lesson == null) {
-            if (other.lesson != null)
-                return false;
-        } else if (!lesson.equals(other.lesson))
-            return false;
-        if (user == null) {
-            if (other.user != null)
-                return false;
-        } else if (!user.equals(other.user))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(user, lesson);
     }
-
 }

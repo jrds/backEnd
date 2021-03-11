@@ -1,27 +1,61 @@
 package org.github.jrds.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.*;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
+import javax.websocket.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.messages.*;
 
 public class ClientWebSocket extends Endpoint {
+
+
+    private static final String BASE_URL = "ws://localhost:8080/lesson/";
+
     private CountDownLatch closureLatch = new CountDownLatch(1);
     private BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
     private ObjectMapper mapper = new ObjectMapper();
-    private Map<Integer, Request> messagesWithoutResponse = new HashMap<>();
+    private Map<Integer, CompletableFuture<Response>> uncompletedFutures = new HashMap<>();
+    private Session session;
+
+
+    public static ClientWebSocket connect(String userId, String lessonId) {
+        try {
+            final URI uri = URI.create(BASE_URL + lessonId);
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            ClientWebSocket webSocket = new ClientWebSocket();
+            ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
+                @Override
+                public void beforeRequest(Map<String, List<String>> headers) {
+                    headers.put("Authorization", Collections
+                            .singletonList("Basic " + Base64.getEncoder().encodeToString((userId + ":pw").getBytes())));
+                }
+            };
+            ClientEndpointConfig clientConfig = ClientEndpointConfig.Builder.create()
+                    .configurator(configurator)
+                    .build();
+            Session newSession = container.connectToServer(webSocket, clientConfig, uri);
+//            try{
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e){
+///          }
+            if (!newSession.isOpen()){
+                throw new RuntimeException("Failed to open session");
+            }
+            else {
+                webSocket.session = newSession;
+            }
+            return webSocket;
+
+        } catch (DeploymentException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
@@ -39,10 +73,8 @@ public class ClientWebSocket extends Endpoint {
         try {
             Message msg = mapper.readValue(message, Message.class);
             int msgId = msg.getId();
-            if (msg instanceof SuccessMessage || msg instanceof FailureMessage){
-                messagesWithoutResponse.get(msgId).setResponse((Response) msg);
-                // TODO remove casting
-                messagesWithoutResponse.remove(msgId);
+            if (msg instanceof Response){
+                uncompletedFutures.remove(msgId).complete((Response) msg);
             } else {
                 messagesReceived.add(msg);
             }
@@ -55,7 +87,14 @@ public class ClientWebSocket extends Endpoint {
     @Override
     public void onClose(Session session, CloseReason closeReason) {
         System.out.println("Client Socket Closed: " + closeReason);
-        closureLatch.countDown();
+        try {
+            session.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            closureLatch.countDown();
+        }
     }
 
     @Override
@@ -76,8 +115,15 @@ public class ClientWebSocket extends Endpoint {
         }
     }
 
-    public void addRequest(Request message) {
-        messagesWithoutResponse.put(message.getId(), message);
+    public Future<Response> sendMessage(Request message) {
+        try {
+            String json = mapper.writeValueAsString(message);
+            session.getBasicRemote().sendText(json);
+            CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+            uncompletedFutures.put(message.getId(), completableFuture);
+            return completableFuture;
+        }   catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
 }

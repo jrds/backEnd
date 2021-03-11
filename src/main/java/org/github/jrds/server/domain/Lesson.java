@@ -1,25 +1,22 @@
+
 package org.github.jrds.server.domain;
 
 
 import org.github.jrds.server.Main;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Lesson {
 
-    private String id;
+    private final String id;
     private User educator;
-    private Set<User> learners; 
-    private Map<String, Instruction> instructions = new TreeMap<>();
+    private final Set<User> learners;
+    private final Map<String, Instruction> instructions = new TreeMap<>();
 
     public Lesson(String id, User educator, Set<User> learners) { 
-        this.id = id;                                                 
-        this.educator = educator;
-        this.learners = learners;
+        this.id = Objects.requireNonNull(id);
+        this.educator = Objects.requireNonNull(educator);
+        this.learners = learners == null ? new HashSet<>() : learners;
     }
 
     public String getId() {
@@ -31,7 +28,7 @@ public class Lesson {
     }
 
     public Set<User> getLearners() {
-        return learners;
+        return Collections.unmodifiableSet(learners);
     }
 
     public void addLearner(User learner) { // could pass in other detail to construct user??
@@ -134,28 +131,15 @@ public class Lesson {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lesson lesson = (Lesson) o;
+        return id.equals(lesson.id);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Lesson other = (Lesson) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(id);
     }
-
 }

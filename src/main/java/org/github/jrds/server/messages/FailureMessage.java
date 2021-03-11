@@ -20,4 +20,14 @@ public class FailureMessage extends Response {
     public String getFailureReason() {
         return failureReason;
     }
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
+
+    @Override
+    public FailureMessage asFailure() {
+        return this;
+    }
 }

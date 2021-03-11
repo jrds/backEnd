@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -18,7 +19,7 @@ import java.util.Objects;
 
 public abstract class Message {
 
-    protected static int idCounter = 1;
+    protected static AtomicInteger idCounter = new AtomicInteger(0);
 
     private String from;
     private String to;
@@ -28,7 +29,7 @@ public abstract class Message {
     public Message(String from, String to) {
         this.from = from;
         this.to = to;
-        this.id = idCounter++;
+        this.id = idCounter.incrementAndGet();
     }
 
     public Message(String from, String to, int id) {

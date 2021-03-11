@@ -7,6 +7,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.internal.runners.statements.Fail;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import static org.junit.Assert.fail;
 
 
@@ -269,7 +274,7 @@ public class InstructionsTest extends ApplicationTest {
     //TODO how does the educator see the instructions, he's able to access, edit and create, but isn't sent the instruction message
 
     @Test
-    public void studentCannotStartLesson(){
+    public void studentCannotStartLesson() throws InterruptedException, ExecutionException, TimeoutException {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
 
@@ -279,16 +284,11 @@ public class InstructionsTest extends ApplicationTest {
         l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
-        Request msg1 = c2.startLesson();
+        Future<Response> startLessonFuture = c2.startLesson();
+        Response startLessonResponse = startLessonFuture.get(10, TimeUnit.SECONDS);
 
-        Message msg = c2.getMessageReceived();
-
-        Assert.assertTrue(msg1.getResponse() instanceof FailureMessage);
-        FailureMessage response = (FailureMessage) msg1.getResponse();
-
-        Assert.assertNull(msg);
-        Assert.assertEquals("Learner cannot start a lesson", (response.getFailureReason()));
-
+        Assert.assertTrue(startLessonResponse.isFailure());
+        Assert.assertEquals("Learner cannot start a lesson", startLessonResponse.asFailure().getFailureReason());
     }
 
     @Test

@@ -3,6 +3,8 @@ package org.github.jrds.server.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class Instruction {
 
     private String title;
@@ -14,9 +16,9 @@ public class Instruction {
     public Instruction(@JsonProperty("title") String title,
                        @JsonProperty("body") String body,
                        @JsonProperty("author") User author) {
-        this.title = title;
+        this.title = Objects.requireNonNull(title);
         this.body = body;
-        this.author = author;
+        this.author = Objects.requireNonNull(author);
     }
 
 
@@ -39,33 +41,15 @@ public class Instruction {
 
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((title == null) ? 0 : title.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Instruction that = (Instruction) o;
+        return title.equals(that.title) && author.equals(that.author);
     }
-
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Instruction other = (Instruction) obj;
-        if (title == null) {
-            if (other.title != null)
-                return false;
-        } else if (!title.equals(other.title))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(title, author);
     }
-
-
-    
 }
-
-//TODO - Should this be a class in lesson?

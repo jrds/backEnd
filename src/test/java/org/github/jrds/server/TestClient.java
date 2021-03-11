@@ -3,6 +3,8 @@ package org.github.jrds.server;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -23,7 +25,6 @@ public class TestClient {
     private String id; // TODO - REVIEW - added name, so that userStrore & authStore (which treat id as u1900 etc, are the same as what id constitutes here)
     private String name; // TODO - will be useful when sending messages, as humans need names not ID, but ID is the unique identifier
     private ClientWebSocket clientWebSocket;
-    private Session session;
     private ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
 
@@ -33,74 +34,35 @@ public class TestClient {
     }
 
     public void connect(String lessonId) {
-        try {
-            final URI uri = URI.create(BASE_URL + lessonId);
-
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            clientWebSocket = new ClientWebSocket();
-            ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator() {
-                @Override
-                public void beforeRequest(Map<String, List<String>> headers) {
-                    headers.put("Authorization", Collections
-                            .singletonList("Basic " + Base64.getEncoder().encodeToString((id + ":pw").getBytes())));
-                }
-            };
-            ClientEndpointConfig clientConfig = ClientEndpointConfig.Builder.create()
-                .configurator(configurator)
-                .build();
-            Session newSession = container.connectToServer(clientWebSocket, clientConfig, uri);
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException e){
-
-            }
-            if (!newSession.isOpen()){
-                throw new RuntimeException("Failed to open session");
-            }
-            else {
-                session = newSession;
-            }
-        } catch (DeploymentException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        clientWebSocket = ClientWebSocket.connect(id, lessonId);
     }
 
     public void disconnect() {
         try {
-            if(session.isOpen()){
-                sendSessionEndMessage();
-                // Wait for remote to close
-                clientWebSocket.awaitClosure();
-                // Close session
-                session.close();
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            sendSessionEndMessage();
+            // Wait for remote to close
+            clientWebSocket.awaitClosure();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }
 
-    public ChatMessage sendChatMessage(String msg, String to) {
+
+    public Future<Response> sendChatMessage(String msg, String to) {
         ChatMessage m = new ChatMessage(id, to, msg);
-        sendMessage(m);
-
-        return m;
+        return clientWebSocket.sendMessage(m);
     }
 
 
-    public LessonStartMessage startLesson(){
+    public Future<Response> startLesson() {
         LessonStartMessage m = new LessonStartMessage(id);
-        sendMessage(m);
-        return m;
+        return clientWebSocket.sendMessage(m);
     }
 
-    public SessionEndMessage sendSessionEndMessage() {
+    public Future<Response> sendSessionEndMessage() {
         SessionEndMessage m = new SessionEndMessage(id);
-        sendMessage(m);
-        return m;
+        return clientWebSocket.sendMessage(m);
     }
 
     public Message getMessageReceived() {
@@ -111,20 +73,9 @@ public class TestClient {
         return id;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    private void sendMessage(Message message) {
-        try {
-            String json = mapper.writeValueAsString(message);
-            session.getBasicRemote().sendText(json);
-            if (message instanceof Request){
-                clientWebSocket.addRequest((Request) message);
-                // Todo as request??
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }
