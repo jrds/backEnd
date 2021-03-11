@@ -10,8 +10,10 @@ public class FailureMessage extends Message {
     @JsonCreator
     public FailureMessage(
             @JsonProperty("to") String to,
-            @JsonProperty("failureReason") String failureReason) {
-        super(null, to);
+            @JsonProperty("failureReason") String failureReason,
+            @JsonProperty("id") int id)
+    {
+        super(null, to, id);
         this.failureReason = failureReason;
     }
 

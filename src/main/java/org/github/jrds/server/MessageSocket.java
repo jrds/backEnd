@@ -75,21 +75,21 @@ public class MessageSocket {
                         if(Main.attendanceStore.getAttendance(learner,lesson) != null) {
                             InstructionMessage iM = new InstructionMessage(lesson.getEducator(), learner, i);
                             sendMessage(iM);
-                            sendMessage(new SuccessMessage(msg.getFrom()));
+                            sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
                         }
                         else {
-                            sendMessage(new FailureMessage(msg.getFrom(), "Learner: "+ learner.getId() + "has no registered attendance"));
+                            sendMessage(new FailureMessage(msg.getFrom(), "Learner has no registered attendance", msg.getId()));
                             // TODO - consider how to test this - as there could be several messages (mainly success) in the educators queue.
                         }
                     }
                 }
             } else {
-                sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson"));
+                sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson", msg.getId()));
             }
         }
         else {
             sendMessage(msg);
-            sendMessage(new SuccessMessage(msg.getFrom()));
+            sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
         }
     }
 

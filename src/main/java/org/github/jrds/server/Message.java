@@ -23,10 +23,19 @@ public abstract class Message {
 
     private String from;
     private String to;
+    private int id;
+    private static int idCounter;
 
     public Message(String from, String to) {
         this.from = from;
         this.to = to;
+        this.id = idCounter++;
+    }
+
+    public Message(String from, String to, int id) {
+        this.from = from;
+        this.to = to;
+        this.id = id;
     }
 
     public String getFrom() {
@@ -36,6 +45,8 @@ public abstract class Message {
     public String getTo() {
         return to;
     }
+
+    public int getId() { return id; }
 
     @Override
     public boolean equals(Object o) {
