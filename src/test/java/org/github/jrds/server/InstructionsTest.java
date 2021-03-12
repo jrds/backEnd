@@ -231,10 +231,10 @@ public class InstructionsTest extends ApplicationTest
         Assert.assertTrue(received1 instanceof InstructionMessage);
         Assert.assertTrue(received2 instanceof InstructionMessage);
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received2).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received2).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received2).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received2).getInstruction().getBody());
     }
 
 
@@ -259,15 +259,15 @@ public class InstructionsTest extends ApplicationTest
         Message received3 = c3.getMessageReceived();
         Message received4 = c3.getMessageReceived();
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received3).getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received3).getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionMessage) received3).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionMessage) received3).getInstruction().getBody());
 
-        Assert.assertEquals(testTitle2, ((InstructionMessage) received2).getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage) received2).getBody());
-        Assert.assertEquals(testTitle2, ((InstructionMessage) received4).getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage) received4).getBody());
+        Assert.assertEquals(testTitle2, ((InstructionMessage) received2).getInstruction().getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage) received2).getInstruction().getBody());
+        Assert.assertEquals(testTitle2, ((InstructionMessage) received4).getInstruction().getTitle());
+        Assert.assertEquals(testBody2, ((InstructionMessage) received4).getInstruction().getBody());
     }
 
     @Test

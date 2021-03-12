@@ -21,6 +21,7 @@ import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+import org.github.jrds.server.dto.InstructionDto;
 import org.github.jrds.server.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +93,8 @@ public class MessageSocket
                     {
                         if (server.attendanceStore.getAttendance(learner, lesson) != null)
                         {
-                            InstructionMessage iM = new InstructionMessage(lesson.getEducator(), learner, i);
+                            InstructionDto instructionDto = new InstructionDto(i);
+                            InstructionMessage iM = new InstructionMessage(msg.getFrom(), learner.getId(), instructionDto);
                             sendMessage(iM);
                             sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
                         }
