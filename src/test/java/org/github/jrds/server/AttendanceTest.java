@@ -3,20 +3,23 @@ package org.github.jrds.server;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AttendanceTest extends ApplicationTest {
+public class AttendanceTest extends ApplicationTest
+{
 
     @Test
-    public void oneAttendanceRecordedCorrectly() {
+    public void oneAttendanceRecordedCorrectly()
+    {
         connect(l1Id, l1Name, lesson1);
-        Assert.assertEquals(l1Id, getAttendance(l1Id,lesson1).getUser().getId());
-        Assert.assertEquals(lesson1, getAttendance(l1Id,lesson1).getLesson().getId());
+        Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
+        Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
     }
 
     @Test
-    public void twoAttendancesRecordedCorrectly() {
+    public void twoAttendancesRecordedCorrectly()
+    {
         connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson2);
- 
+
         Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
         Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
         Assert.assertEquals(l2Id, getAttendance(l2Id, lesson2).getUser().getId());
@@ -25,90 +28,109 @@ public class AttendanceTest extends ApplicationTest {
 
 
     @Test
-    public void userCantRegisterAttendanceForTheSameLessonTwice(){
-        try {
-             connect(l1Id, l1Name, lesson1);
+    public void userCantRegisterAttendanceForTheSameLessonTwice()
+    {
+        try
+        {
+            connect(l1Id, l1Name, lesson1);
         }
-        catch(Exception e){
+        catch (Exception e)
+        {
             // Expected
         }
-        try {
+        try
+        {
             connect(l1Id, l1Name, lesson1);
             Assert.fail("Expected connection to fail, because learner 1 is already connnected/attending this lesson");
             //might need an if... to check if the user is already in attendance in connect method to resolve this. 
-        } catch(Exception e){
+        }
+        catch (Exception e)
+        {
             // Expected
         }
     }
 
     @Test
-    public void unregisteredStudentAttendanceNotRecorded() {
-        try {
+    public void unregisteredStudentAttendanceNotRecorded()
+    {
+        try
+        {
             connect(l99Id, l99Name, lesson1);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             //expected
-        } 
+        }
 
         Assert.assertNull(getAttendance(l99Id, lesson1));
     }
 
     @Test
-    public void unregisteredLessonAttendanceNotRecorded() {
-        try {
+    public void unregisteredLessonAttendanceNotRecorded()
+    {
+        try
+        {
             connect(l1Id, l1Name, "9999");
-        } catch (Exception e) { 
+        }
+        catch (Exception e)
+        {
             //expected
-        } 
-     
+        }
+
         Assert.assertNull(getAttendance(l1Id, "9999"));
     }
 
     @Test
-    public void educatorConnectionVerificationProvided() {
+    public void educatorConnectionVerificationProvided()
+    {
         connect(eduId, eduName, lesson1);
         connect(l1Id, l1Name, lesson1);
         Assert.assertNotNull(getAttendance(eduId, lesson1));
     }
 
     @Test
-    public void educatorConnectionVerificationDenied() {
+    public void educatorConnectionVerificationDenied()
+    {
         connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson1);
         Assert.assertNull(getAttendance(eduId, lesson1));
     }
- 
+
 
     @Test
-    public void attendanceRemovedFromStoreAfterDisconnect(){
-        TestClient c1 = connect(l1Id, l1Name ,lesson1);
+    public void attendanceRemovedFromStoreAfterDisconnect()
+    {
+        TestClient c1 = connect(l1Id, l1Name, lesson1);
         Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
         Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
-        
+
         disconnect(c1);
         Assert.assertNull(getAttendance(l1Id, lesson1));
     }
 
     @Test
-    public void attendanceRemovedAndReaddedUponDisconnectAndReconnnect(){
+    public void attendanceRemovedAndReaddedUponDisconnectAndReconnnect()
+    {
         TestClient c1 = connect(l1Id, l1Name, lesson1);
         disconnect(c1);
-        
+
         connect(l1Id, l1Name, lesson1);
         Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
         Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
     }
-    
+
 
     @Test
-    public void otherAttendancesNotImpactedWhenAnotherIsRemoved(){
+    public void otherAttendancesNotImpactedWhenAnotherIsRemoved()
+    {
         TestClient c1 = connect(l1Id, l1Name, lesson1);
         connect(l2Id, l2Name, lesson1);
-    
+
         Assert.assertEquals(l1Id, getAttendance(l1Id, lesson1).getUser().getId());
         Assert.assertEquals(lesson1, getAttendance(l1Id, lesson1).getLesson().getId());
         Assert.assertEquals(l2Id, getAttendance(l2Id, lesson1).getUser().getId());
         Assert.assertEquals(lesson1, getAttendance(l2Id, lesson1).getLesson().getId());
-        
+
         disconnect(c1);
         Assert.assertNull(getAttendance(l1Id, lesson1));
         Assert.assertEquals(l2Id, getAttendance(l2Id, lesson1).getUser().getId());

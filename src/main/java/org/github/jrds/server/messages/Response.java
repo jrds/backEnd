@@ -14,9 +14,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = SuccessMessage.class, name = "success")})
 
 
-public abstract class Response extends Message {
+public abstract class Response extends Message
+{
 
-    public Response( String to, int id) {
+    public Response(String to, int id)
+    {
         super(null, to, id);
     }
 

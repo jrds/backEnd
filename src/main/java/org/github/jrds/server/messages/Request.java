@@ -15,20 +15,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = LessonStartMessage.class, name = "lessonStart")
 })
 
-public class Request extends Message {
-
+public class Request extends Message
+{
 
     private Response response = null;
 
-    public Request(String to, String from) {
-        super(to,from);
+    public Request(String to, String from)
+    {
+        super(to, from);
     }
 
-    public Response getResponse() {
+    public Response getResponse()
+    {
         return response;
     }
 
-    public void setResponse(Response response) {
+    public void setResponse(Response response)
+    {
         this.response = response;
     }
 }

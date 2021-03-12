@@ -16,17 +16,19 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.Assert.fail;
 
 
-public class InstructionsTest extends ApplicationTest {
-    private String testTitle1 = "Instruction Test 1";
-    private String testBody1 = "Body of Test Instruction 1";
-    private String testTitle2 = "Instruction Test 2";
-    private String testBody2 = "Body of Test Instruction 2";
-    private String testTitle3 = "Instruction Test 3";
-    private String testBody3 = "Body of Test Instruction 3";
+public class InstructionsTest extends ApplicationTest
+{
+    private final String testTitle1 = "Instruction Test 1";
+    private final String testBody1 = "Body of Test Instruction 1";
+    private final String testTitle2 = "Instruction Test 2";
+    private final String testBody2 = "Body of Test Instruction 2";
+    private final String testTitle3 = "Instruction Test 3";
+    private final String testBody3 = "Body of Test Instruction 3";
 
 
     @Test
-    public void educatorCreatesInstructionToLesson() {
+    public void educatorCreatesInstructionToLesson()
+    {
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
@@ -44,7 +46,8 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void educatorCanCreateMultipleInstructions() {
+    public void educatorCanCreateMultipleInstructions()
+    {
 
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
@@ -74,7 +77,8 @@ public class InstructionsTest extends ApplicationTest {
     //Once removing is also a concept will need tests to check they contain the expected instruction.
 
     @Test
-    public void educatorCanRemoveAnInstruction() {
+    public void educatorCanRemoveAnInstruction()
+    {
 
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
@@ -102,7 +106,8 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void educatorCanRemoveAllInstructions() {
+    public void educatorCanRemoveAllInstructions()
+    {
         // already proven in other tests - is it good to separate it out?
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
@@ -123,7 +128,8 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void educatorCanEditInstructionTitle() {
+    public void educatorCanEditInstructionTitle()
+    {
 
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
@@ -142,7 +148,8 @@ public class InstructionsTest extends ApplicationTest {
     }
 
     @Test
-    public void educatorCanEditInstructionBody() {
+    public void educatorCanEditInstructionBody()
+    {
 
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
@@ -162,24 +169,29 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void studentCantCreateInstructionToLesson() {
+    public void studentCantCreateInstructionToLesson()
+    {
         connect(l1Id, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(l1Id);
 
         l.removeAllInstructions();
 
-        try {
+        try
+        {
             l.createInstruction(testTitle1, testBody1, u);
             fail("Expected Illegal Argument Exception");
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             Assert.assertEquals("Only the educator of this lesson can add instructions", e.getMessage());
         }
     }
 
 
     @Test
-    public void instructionsCantHaveTheSameTitle() {
+    public void instructionsCantHaveTheSameTitle()
+    {
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
@@ -187,17 +199,21 @@ public class InstructionsTest extends ApplicationTest {
         l.removeAllInstructions();
 
         l.createInstruction(testTitle1, testBody1, u);
-        try {
+        try
+        {
             l.createInstruction(testTitle1, testBody2, u);
             fail("Expected illegal argument exception");
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             Assert.assertEquals("This title already exists", e.getMessage());
         }
 
     }
 
     @Test
-    public void startLessonSendsOneInstructionToAllLearners() {
+    public void startLessonSendsOneInstructionToAllLearners()
+    {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l2Id, l2Name, lesson1);
@@ -223,7 +239,8 @@ public class InstructionsTest extends ApplicationTest {
 
 
     @Test
-    public void startLessonSendsMultipleInstructionsToAllLearners() {
+    public void startLessonSendsMultipleInstructionsToAllLearners()
+    {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l2Id, l2Name, lesson1);
@@ -254,7 +271,8 @@ public class InstructionsTest extends ApplicationTest {
     }
 
     @Test
-    public void learnerNotInClassDoesntReceiveInstructions() {
+    public void learnerNotInClassDoesntReceiveInstructions()
+    {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
         TestClient c3 = connect(l99Id, l99Name, lesson2);
@@ -274,7 +292,8 @@ public class InstructionsTest extends ApplicationTest {
     //TODO how does the educator see the instructions, he's able to access, edit and create, but isn't sent the instruction message
 
     @Test
-    public void studentCannotStartLesson() throws InterruptedException, ExecutionException, TimeoutException {
+    public void studentCannotStartLesson() throws InterruptedException, ExecutionException, TimeoutException
+    {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
 
@@ -293,7 +312,8 @@ public class InstructionsTest extends ApplicationTest {
 
     @Test
     @Ignore
-    public void instructionsArePresentAfterEducatorDisconnectsAndReconnects() {
+    public void instructionsArePresentAfterEducatorDisconnectsAndReconnects()
+    {
         // some sort of permanence needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
         // potentially add to the set up/initialisation ? // Needs more thought. 
         fail();

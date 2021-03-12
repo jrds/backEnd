@@ -17,47 +17,63 @@ import java.util.concurrent.atomic.AtomicInteger;
         @Type(value = Response.class, name = "response")
 })
 
-public abstract class Message {
+public abstract class Message
+{
 
     protected static AtomicInteger idCounter = new AtomicInteger(0);
 
-    private String from;
-    private String to;
-    private int id;
+    private final String from;
+    private final String to;
+    private final int id;
 
 
-    public Message(String from, String to) {
+    public Message(String from, String to)
+    {
         this.from = from;
         this.to = to;
         this.id = idCounter.incrementAndGet();
     }
 
-    public Message(String from, String to, int id) {
+    public Message(String from, String to, int id)
+    {
         this.from = from;
         this.to = to;
         this.id = id;
     }
 
-    public String getFrom() {
+    public String getFrom()
+    {
         return from;
     }
 
-    public String getTo() {
+    public String getTo()
+    {
         return to;
     }
 
-    public int getId() { return id; }
+    public int getId()
+    {
+        return id;
+    }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
         Message message = (Message) o;
         return id == message.id;
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return Objects.hash(id);
     }
 }

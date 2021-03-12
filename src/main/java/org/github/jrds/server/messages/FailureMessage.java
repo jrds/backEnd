@@ -3,9 +3,10 @@ package org.github.jrds.server.messages;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class FailureMessage extends Response {
+public class FailureMessage extends Response
+{
 
-    private String failureReason;
+    private final String failureReason;
 
     @JsonCreator
     public FailureMessage(
@@ -17,17 +18,20 @@ public class FailureMessage extends Response {
         this.failureReason = failureReason;
     }
 
-    public String getFailureReason() {
+    public String getFailureReason()
+    {
         return failureReason;
     }
 
     @Override
-    public boolean isSuccess() {
+    public boolean isSuccess()
+    {
         return false;
     }
 
     @Override
-    public FailureMessage asFailure() {
+    public FailureMessage asFailure()
+    {
         return this;
     }
 }

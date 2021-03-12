@@ -6,48 +6,62 @@ import org.github.jrds.server.domain.Instruction;
 
 import java.util.Objects;
 
-public class InstructionDto {
+public class InstructionDto
+{
 
-    private String title;
-    private String body;
-    private String authorId;
+    private final String title;
+    private final String body;
+    private final String authorId;
 
 
     @JsonCreator
     public InstructionDto(@JsonProperty("title") String title,
                           @JsonProperty("body") String body,
-                          @JsonProperty("authorId") String authorId) {
+                          @JsonProperty("authorId") String authorId)
+    {
         this.title = Objects.requireNonNull(title);
         this.body = Objects.requireNonNull(body);
         this.authorId = Objects.requireNonNull(authorId);
     }
 
-    public InstructionDto(Instruction instruction) {
+    public InstructionDto(Instruction instruction)
+    {
         this(instruction.getTitle(), instruction.getBody(), instruction.getAuthor().getId());
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public String getBody() {
+    public String getBody()
+    {
         return body;
     }
 
-    public String getAuthorId() {
+    public String getAuthorId()
+    {
         return authorId;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
         InstructionDto that = (InstructionDto) o;
-        return title.equals(that.title) && body.equals(that.body) && authorId.equals(that.authorId);
+        return title.equals(that.title) && authorId.equals(that.authorId);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(title, body, authorId);
+    public int hashCode()
+    {
+        return Objects.hash(title, authorId);
     }
 }

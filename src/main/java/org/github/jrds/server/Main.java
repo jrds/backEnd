@@ -22,7 +22,8 @@ import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStore;
 import org.github.jrds.server.persistence.UsersStore;
 
-public class Main {
+public class Main
+{
     public static Main defaultInstance;
 
     public UsersStore usersStore = new UsersStore();
@@ -36,7 +37,8 @@ public class Main {
         defaultInstance = this;
     }
 
-    public void start() {
+    public void start()
+    {
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8080);
@@ -56,42 +58,50 @@ public class Main {
             wsContainer.addEndpoint(MessageSocket.class);
         });
 
-        try {
+        try
+        {
             server.start();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
     }
-    
-    private SecurityHandler auth() {
+
+    private SecurityHandler auth()
+    {
 
         HashLoginService l = new HashLoginService();
         l.setUserStore(usersStore.getAuthUserStore());
         l.setName("realm");
-        
+
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);
         constraint.setRoles(new String[]{"user"});
         constraint.setAuthenticate(true);
-         
+
         ConstraintMapping cm = new ConstraintMapping();
         cm.setConstraint(constraint);
         cm.setPathSpec("/*");
-        
+
         ConstraintSecurityHandler csh = new ConstraintSecurityHandler();
         csh.setAuthenticator(new BasicAuthenticator());
         csh.setRealmName("myrealm");
         csh.addConstraintMapping(cm);
         csh.setLoginService(l);
-        
+
         return csh;
     }
 
-    public void stop() {
-        try {
+    public void stop()
+    {
+        try
+        {
             server.stop();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
     }

@@ -16,10 +16,10 @@ public class ClientWebSocket extends Endpoint
 
     private static final String BASE_URL = "ws://localhost:8080/lesson/";
 
-    private CountDownLatch closureLatch = new CountDownLatch(1);
-    private BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
-    private ObjectMapper mapper = new ObjectMapper();
-    private Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
+    private final CountDownLatch closureLatch = new CountDownLatch(1);
+    private final BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
     private Session session;
 
 
