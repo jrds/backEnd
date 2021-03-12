@@ -62,6 +62,11 @@ public class TestClient
         return clientWebSocket.sendMessage(m);
     }
 
+    public Future<Response> requestHelp()
+    {
+        RequestHelpMessage m = new RequestHelpMessage(null, id);
+        return clientWebSocket.sendMessage(m);
+    }
 
     public Future<Response> startLesson()
     {

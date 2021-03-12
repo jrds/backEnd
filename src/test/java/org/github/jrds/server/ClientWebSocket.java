@@ -2,6 +2,7 @@ package org.github.jrds.server;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -9,6 +10,7 @@ import javax.websocket.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.messages.*;
+import org.junit.Assert;
 
 public class ClientWebSocket extends Endpoint
 {
@@ -20,6 +22,8 @@ public class ClientWebSocket extends Endpoint
     private final BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
+    private final Map<String, Message> openHelpRequests = new TreeMap<>();
+
     private Session session;
 
 
@@ -102,6 +106,12 @@ public class ClientWebSocket extends Endpoint
                     throw new IllegalStateException("Unexpected message");
                 }
             }
+            else if (msg instanceof RequestHelpMessage)
+            {
+                Assert.assertFalse(openHelpRequests.containsKey(msg.getFrom()));
+                ((RequestHelpMessage) msg).setTimeEducatorReceivedRequest(Instant.now());
+                openHelpRequests.put(msg.getFrom(), msg);
+            }
             else
             {
                 messagesReceived.add(msg);
@@ -154,6 +164,11 @@ public class ClientWebSocket extends Endpoint
         {
             return null;
         }
+    }
+
+    Set<Message> getHelpRequests()
+    {
+        return (Set<Message>) openHelpRequests.values();
     }
 
     public Future<Response> sendMessage(Request message)

@@ -1,9 +1,7 @@
 package org.github.jrds.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import javax.websocket.CloseReason;
@@ -35,6 +33,7 @@ public class MessageSocket
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, Attendance> sessionAttendances = new HashMap<>();
+    private final Set<RequestHelpMessage> activeHelpRequests = new LinkedHashSet<>();
 
     public MessageSocket()
     {
@@ -109,6 +108,20 @@ public class MessageSocket
             else
             {
                 sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson", msg.getId()));
+            }
+        }
+        else if (msg instanceof RequestHelpMessage)
+        {
+            if (activeHelpRequests.contains((RequestHelpMessage) msg))
+            {
+                activeHelpRequests.add((RequestHelpMessage) msg);
+                RequestHelpMessage rH = new RequestHelpMessage(attendance.getLesson().getEducator().getId(),msg.getFrom());
+                sendMessage(rH);
+                sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
+            }
+            else
+            {
+                sendMessage(new FailureMessage(msg.getFrom(), "Learners cannot create more than one active help request", msg.getId()));
             }
         }
         else
