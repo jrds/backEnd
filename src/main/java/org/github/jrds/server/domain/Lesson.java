@@ -1,17 +1,14 @@
 package org.github.jrds.server.domain;
 
 
-import org.github.jrds.server.Main;
-
 import java.util.*;
 
 public class Lesson
 {
-
     private final String id;
     private final User educator;
     private final Set<User> learners;
-    private final Map<String, Instruction> instructions = new TreeMap<>();
+    private final List<Instruction> instructions = new ArrayList<>();
 
     public Lesson(String id, User educator, Set<User> learners)
     {
@@ -66,18 +63,15 @@ public class Lesson
         }
     }
 
-    public void createInstruction(String title, String body, User author)
+    public Instruction createInstruction(String title, String body, User author)
     {
         if (author.equals(educator))
         {
-            if (!instructions.containsKey(title))
-            {
-                storeInstruction(new Instruction(title, body, author)); // it's already established that author and educator are equal, is there any reason to use one over the other? 
-            }
-            else
-            {
-                throw new IllegalArgumentException("This title already exists");
-            }
+            String id = UUID.randomUUID().toString();
+            // it's already established that author and educator are equal, is there any reason to use one over the other?
+            Instruction i = new Instruction(id, this, title, body, author);
+            instructions.add(i);
+            return i;
         }
         else
         {
@@ -85,72 +79,19 @@ public class Lesson
         }
     }
 
-    private void storeInstruction(Instruction i)
+    public Instruction getInstruction(String id)
     {
-        instructions.put(i.getTitle(), i);
-    }
-
-    public Instruction getInstruction(String instructionTitle)
-    {
-        if (instructions.containsKey(instructionTitle))
-        {
-            return instructions.get(instructionTitle);
-        }
-        else
-        {
-            return null;
-        }
+        return instructions.stream().filter(i -> i.getId().equals(id)).findFirst().orElse(null);
     }
 
     public List<Instruction> getAllInstructions()
     {
-        return new ArrayList<>(instructions.values());
+        return Collections.unmodifiableList(instructions);
     }
 
-    public void editInstructionTitle(String currentTitle, String newTitle, User u)
+    public void removeInstruction(Instruction instruction)
     {
-        if (u.equals(educator))
-        {
-            if (instructions.containsKey(currentTitle))
-            {
-                instructions.put(newTitle, new Instruction(newTitle, instructions.get(currentTitle).getBody(), instructions.get(currentTitle).getAuthor()));
-                instructions.remove(currentTitle);
-            }
-            else
-            {
-                System.out.println("This title already exists.");
-            }
-        }
-        else
-        {
-            System.out.println("Only the educator of the class can edit the instruction.");
-        }
-    }
-
-
-    public void editInstructionBody(String instructionTitle, String instructionBody, User u)
-    {
-        if (u.equals(educator))
-        {
-            if (instructions.containsKey(instructionTitle))
-            {
-                instructions.get(instructionTitle).setBody(instructionBody);
-            }
-            else
-            {
-                System.out.println("This title does not exists.");
-            }
-        }
-        else
-        {
-            System.out.println("Only the educator of the class can edit the instruction.");
-        }
-    }
-
-
-    public void removeInstruction(String instructionTitle)
-    {
-        instructions.remove(instructionTitle);
+        instructions.remove(instruction);
     }
 
     public void removeAllInstructions()
@@ -158,6 +99,25 @@ public class Lesson
         instructions.clear();
     }
 
+    void moveUp(Instruction instruction)
+    {
+        int index = instructions.indexOf(instruction);
+        if (index > 0)
+        {
+            instructions.set(index, instructions.get(index - 1));
+            instructions.set(index - 1, instruction);
+        }
+    }
+
+    void moveDown(Instruction instruction)
+    {
+        int index = instructions.indexOf(instruction);
+        if (index < instructions.size() - 1 && index != -1)
+        {
+            instructions.set(index, instructions.get(index + 1));
+            instructions.set(index + 1, instruction);
+        }
+    }
 
     @Override
     public String toString()

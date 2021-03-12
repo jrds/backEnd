@@ -8,13 +8,17 @@ import java.util.Objects;
 public class Instruction
 {
 
-    private final String title;
+    private String id;
+    private Lesson lesson;
+    private String title;
     private String body;
     private final User author;
 
 
-    Instruction(String title, String body, User author)
+    Instruction(String id, Lesson lesson, String title, String body, User author)
     {
+        this.id = Objects.requireNonNull(id);
+        this.lesson = Objects.requireNonNull(lesson);
         this.title = Objects.requireNonNull(title);
         this.body = body;
         this.author = Objects.requireNonNull(author);
@@ -26,13 +30,18 @@ public class Instruction
         return title;
     }
 
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
     public String getBody()
     {
         return body;
     }
 
 
-    void setBody(String body)
+    public void setBody(String body)
     {
         this.body = body;
     }
@@ -42,6 +51,15 @@ public class Instruction
         return author;
     }
 
+    public void moveUp()
+    {
+        lesson.moveUp(this);
+    }
+
+    public void moveDown()
+    {
+        lesson.moveDown(this);
+    }
 
     @Override
     public boolean equals(Object o)
@@ -55,12 +73,17 @@ public class Instruction
             return false;
         }
         Instruction that = (Instruction) o;
-        return title.equals(that.title) && author.equals(that.author);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(title, author);
+        return Objects.hash(id);
+    }
+
+    public String getId()
+    {
+        return id;
     }
 }

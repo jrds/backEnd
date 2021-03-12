@@ -1,5 +1,6 @@
 package org.github.jrds.server;
 
+import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
 import org.github.jrds.server.messages.*;
@@ -33,87 +34,102 @@ public class InstructionsTest extends ApplicationTest
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();
         Assert.assertEquals(0, l.getAllInstructions().size());
 
-        l.createInstruction(testTitle1, testBody1, u);
+        Instruction instruction = l.createInstruction(testTitle1, testBody1, u);
+        Assert.assertEquals(testTitle1, instruction.getTitle());
+        Assert.assertEquals(testBody1, instruction.getBody());
+        Assert.assertEquals(u, instruction.getAuthor());
 
-        Assert.assertFalse(l.getAllInstructions().isEmpty());
-        Assert.assertNotNull(l.getInstruction(testTitle1)); // TODO - REVIEW this proves the title is as expected so don't need a separate test for this.
-        Assert.assertEquals(testBody1, l.getInstruction(testTitle1).getBody());
-        Assert.assertEquals(u, l.getInstruction(testTitle1).getAuthor());
+        Assert.assertEquals(1, l.getAllInstructions().size());
+        Assert.assertNotNull(l.getInstruction(instruction.getId()));
     }
 
 
     @Test
     public void educatorCanCreateMultipleInstructions()
     {
-
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();
-        l.createInstruction(testTitle1, testBody1, u);
-        l.createInstruction(testTitle2, testBody2, u);
-        l.createInstruction(testTitle3, testBody3, u);
+        Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
+        Instruction i2 = l.createInstruction(testTitle2, testBody2, u);
+        Instruction i3 = l.createInstruction(testTitle3, testBody3, u);
 
         Assert.assertEquals(3, l.getAllInstructions().size());
 
-        Assert.assertNotNull(l.getInstruction(testTitle1));
-        Assert.assertNotNull(l.getInstruction(testTitle2));
-        Assert.assertNotNull(l.getInstruction(testTitle3));
+        Assert.assertNotNull(l.getInstruction(i1.getId()));
+        Assert.assertNotNull(l.getInstruction(i2.getId()));
+        Assert.assertNotNull(l.getInstruction(i3.getId()));
 
         Assert.assertEquals(testBody1, l.getAllInstructions().get(0).getBody());
         Assert.assertEquals(testBody2, l.getAllInstructions().get(1).getBody());
         Assert.assertEquals(testBody3, l.getAllInstructions().get(2).getBody());
-
-        Assert.assertEquals(u, l.getAllInstructions().get(0).getAuthor());
-        Assert.assertEquals(u, l.getAllInstructions().get(1).getAuthor());
-        Assert.assertEquals(u, l.getAllInstructions().get(2).getAuthor());
     }
 
-    //TODO - Create some test for the ordering.
-    //Once removing is also a concept will need tests to check they contain the expected instruction.
-
     @Test
-    public void educatorCanRemoveAnInstruction()
+    public void canReorderInstructions()
     {
-
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();
-        l.createInstruction(testTitle1, testBody1, u);
-        l.createInstruction(testTitle2, testBody2, u);
-        l.createInstruction(testTitle3, testBody3, u);
+        Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
+        Instruction i2 = l.createInstruction(testTitle2, testBody2, u);
+        Instruction i3 = l.createInstruction(testTitle3, testBody3, u);
 
-        l.removeInstruction(testTitle2);
+        i2.moveDown();
+        Assert.assertEquals(testBody1, l.getAllInstructions().get(0).getBody());
+        Assert.assertEquals(testBody3, l.getAllInstructions().get(1).getBody());
+        Assert.assertEquals(testBody2, l.getAllInstructions().get(2).getBody());
+
+        i3.moveUp();
+        Assert.assertEquals(testBody3, l.getAllInstructions().get(0).getBody());
+        Assert.assertEquals(testBody1, l.getAllInstructions().get(1).getBody());
+        Assert.assertEquals(testBody2, l.getAllInstructions().get(2).getBody());
+
+        i3.moveUp();
+        Assert.assertEquals(testBody3, l.getAllInstructions().get(0).getBody());
+        Assert.assertEquals(testBody1, l.getAllInstructions().get(1).getBody());
+        Assert.assertEquals(testBody2, l.getAllInstructions().get(2).getBody());
+
+        i2.moveDown();
+        Assert.assertEquals(testBody3, l.getAllInstructions().get(0).getBody());
+        Assert.assertEquals(testBody1, l.getAllInstructions().get(1).getBody());
+        Assert.assertEquals(testBody2, l.getAllInstructions().get(2).getBody());
+    }
+
+    @Test
+    public void educatorCanRemoveAnInstruction()
+    {
+        connect(eduId, eduName, lesson1);
+        Lesson l = server.lessonStore.getLesson(lesson1);
+        User u = server.usersStore.getUser(eduId);
+
+        Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
+        Instruction i2 = l.createInstruction(testTitle2, testBody2, u);
+        Instruction i3 = l.createInstruction(testTitle3, testBody3, u);
+
+        l.removeInstruction(i2);
 
         Assert.assertEquals(2, l.getAllInstructions().size());
 
-        Assert.assertNotNull(l.getInstruction(testTitle1));
-        Assert.assertNotNull(l.getInstruction(testTitle3));
-        Assert.assertNull(l.getInstruction(testTitle2));
+        Assert.assertNotNull(l.getInstruction(i1.getId()));
+        Assert.assertNotNull(l.getInstruction(i3.getId()));
+        Assert.assertNull(l.getInstruction(i2.getId()));
 
         Assert.assertEquals(testBody1, l.getAllInstructions().get(0).getBody());
         Assert.assertEquals(testBody3, l.getAllInstructions().get(1).getBody());
-
-        Assert.assertEquals(u, l.getAllInstructions().get(0).getAuthor());
-        Assert.assertEquals(u, l.getAllInstructions().get(1).getAuthor());
     }
 
 
     @Test
     public void educatorCanRemoveAllInstructions()
     {
-        // already proven in other tests - is it good to separate it out?
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
-
-        l.removeAllInstructions();
 
         l.createInstruction(testTitle1, testBody1, u);
         l.createInstruction(testTitle2, testBody2, u);
@@ -130,43 +146,34 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void educatorCanEditInstructionTitle()
     {
-
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();
-        l.createInstruction(testTitle1, testBody1, u);
+        Instruction instruction = l.createInstruction(testTitle1, testBody1, u);
 
-        Assert.assertEquals(testTitle1, l.getInstruction(testTitle1).getTitle());
+        instruction.setTitle(testTitle2);
 
-        l.editInstructionTitle(testTitle1, testTitle2, u);
-        Assert.assertNotNull(l.getInstruction(testTitle2));
-        Assert.assertNull(l.getInstruction(testTitle1));
-        Assert.assertEquals(testBody1, l.getInstruction(testTitle2).getBody());
-        Assert.assertEquals(u, l.getInstruction(testTitle2).getAuthor());
+        Instruction refetch = l.getInstruction(instruction.getId());
+        Assert.assertEquals(testTitle2, refetch.getTitle());
+        Assert.assertEquals(testBody1, refetch.getBody());
     }
 
     @Test
     public void educatorCanEditInstructionBody()
     {
-
         connect(eduId, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(eduId);
 
-        l.removeAllInstructions();
-        l.createInstruction(testTitle1, testBody1, u);
+        Instruction instruction = l.createInstruction(testTitle1, testBody1, u);
 
-        Assert.assertEquals(testBody1, l.getInstruction(testTitle1).getBody());
+        instruction.setBody(testBody2);
 
-        l.editInstructionBody(testTitle1, testBody2, u);
-        Assert.assertNotNull(l.getInstruction(testTitle1));
-        Assert.assertEquals(testBody2, l.getInstruction(testTitle1).getBody());
-        Assert.assertNotEquals(testBody1, l.getInstruction(testTitle1).getBody());
-        Assert.assertEquals(u, l.getInstruction(testTitle1).getAuthor());
+        Instruction refetch = l.getInstruction(instruction.getId());
+        Assert.assertEquals(testTitle1, refetch.getTitle());
+        Assert.assertEquals(testBody2, refetch.getBody());
     }
-
 
     @Test
     public void studentCantCreateInstructionToLesson()
@@ -174,8 +181,6 @@ public class InstructionsTest extends ApplicationTest
         connect(l1Id, eduName, lesson1);
         Lesson l = server.lessonStore.getLesson(lesson1);
         User u = server.usersStore.getUser(l1Id);
-
-        l.removeAllInstructions();
 
         try
         {
@@ -188,29 +193,6 @@ public class InstructionsTest extends ApplicationTest
         }
     }
 
-
-    @Test
-    public void instructionsCantHaveTheSameTitle()
-    {
-        connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
-        User u = server.usersStore.getUser(eduId);
-
-        l.removeAllInstructions();
-
-        l.createInstruction(testTitle1, testBody1, u);
-        try
-        {
-            l.createInstruction(testTitle1, testBody2, u);
-            fail("Expected illegal argument exception");
-        }
-        catch (IllegalArgumentException e)
-        {
-            Assert.assertEquals("This title already exists", e.getMessage());
-        }
-
-    }
-
     @Test
     public void startLessonSendsOneInstructionToAllLearners()
     {
@@ -221,7 +203,6 @@ public class InstructionsTest extends ApplicationTest
         User u = server.usersStore.getUser(eduId);
         Lesson l = server.lessonStore.getLesson(lesson1);
 
-        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
         c1.startLesson();
@@ -248,7 +229,6 @@ public class InstructionsTest extends ApplicationTest
         User u = server.usersStore.getUser(eduId);
         Lesson l = server.lessonStore.getLesson(lesson1);
 
-        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
         l.createInstruction(testTitle2, testBody2, u);
 
@@ -280,7 +260,6 @@ public class InstructionsTest extends ApplicationTest
         User u = server.usersStore.getUser(eduId);
         Lesson l = server.lessonStore.getLesson(lesson1);
 
-        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
         c1.startLesson();
@@ -300,7 +279,6 @@ public class InstructionsTest extends ApplicationTest
         User u = server.usersStore.getUser(eduId);
         Lesson l = server.lessonStore.getLesson(lesson1);
 
-        l.removeAllInstructions();
         l.createInstruction(testTitle1, testBody1, u);
 
         Future<Response> startLessonFuture = c2.startLesson();
