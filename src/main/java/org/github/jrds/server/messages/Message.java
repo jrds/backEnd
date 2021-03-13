@@ -14,7 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonSubTypes({
         @Type(value = Request.class, name = "request"),
-        @Type(value = Response.class, name = "response")
+        @Type(value = Response.class, name = "response"),
+        @Type(value = OpenHelpRequestsMessage.class, name = "openHelpRequests") //TODO - MOVE TO RESPONSE
+
 })
 
 public abstract class Message

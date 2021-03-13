@@ -1,28 +1,20 @@
 package org.github.jrds.server;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-
-import javax.websocket.CloseReason;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.Lesson;
-import org.github.jrds.server.domain.User;
+import org.github.jrds.server.domain.*;
+import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.dto.InstructionDto;
 import org.github.jrds.server.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 @ServerEndpoint(value = "/lesson/{lessonId}")
 public class MessageSocket
@@ -31,13 +23,15 @@ public class MessageSocket
     private static final Map<String, Session> userSessions = new HashMap<>();
     private final Main server;
     private final CountDownLatch closureLatch = new CountDownLatch(1);
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
     private final Map<String, Attendance> sessionAttendances = new HashMap<>();
-    private final Set<RequestHelpMessage> activeHelpRequests = new LinkedHashSet<>();
+    private final SortedSet<HelpRequest> openHelpRequests = new TreeSet<>();
 
     public MessageSocket()
     {
         this.server = Main.defaultInstance;
+        mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
     }
 
     @OnOpen
@@ -112,12 +106,13 @@ public class MessageSocket
         }
         else if (msg instanceof RequestHelpMessage)
         {
-            if (activeHelpRequests.contains((RequestHelpMessage) msg))
+            if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(msg.getFrom())))
             {
-                activeHelpRequests.add((RequestHelpMessage) msg);
-                RequestHelpMessage rH = new RequestHelpMessage(attendance.getLesson().getEducator().getId(),msg.getFrom());
-                sendMessage(rH);
+                HelpRequest helpRequest = new HelpRequest(attendance.getUser());
+                openHelpRequests.add(helpRequest);
                 sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
+                List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
+                sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
             }
             else
             {

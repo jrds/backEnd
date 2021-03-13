@@ -2,7 +2,6 @@ package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.eclipse.jetty.client.api.Authentication;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -14,7 +13,8 @@ import org.eclipse.jetty.client.api.Authentication;
         @JsonSubTypes.Type(value = SessionEndMessage.class, name = "sessionEnd"),
         @JsonSubTypes.Type(value = InstructionMessage.class, name = "instruction"),
         @JsonSubTypes.Type(value = LessonStartMessage.class, name = "lessonStart"),
-        @JsonSubTypes.Type(value = RequestHelpMessage.class, name =  "requestHelp")
+        @JsonSubTypes.Type(value = RequestHelpMessage.class, name =  "requestHelp"),
+
 })
 
 public class Request extends Message
@@ -22,9 +22,9 @@ public class Request extends Message
 
     private Response response = null;
 
-    public Request(String to, String from)
+    public Request(String from, String to)
     {
-        super(to, from);
+        super(from, to);
     }
 
     public Response getResponse()

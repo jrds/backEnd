@@ -2,15 +2,14 @@ package org.github.jrds.server;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 
 import javax.websocket.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.messages.*;
-import org.junit.Assert;
 
 public class ClientWebSocket extends Endpoint
 {
@@ -20,12 +19,17 @@ public class ClientWebSocket extends Endpoint
 
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
     private final Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
-    private final Map<String, Message> openHelpRequests = new TreeMap<>();
+    private List<HelpRequestDto> openHelpRequests = new ArrayList<>();
 
     private Session session;
 
+    public ClientWebSocket()
+    {
+        mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+    }
 
     public static ClientWebSocket connect(String userId, String lessonId)
     {
@@ -106,11 +110,10 @@ public class ClientWebSocket extends Endpoint
                     throw new IllegalStateException("Unexpected message");
                 }
             }
-            else if (msg instanceof RequestHelpMessage)
+
+            else if (msg instanceof OpenHelpRequestsMessage)
             {
-                Assert.assertFalse(openHelpRequests.containsKey(msg.getFrom()));
-                ((RequestHelpMessage) msg).setTimeEducatorReceivedRequest(Instant.now());
-                openHelpRequests.put(msg.getFrom(), msg);
+                openHelpRequests = ((OpenHelpRequestsMessage) msg).getOpenHelpRequests();
             }
             else
             {
@@ -166,9 +169,9 @@ public class ClientWebSocket extends Endpoint
         }
     }
 
-    Set<Message> getHelpRequests()
+    List<HelpRequestDto> getOpenHelpRequests()
     {
-        return (Set<Message>) openHelpRequests.values();
+        return openHelpRequests;
     }
 
     public Future<Response> sendMessage(Request message)

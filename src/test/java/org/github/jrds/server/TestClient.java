@@ -1,21 +1,12 @@
 package org.github.jrds.server;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
 import java.util.concurrent.Future;
-
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.messages.*;
 
 public class TestClient
@@ -27,7 +18,6 @@ public class TestClient
     private final String name; // TODO - will be useful when sending messages, as humans need names not ID, but ID is the unique identifier
     private ClientWebSocket clientWebSocket;
     private final ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-
 
     public TestClient(String id, String name)
     {
@@ -64,7 +54,7 @@ public class TestClient
 
     public Future<Response> requestHelp()
     {
-        RequestHelpMessage m = new RequestHelpMessage(null, id);
+        RequestHelpMessage m = new RequestHelpMessage(id);
         return clientWebSocket.sendMessage(m);
     }
 
@@ -96,4 +86,8 @@ public class TestClient
     }
 
 
+    public List<HelpRequestDto> getHelpRequests()
+    {
+        return clientWebSocket.getOpenHelpRequests();
+    }
 }
