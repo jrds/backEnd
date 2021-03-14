@@ -1,12 +1,12 @@
 package org.github.jrds.server.persistence;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AttendanceStore
 {

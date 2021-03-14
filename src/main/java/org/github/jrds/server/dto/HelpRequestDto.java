@@ -3,11 +3,8 @@ package org.github.jrds.server.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.domain.HelpRequest;
-import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.Status;
 
 import java.time.Instant;
-import java.util.Objects;
 
 public class HelpRequestDto
 {

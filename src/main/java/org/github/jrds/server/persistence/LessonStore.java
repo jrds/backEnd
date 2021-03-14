@@ -1,13 +1,9 @@
 package org.github.jrds.server.persistence;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+
+import java.util.*;
 
 public class LessonStore
 {

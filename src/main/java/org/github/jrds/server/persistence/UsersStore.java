@@ -1,12 +1,12 @@
 package org.github.jrds.server.persistence;
 
+import org.eclipse.jetty.security.UserStore;
+import org.github.jrds.server.domain.User;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.jetty.security.UserStore;
-import org.github.jrds.server.domain.User;
 
 public class UsersStore
 {

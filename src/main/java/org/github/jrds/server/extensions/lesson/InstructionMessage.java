@@ -1,25 +1,24 @@
-package org.github.jrds.server.messages;
+package org.github.jrds.server.extensions.lesson;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.User;
 import org.github.jrds.server.dto.InstructionDto;
+import org.github.jrds.server.messages.Info;
+import org.github.jrds.server.messages.Request;
 
 import java.util.Objects;
 
-public class InstructionMessage extends Request
+public class InstructionMessage extends Info
 {
 
     private final InstructionDto instruction;
 
     @JsonCreator
     public InstructionMessage(
-            @JsonProperty("from") String from,
             @JsonProperty("to") String to,
             @JsonProperty("instruction") InstructionDto instruction)
     {
-        super(from, to);
+        super(to);
         this.instruction = Objects.requireNonNull(instruction);
     }
 

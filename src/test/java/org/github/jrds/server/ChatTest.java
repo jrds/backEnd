@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.github.jrds.server.messages.ChatMessage;
+import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.messages.Message;
 import org.github.jrds.server.messages.Response;
 import org.junit.Assert;

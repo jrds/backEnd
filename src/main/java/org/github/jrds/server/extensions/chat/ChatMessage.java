@@ -1,7 +1,8 @@
-package org.github.jrds.server.messages;
+package org.github.jrds.server.extensions.chat;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.github.jrds.server.messages.Request;
 
 import java.util.Objects;
 

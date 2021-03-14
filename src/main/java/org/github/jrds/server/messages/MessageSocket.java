@@ -1,11 +1,11 @@
-package org.github.jrds.server;
+package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.github.jrds.server.domain.*;
-import org.github.jrds.server.dto.HelpRequestDto;
-import org.github.jrds.server.dto.InstructionDto;
-import org.github.jrds.server.messages.*;
+import org.github.jrds.server.Main;
+import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,6 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 
 @ServerEndpoint(value = "/lesson/{lessonId}")
 public class MessageSocket
@@ -25,13 +24,18 @@ public class MessageSocket
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper;
     private final Map<String, Attendance> sessionAttendances = new HashMap<>();
-    private final SortedSet<HelpRequest> openHelpRequests = new TreeSet<>();
+    private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
 
     public MessageSocket()
     {
         this.server = Main.defaultInstance;
+        messagingExtensions.addAll(server.getMessagingExtension());
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
+        messagingExtensions.stream()
+                .map(MessagingExtension::getRequestNamedTypes)
+                .flatMap(Collection::stream)
+                .forEach(mapper::registerSubtypes);
     }
 
     @OnOpen
@@ -62,71 +66,42 @@ public class MessageSocket
     @OnMessage
     public void onWebSocketText(Session sess, String message) throws IOException
     {
-        Message msg = mapper.readValue(message, Message.class);
-        LOGGER.info("Received message: " + msg);
+        Request request = mapper.readValue(message, Request.class);
+        LOGGER.info("Received request: " + request);
         Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
 
-        if (msg instanceof SessionEndMessage)
+        if (request instanceof SessionEndMessage)
         {
             sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
             server.attendanceStore.removeAttendance(attendance);
             userSessions.remove(sess.getUserPrincipal().getName());
             sessionAttendances.remove(sess.getId());
-            //TODO - REVIEW - session end message shouldn't send a success message because we've removed it already.
-            //Or could be a success message at the start of this if.
-        }
-        else if (msg instanceof LessonStartMessage)
-        {
-            if (msg.getFrom().equals(attendance.getLesson().getEducator().getId()))
-            {
-                Lesson lesson = attendance.getLesson();
-                for (Instruction i : lesson.getAllInstructions())
-                {
-                    for (User learner : lesson.getLearners())
-                    {
-                        if (server.attendanceStore.getAttendance(learner, lesson) != null)
-                        {
-                            InstructionDto instructionDto = new InstructionDto(i);
-                            InstructionMessage iM = new InstructionMessage(msg.getFrom(), learner.getId(), instructionDto);
-                            sendMessage(iM);
-                            sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
-                        }
-                        else
-                        {
-                            sendMessage(new FailureMessage(msg.getFrom(), "Learner has no registered attendance", msg.getId()));
-                            // TODO - consider how to test this - as there could be several messages (mainly success) in the educators queue.
-                        }
-                    }
-                }
-            }
-            else
-            {
-                sendMessage(new FailureMessage(msg.getFrom(), "Learner cannot start a lesson", msg.getId()));
-            }
-        }
-        else if (msg instanceof RequestHelpMessage)
-        {
-            if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(msg.getFrom())))
-            {
-                HelpRequest helpRequest = new HelpRequest(attendance.getUser());
-                openHelpRequests.add(helpRequest);
-                sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
-                List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-                sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
-            }
-            else
-            {
-                sendMessage(new FailureMessage(msg.getFrom(), "Learners cannot create more than one active help request", msg.getId()));
-            }
         }
         else
         {
-            sendMessage(msg);
-            sendMessage(new SuccessMessage(msg.getFrom(), msg.getId()));
+            MessagingExtension extension = messagingExtensions.stream()
+                    .filter(e -> e.handles(request))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Unknown message type: " + request.getClass().getName()));
+            try
+            {
+                extension.handle(request, attendance, this);
+                sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+            }
+            catch (Exception e)
+            {
+                sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
+            }
         }
+
+//        else
+//        {
+//            sendMessage(request);
+//            sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+//        }
     }
 
-    private void sendMessage(Message message)
+    public void sendMessage(Message message)
     {
         try
         {

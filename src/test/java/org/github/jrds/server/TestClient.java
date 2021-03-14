@@ -7,6 +7,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.extensions.chat.ChatMessage;
+import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
+import org.github.jrds.server.extensions.help.RequestHelpMessage;
+import org.github.jrds.server.extensions.lesson.LessonStartMessage;
+import org.github.jrds.server.messages.SessionEndMessage;
 import org.github.jrds.server.messages.*;
 
 public class TestClient
@@ -70,6 +75,12 @@ public class TestClient
         return clientWebSocket.sendMessage(m);
     }
 
+    public Future<Response> cancelHelpRequest()
+    {
+        CancelHelpRequestMessage m = new CancelHelpRequestMessage(id);
+        return clientWebSocket.sendMessage(m);
+    }
+
     public Message getMessageReceived()
     {
         return clientWebSocket.nextMessageFromQueue();
@@ -90,4 +101,6 @@ public class TestClient
     {
         return clientWebSocket.getOpenHelpRequests();
     }
+
+
 }

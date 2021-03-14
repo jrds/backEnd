@@ -3,11 +3,11 @@ package org.github.jrds.server;
 import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.Lesson;
 import org.github.jrds.server.domain.User;
+import org.github.jrds.server.extensions.lesson.InstructionMessage;
 import org.github.jrds.server.messages.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

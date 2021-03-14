@@ -1,11 +1,5 @@
 package org.github.jrds.server;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.DispatcherType;
-
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -17,10 +11,19 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-import org.github.jrds.server.messages.Message;
+import org.github.jrds.server.extensions.chat.ChatMessagingExtension;
+import org.github.jrds.server.extensions.help.HelpMessagingExtension;
+import org.github.jrds.server.extensions.lesson.LessonMessagingExtension;
+import org.github.jrds.server.messages.MessageSocket;
+import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStore;
 import org.github.jrds.server.persistence.UsersStore;
+
+import javax.servlet.DispatcherType;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 
 public class Main
 {
@@ -104,5 +107,14 @@ public class Main
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public Collection<? extends MessagingExtension> getMessagingExtension()
+    {
+        return Arrays.asList(
+                new HelpMessagingExtension(),
+                new ChatMessagingExtension(),
+                new LessonMessagingExtension(this)
+        );
     }
 }

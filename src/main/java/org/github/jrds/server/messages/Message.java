@@ -2,7 +2,6 @@ package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,12 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         include = JsonTypeInfo.As.PROPERTY,
         property = "_type")
 
-@JsonSubTypes({
-        @Type(value = Request.class, name = "request"),
-        @Type(value = Response.class, name = "response"),
-        @Type(value = OpenHelpRequestsMessage.class, name = "openHelpRequests") //TODO - MOVE TO RESPONSE
-
-})
+@JsonSubTypes({@JsonSubTypes.Type(Request.class),@JsonSubTypes.Type(Response.class),@JsonSubTypes.Type(Info.class)})
 
 public abstract class Message
 {

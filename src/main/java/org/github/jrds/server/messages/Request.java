@@ -9,15 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "_type")
 
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ChatMessage.class, name = "chat"),
-        @JsonSubTypes.Type(value = SessionEndMessage.class, name = "sessionEnd"),
-        @JsonSubTypes.Type(value = InstructionMessage.class, name = "instruction"),
-        @JsonSubTypes.Type(value = LessonStartMessage.class, name = "lessonStart"),
-        @JsonSubTypes.Type(value = RequestHelpMessage.class, name =  "requestHelp"),
+        @JsonSubTypes.Type(value = SessionEndMessage.class, name = "sessionEnd")})
 
-})
-
-public class Request extends Message
+public abstract class Request extends Message
 {
 
     private Response response = null;

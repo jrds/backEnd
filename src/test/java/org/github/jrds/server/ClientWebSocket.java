@@ -8,7 +8,14 @@ import java.util.concurrent.*;
 import javax.websocket.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.extensions.chat.ChatMessage;
+import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
+import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
+import org.github.jrds.server.extensions.help.RequestHelpMessage;
+import org.github.jrds.server.extensions.lesson.InstructionMessage;
+import org.github.jrds.server.extensions.lesson.LessonStartMessage;
 import org.github.jrds.server.messages.*;
 
 public class ClientWebSocket extends Endpoint
@@ -29,6 +36,15 @@ public class ClientWebSocket extends Endpoint
     {
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
+        mapper.registerSubtypes(
+                new NamedType(RequestHelpMessage.class, "requestHelp"),
+                new NamedType(CancelHelpRequestMessage.class, "requestHelpCancel"),
+                new NamedType(ChatMessage.class, "chat"),
+                new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests"),
+                new NamedType(InstructionMessage.class, "instruction"),
+                new NamedType(LessonStartMessage.class, "lessonStart")
+
+        );
     }
 
     public static ClientWebSocket connect(String userId, String lessonId)
