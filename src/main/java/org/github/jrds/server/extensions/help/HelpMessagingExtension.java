@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.HelpRequest;
+import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.messages.Message;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
@@ -47,12 +49,30 @@ public class HelpMessagingExtension implements MessagingExtension
             }
             else
             {
-                Optional<HelpRequest> toUpdate = openHelpRequests.stream()
-                        .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
-                        .findFirst();
-                toUpdate.ifPresent(helpRequest -> {helpRequest.setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());});//setStatus
-                List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-                messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+                if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.IN_PROGRESS))
+                {
+                    Optional<HelpRequest> toUpdate = openHelpRequests.stream()
+                            .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
+                            .findFirst();
+                    toUpdate.ifPresent(helpRequest -> {
+                        helpRequest.setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
+                    });//setStatus
+                    List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
+                    messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+                }
+                else if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.COMPLETED))
+                {
+                    Optional<HelpRequest> toUpdate = openHelpRequests.stream()
+                            .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
+                            .findFirst();
+                    toUpdate.ifPresent(helpRequest -> {
+                        helpRequest.setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
+                        System.out.println(request); }); //WOULD WRITE TO DB WHEN IT DEVELOPS BEYOND A PROTOTYPE
+                    toUpdate.ifPresent(openHelpRequests::remove);
+                    List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
+                    messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+                }
+                else throw new IllegalStateException("Once a request has been created, it cannot be reset to a NEW request");
             }
         }
         else

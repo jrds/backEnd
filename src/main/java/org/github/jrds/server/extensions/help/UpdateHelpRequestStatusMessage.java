@@ -32,4 +32,18 @@ public class UpdateHelpRequestStatusMessage extends Request
     {
         return newStatus;
     }
+
+    @Override
+    public String toString()
+    {
+        return "UpdateHelpRequestStatusMessage{" +
+                "learnerId='" + learnerId + '\'' +
+                ", newStatus=" + newStatus +
+                " Message from: " + super.getFrom() +
+                " Message to: " + super.getTo() +
+                " Message id: " + super.getId() +
+                '}';
+    }
 }
+
+

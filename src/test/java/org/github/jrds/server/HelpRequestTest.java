@@ -122,10 +122,29 @@ public class HelpRequestTest extends ApplicationTest
     }
 
     @Test
-    public void educatorMarksHelpRequestAsComplete()
+    public void educatorMarksHelpRequestAsComplete() throws InterruptedException, ExecutionException, TimeoutException
     {
         // TODO - audit in active lesson of help request closure etc.
 
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+
+        // wait for c1 to have received the message
+        c1.getMessageReceived();
+
+        HelpRequestDto requestToChangeStatus = c1.getHelpRequests().get(0);
+
+        Assert.assertEquals(Status.NEW.toString(),requestToChangeStatus.getStatus()); //TODO maybe should be string not Status?
+
+        c1.updateHelpRequest(requestToChangeStatus, Status.COMPLETED);
+
+        c1.getMessageReceived();
+
+        int numberOfHelpRequest = c1.getHelpRequests().size();
+        Assert.assertEquals(0, numberOfHelpRequest);  // TODO should I try to keep the original message id?
+        // TODO store time updated
     }
 
     @Test
