@@ -48,7 +48,25 @@ public class HelpRequestTest extends ApplicationTest
         c1.getMessageReceived();
         Assert.assertEquals(0,c1.getHelpRequests().size());
 
+    }
 
+    @Test
+    public void helpRequestsAreReceivedInTheCorrectOrder() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l2Id, l2Name, lesson1);
+
+        c3.requestHelp().get(10, TimeUnit.SECONDS);
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+
+        c1.getMessageReceived();
+        c1.getMessageReceived();
+
+        List<HelpRequestDto> helpRequests = c1.getHelpRequests();
+        Assert.assertEquals(2,helpRequests.size());
+        Assert.assertEquals(l2Id,helpRequests.get(0).getLearnerId());
+        Assert.assertEquals(l1Id,helpRequests.get(1).getLearnerId());
     }
 
     @Test
@@ -69,11 +87,7 @@ public class HelpRequestTest extends ApplicationTest
 
     }
 
-    @Test
-    public void helpRequestsAreReceivedInTheCorrectOrder()
-    {
 
-    }
 
     @Test
     public void helpRequestOrderingIsNotImpactedWhenOnesAreRemoved(){

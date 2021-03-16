@@ -34,10 +34,15 @@ public class Main
     public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;
+    private Collection<? extends MessagingExtension> extensions;
 
     public Main()
     {
         defaultInstance = this;
+        extensions = Arrays.asList(
+            new HelpMessagingExtension(),
+            new ChatMessagingExtension(),
+            new LessonMessagingExtension(this));
     }
 
     public void start()
@@ -111,10 +116,6 @@ public class Main
 
     public Collection<? extends MessagingExtension> getMessagingExtension()
     {
-        return Arrays.asList(
-                new HelpMessagingExtension(),
-                new ChatMessagingExtension(),
-                new LessonMessagingExtension(this)
-        );
+        return extensions;
     }
 }
