@@ -2,11 +2,17 @@ package org.github.jrds.server.extensions.lesson;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.Main;
-import org.github.jrds.server.domain.*;
+import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Instruction;
+import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.User;
 import org.github.jrds.server.dto.InstructionDto;
-import org.github.jrds.server.messages.*;
+import org.github.jrds.server.messages.MessageSocket;
+import org.github.jrds.server.messages.MessagingExtension;
+import org.github.jrds.server.messages.Request;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class LessonMessagingExtension implements MessagingExtension
 {

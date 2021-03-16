@@ -2,6 +2,9 @@ package org.github.jrds.server;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -70,14 +73,6 @@ public class ClientWebSocket extends Endpoint
                     .configurator(configurator)
                     .build();
             Session newSession = container.connectToServer(webSocket, clientConfig, uri);
-            // TODO If time fix by moving lesson validation to a hello message request/response
-            try
-            {
-                Thread.sleep(2000);
-            }
-            catch (InterruptedException e)
-            {
-            }
             if (!newSession.isOpen())
             {
                 throw new RuntimeException("Failed to open session");
@@ -85,11 +80,16 @@ public class ClientWebSocket extends Endpoint
             else
             {
                 webSocket.session = newSession;
+                Response response = webSocket.sendMessage(new SessionStartMessage(userId)).get(10, TimeUnit.SECONDS);
+                if (response.isFailure())
+                {
+                    throw new IllegalStateException("Failed to start session: " + response.asFailure().getFailureReason());
+                }
             }
             return webSocket;
 
         }
-        catch (DeploymentException | IOException e)
+        catch (Exception e)
         {
             throw new RuntimeException(e);
         }
@@ -108,7 +108,7 @@ public class ClientWebSocket extends Endpoint
             }
         };
         session.addMessageHandler(handler);
-        System.out.println("Client Socket Connected: " + session);
+        System.out.println(DateTimeFormatter.ISO_TIME.format(LocalDateTime.now()) + " Client Socket Connected: " + session);
     }
 
     private void handleTextMessage(Session sess, String message)
@@ -128,13 +128,12 @@ public class ClientWebSocket extends Endpoint
                     throw new IllegalStateException("Unexpected message");
                 }
             }
-
-            else if (msg instanceof OpenHelpRequestsMessage)
-            {
-                openHelpRequests = ((OpenHelpRequestsMessage) msg).getOpenHelpRequests();
-            }
             else
             {
+                if (msg instanceof OpenHelpRequestsMessage)
+                {
+                    openHelpRequests = ((OpenHelpRequestsMessage) msg).getOpenHelpRequests();
+                }
                 messagesReceived.add(msg);
             }
         }
@@ -142,7 +141,7 @@ public class ClientWebSocket extends Endpoint
         {
             throw new RuntimeException(e);
         }
-        System.out.println("Client Received:[" + userId + "]: " + message);
+        System.out.println(DateTimeFormatter.ISO_TIME.format(LocalDateTime.now()) + " Client Received:[" + userId + "]: " + message);
     }
 
     @Override

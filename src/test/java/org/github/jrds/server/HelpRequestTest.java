@@ -8,6 +8,8 @@ import org.github.jrds.server.messages.SuccessMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +83,8 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
         c3.requestHelp().get(10, TimeUnit.SECONDS);
 
+        c1.getMessageReceived();
+        c1.getMessageReceived();
         Assert.assertEquals(2,c1.getHelpRequests().size());
 
         Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
@@ -128,7 +132,7 @@ public class HelpRequestTest extends ApplicationTest
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
         c2.requestHelp().get(10, TimeUnit.SECONDS);
-        c2.requestHelp().get(10, TimeUnit.SECONDS);
+        c3.requestHelp().get(10, TimeUnit.SECONDS);
 
         // wait for c1 to have received the message
         c1.getMessageReceived();
@@ -142,7 +146,8 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
 
-        Assert.assertEquals(0, c1.getHelpRequests().size());  // TODO should I try to keep the original message id?
+        Assert.assertEquals(1, c1.getHelpRequests().size());  // TODO should I try to keep the original message id?
+        Assert.assertEquals(l2Id, c1.getHelpRequests().get(0).getLearnerId());
         // TODO store time updated
     }
 
@@ -159,6 +164,9 @@ public class HelpRequestTest extends ApplicationTest
         c3.requestHelp().get(10, TimeUnit.SECONDS);
         c4.requestHelp().get(10, TimeUnit.SECONDS);
 
+        c1.getMessageReceived();
+        c1.getMessageReceived();
+        c1.getMessageReceived();
         List<HelpRequestDto> helpRequests = c1.getHelpRequests();
         Assert.assertEquals(3,helpRequests.size());
 
@@ -189,6 +197,9 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
         c4.requestHelp().get(10, TimeUnit.SECONDS);
 
+        c1.getMessageReceived();
+        c1.getMessageReceived();
+        c1.getMessageReceived();
         List<HelpRequestDto> helpRequests = c1.getHelpRequests();
         Assert.assertEquals(3,helpRequests.size());
 

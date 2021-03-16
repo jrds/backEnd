@@ -25,10 +25,14 @@ public class MessageSocket
     private final ObjectMapper mapper;
     private final Map<String, Attendance> sessionAttendances = new HashMap<>();
     private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
+    private final MessageStats messageStats = new MessageStats();
+    private String lessonId;
+    private User user;
 
     public MessageSocket()
     {
         this.server = Main.defaultInstance;
+        server.setMessageStats(messageStats);
         messagingExtensions.addAll(server.getMessagingExtension());
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
@@ -44,22 +48,9 @@ public class MessageSocket
         LOGGER.info("Socket Connected: " + sess);
 
         String userId = sess.getUserPrincipal().getName();
-        User user = server.usersStore.getUser(userId);
+        user = server.usersStore.getUser(userId);
         userSessions.put(userId, sess);
-
-        String lessonId = sess.getPathParameters().get("lessonId");
-        Lesson lesson = server.lessonStore.getLesson(lessonId);
-
-        if (server.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user)))
-        {
-            Attendance attendance = new Attendance(user, lesson);
-            server.attendanceStore.storeAttendance(attendance);
-            sessionAttendances.put(sess.getId(), attendance);
-        }
-        else
-        {
-            throw new IllegalStateException("Attendance already in existence for this user, in this lesson");
-        }
+        lessonId = sess.getPathParameters().get("lessonId");
         // TODO add to assumptions documentation that a user will not have 2 classes at the same time.
     }
 
@@ -67,38 +58,53 @@ public class MessageSocket
     public void onWebSocketText(Session sess, String message) throws IOException
     {
         Request request = mapper.readValue(message, Request.class);
+        messageStats.incrementReceived(request.getFrom());
         LOGGER.info("Received request: " + message);
-        Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
 
-        if (request instanceof SessionEndMessage)
+        if (request instanceof SessionStartMessage)
         {
-            sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-            server.attendanceStore.removeAttendance(attendance);
-            userSessions.remove(sess.getUserPrincipal().getName());
-            sessionAttendances.remove(sess.getId());
+            Lesson lesson = server.lessonStore.getLesson(lessonId);
+
+            if (server.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user)))
+            {
+                Attendance attendance = new Attendance(user, lesson);
+                server.attendanceStore.storeAttendance(attendance);
+                sessionAttendances.put(sess.getId(), attendance);
+                sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+            }
+            else
+            {
+                sendMessage(new FailureMessage(request.getFrom(), "Attendance already in existence for this user, in this lesson", request.getId()));
+            }
         }
         else
         {
-            MessagingExtension extension = messagingExtensions.stream()
-                    .filter(e -> e.handles(request))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Unknown message type: " + request.getClass().getName()));
-            try
+            Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
+
+            if (request instanceof SessionEndMessage)
             {
-                extension.handle(request, attendance, this);
-                sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+                sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
+                server.attendanceStore.removeAttendance(attendance);
+                userSessions.remove(sess.getUserPrincipal().getName());
+                sessionAttendances.remove(sess.getId());
             }
-            catch (Exception e)
+            else
             {
-                sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
+                MessagingExtension extension = messagingExtensions.stream()
+                        .filter(e -> e.handles(request))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Unknown message type: " + request.getClass().getName()));
+                try
+                {
+                    extension.handle(request, attendance, this);
+                    sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+                }
+                catch (Exception e)
+                {
+                    sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
+                }
             }
         }
-
-//        else
-//        {
-//            sendMessage(request);
-//            sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
-//        }
     }
 
     public void sendMessage(Message message)
@@ -108,6 +114,7 @@ public class MessageSocket
             Session to = userSessions.get(message.getTo());
             String json = mapper.writeValueAsString(message);
             to.getAsyncRemote().sendText(json);
+            messageStats.incrementSent(to.getId());
         }
         catch (JsonProcessingException e)
         {

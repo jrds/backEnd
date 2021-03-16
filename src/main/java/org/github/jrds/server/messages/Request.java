@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "_type")
 
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SessionEndMessage.class, name = "sessionEnd")})
+        @JsonSubTypes.Type(value = SessionStartMessage.class, name = "sessionStart"),
+        @JsonSubTypes.Type(value = SessionEndMessage.class, name = "sessionEnd")
+})
 
 public abstract class Request extends Message
 {

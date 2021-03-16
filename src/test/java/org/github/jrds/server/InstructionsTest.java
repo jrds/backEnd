@@ -265,7 +265,7 @@ public class InstructionsTest extends ApplicationTest
         c1.startLesson();
 
         Assert.assertNotNull(c2.getMessageReceived());
-        Assert.assertNull(c3.getMessageReceived());
+        Assert.assertEquals(0, server.getMessageStats().forUser(l99Id).getSent());
     }
 
     //TODO how does the educator see the instructions, he's able to access, edit and create, but isn't sent the instruction message

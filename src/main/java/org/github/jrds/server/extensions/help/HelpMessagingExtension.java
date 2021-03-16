@@ -29,54 +29,55 @@ public class HelpMessagingExtension implements MessagingExtension
     @Override
     public void handle(Request request, Attendance attendance, MessageSocket messageSocket)
     {
-        if (request instanceof RequestHelpMessage)
+        try
         {
-            if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(request.getFrom())))
+            if (request instanceof RequestHelpMessage)
             {
-                HelpRequest helpRequest = new HelpRequest(attendance.getUser());
-                openHelpRequests.add(helpRequest);
-                List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-                messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+                if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(request.getFrom())))
+                {
+                    HelpRequest helpRequest = new HelpRequest(attendance.getUser());
+                    openHelpRequests.add(helpRequest);
+                }
+                else
+                {
+                    throw new IllegalStateException("Learners cannot create more than one active help request");
+                }
+            }
+            else if (request instanceof UpdateHelpRequestStatusMessage)
+            {
+                Optional<HelpRequest> toUpdate = openHelpRequests.stream()
+                        .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
+                        .findFirst();
+                if (toUpdate.isEmpty())
+                {
+                    throw new IllegalStateException("No open help request found for this learner");
+                }
+                else
+                {
+                    if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.IN_PROGRESS))
+                    {
+                        toUpdate.get().setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
+                    }
+                    else if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.COMPLETED))
+                    {
+                        toUpdate.get().setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
+                        //WOULD WRITE TO DB WHEN IT DEVELOPS BEYOND A PROTOTYPE
+                        toUpdate.ifPresent(openHelpRequests::remove);
+                    }
+                    else
+                        throw new IllegalStateException("Once a request has been created, it cannot be reset to a NEW request");
+                }
             }
             else
             {
-                throw new IllegalStateException("Learners cannot create more than one active help request");
+                Optional<HelpRequest> toRemove = openHelpRequests.stream()
+                        .filter(hr -> hr.getLearner().getId().equals(request.getFrom()))
+                        .findFirst();
+                toRemove.ifPresent(openHelpRequests::remove);
             }
         }
-        else if (request instanceof UpdateHelpRequestStatusMessage)
+        finally
         {
-            Optional<HelpRequest> toUpdate = openHelpRequests.stream()
-                    .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
-                    .findFirst();
-            if (toUpdate.isEmpty())
-            {
-                throw new IllegalStateException("No open help request found for this learner");
-            }
-            else
-            {
-                if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.IN_PROGRESS))
-                {
-                    toUpdate.get().setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
-                    List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-                    messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
-                }
-                else if (((UpdateHelpRequestStatusMessage) request).getNewStatus().equals(Status.COMPLETED))
-                {
-                    toUpdate.get().setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
-                    //WOULD WRITE TO DB WHEN IT DEVELOPS BEYOND A PROTOTYPE
-                    toUpdate.ifPresent(openHelpRequests::remove);
-                    List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-                    messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
-                }
-                else throw new IllegalStateException("Once a request has been created, it cannot be reset to a NEW request");
-            }
-        }
-        else
-        {
-            Optional<HelpRequest> toRemove = openHelpRequests.stream()
-                    .filter(hr -> hr.getLearner().getId().equals(request.getFrom()))
-                    .findFirst();
-            toRemove.ifPresent(openHelpRequests::remove);
             List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
             messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
         }

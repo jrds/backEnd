@@ -46,7 +46,7 @@ public class AttendanceTest extends ApplicationTest
         }
         catch (Exception e)
         {
-            // Expected
+            Assert.assertTrue(e.getMessage().contains("Attendance already in existence for this user, in this lesson"));
         }
     }
 

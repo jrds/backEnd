@@ -15,6 +15,7 @@ import org.github.jrds.server.extensions.chat.ChatMessagingExtension;
 import org.github.jrds.server.extensions.help.HelpMessagingExtension;
 import org.github.jrds.server.extensions.lesson.LessonMessagingExtension;
 import org.github.jrds.server.messages.MessageSocket;
+import org.github.jrds.server.messages.MessageStats;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStore;
@@ -35,6 +36,7 @@ public class Main
 
     private Server server;
     private Collection<? extends MessagingExtension> extensions;
+    private MessageStats messageStats;
 
     public Main()
     {
@@ -43,6 +45,16 @@ public class Main
             new HelpMessagingExtension(),
             new ChatMessagingExtension(),
             new LessonMessagingExtension(this));
+    }
+
+    public void setMessageStats(MessageStats messageStats)
+    {
+        this.messageStats = messageStats;
+    }
+
+    public MessageStats getMessageStats()
+    {
+        return messageStats;
     }
 
     public void start()
