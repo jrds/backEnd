@@ -1,6 +1,8 @@
 package org.github.jrds.server;
 
+import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.messages.FailureMessage;
 import org.github.jrds.server.messages.Response;
 import org.github.jrds.server.messages.SuccessMessage;
 import org.junit.Assert;
@@ -61,7 +63,6 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
 
         c1.getMessageReceived();
-        c1.getMessageReceived();
 
         List<HelpRequestDto> helpRequests = c1.getHelpRequests();
         Assert.assertEquals(2,helpRequests.size());
@@ -70,24 +71,62 @@ public class HelpRequestTest extends ApplicationTest
     }
 
     @Test
-    public void learnerCantSubmit2HelpRequests()
+    public void learnerCantSubmit2HelpRequests() throws InterruptedException, ExecutionException, TimeoutException
     {
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l2Id, l2Name, lesson1);
 
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+        c3.requestHelp().get(10, TimeUnit.SECONDS);
+
+        c1.getMessageReceived();
+
+        Assert.assertEquals(2,c1.getHelpRequests().size());
+
+        Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
+        Assert.assertTrue(state instanceof FailureMessage);
+        Assert.assertEquals("Learners cannot create more than one active help request",((FailureMessage) state).getFailureReason());
+
+        c1.getMessageReceived();
+        Assert.assertEquals(2,c1.getHelpRequests().size());
+
+
+
+    }
+
+    @Test
+    public void educatorMarksHelpRequestAsInProgress() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        // TODO if time - progress note idea, for changing status.
+
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+
+        // wait for c1 to have received the message
+        c1.getMessageReceived();
+
+        HelpRequestDto requestToChangeStatus = c1.getHelpRequests().get(0);
+
+        Assert.assertEquals(Status.NEW.toString(),requestToChangeStatus.getStatus()); //TODO maybe should be string not Status?
+
+        c1.updateHelpRequest(requestToChangeStatus, Status.IN_PROGRESS);
+
+        c1.getMessageReceived();
+
+        HelpRequestDto changedRequest = c1.getHelpRequests().get(0);
+        Assert.assertEquals(Status.IN_PROGRESS.toString(),changedRequest.getStatus());  // TODO should I try to keep the original message id?
+                                                                                        // TODO store time updated
     }
 
     @Test
     public void educatorMarksHelpRequestAsComplete()
     {
+        // TODO - audit in active lesson of help request closure etc.
 
     }
-
-    @Test
-    public void educatorMarksHelpRequestAsInProgress()
-    {
-
-    }
-
-
 
     @Test
     public void helpRequestOrderingIsNotImpactedWhenOnesAreRemoved(){

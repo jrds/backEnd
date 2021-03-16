@@ -9,6 +9,7 @@ import javax.websocket.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
@@ -205,4 +206,5 @@ public class ClientWebSocket extends Endpoint
             throw new RuntimeException(e);
         }
     }
+
 }

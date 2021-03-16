@@ -19,7 +19,7 @@ public class HelpMessagingExtension implements MessagingExtension
     @Override
     public boolean handles(Request request)
     {
-        return request instanceof RequestHelpMessage || request instanceof CancelHelpRequestMessage;
+        return request instanceof RequestHelpMessage || request instanceof CancelHelpRequestMessage || request instanceof UpdateHelpRequestStatusMessage;
     }
 
     @Override
@@ -39,6 +39,22 @@ public class HelpMessagingExtension implements MessagingExtension
                 throw new IllegalStateException("Learners cannot create more than one active help request");
             }
         }
+        else if (request instanceof UpdateHelpRequestStatusMessage)
+        {
+            if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId())))
+            {
+                throw new IllegalStateException("No open help request found for this learner");
+            }
+            else
+            {
+                Optional<HelpRequest> toUpdate = openHelpRequests.stream()
+                        .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
+                        .findFirst();
+                toUpdate.ifPresent(helpRequest -> {helpRequest.setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());});//setStatus
+                List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
+                messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+            }
+        }
         else
         {
             Optional<HelpRequest> toRemove = openHelpRequests.stream()
@@ -56,8 +72,8 @@ public class HelpMessagingExtension implements MessagingExtension
         return Arrays.asList(
                 new NamedType(RequestHelpMessage.class, "requestHelp"),
                 new NamedType(CancelHelpRequestMessage.class, "requestHelpCancel"),
-                new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests")
-
+                new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests"),
+                new NamedType(UpdateHelpRequestStatusMessage.class, "UpdateHelpRequestStatusMessage")
         );
     }
 }
