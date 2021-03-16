@@ -2,17 +2,26 @@ package org.github.jrds.server.domain;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HelpRequest implements Comparable<HelpRequest>
 {
+    private static final AtomicInteger ID_GEN = new AtomicInteger();
+    private static final Object LOCK = new Object();
+
+    private int id;
     private User learner;
     private Instant timeReceived;
     private Status status;
 
     public HelpRequest(User learner)
     {
+        synchronized (LOCK)
+        {
+            this.id = ID_GEN.incrementAndGet();
+            this.timeReceived = Instant.now();
+        }
         this.learner = Objects.requireNonNull(learner);
-        this.timeReceived = Instant.now();
         this.status = Status.NEW;
     }
 
@@ -39,9 +48,6 @@ public class HelpRequest implements Comparable<HelpRequest>
     @Override
     public int compareTo(HelpRequest o)
     {
-        return o == null ? 1 : timeReceived.compareTo(o.timeReceived);
+        return o == null ? 1 : id - o.id;
     }
-
-
-
 }

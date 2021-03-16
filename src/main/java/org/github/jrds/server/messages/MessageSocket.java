@@ -67,7 +67,7 @@ public class MessageSocket
     public void onWebSocketText(Session sess, String message) throws IOException
     {
         Request request = mapper.readValue(message, Request.class);
-        LOGGER.info("Received request: " + request);
+        LOGGER.info("Received request: " + message);
         Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
 
         if (request instanceof SessionEndMessage)

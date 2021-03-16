@@ -63,6 +63,7 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
 
         c1.getMessageReceived();
+        c1.getMessageReceived();
 
         List<HelpRequestDto> helpRequests = c1.getHelpRequests();
         Assert.assertEquals(2,helpRequests.size());
@@ -80,8 +81,6 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
         c3.requestHelp().get(10, TimeUnit.SECONDS);
 
-        c1.getMessageReceived();
-
         Assert.assertEquals(2,c1.getHelpRequests().size());
 
         Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
@@ -90,8 +89,6 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
         Assert.assertEquals(2,c1.getHelpRequests().size());
-
-
 
     }
 
@@ -128,10 +125,13 @@ public class HelpRequestTest extends ApplicationTest
 
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
+        TestClient c3 = connect(l2Id, l2Name, lesson1);
 
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
         c2.requestHelp().get(10, TimeUnit.SECONDS);
 
         // wait for c1 to have received the message
+        c1.getMessageReceived();
         c1.getMessageReceived();
 
         HelpRequestDto requestToChangeStatus = c1.getHelpRequests().get(0);
@@ -142,18 +142,69 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
 
-        int numberOfHelpRequest = c1.getHelpRequests().size();
-        Assert.assertEquals(0, numberOfHelpRequest);  // TODO should I try to keep the original message id?
+        Assert.assertEquals(0, c1.getHelpRequests().size());  // TODO should I try to keep the original message id?
         // TODO store time updated
     }
 
     @Test
-    public void helpRequestOrderingIsNotImpactedWhenOnesAreRemoved(){
+    public void helpRequestOrderingIsNotImpactedWhenOnesAreRemoved() throws InterruptedException, ExecutionException, TimeoutException
+    {
 
+        TestClient c1 = connect(eduId, eduName, lesson2);
+        TestClient c2 = connect(l1Id, l1Name, lesson2);
+        TestClient c3 = connect(l2Id, l2Name, lesson2);
+        TestClient c4 = connect(l99Id, l99Name, lesson2);
+
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+        c3.requestHelp().get(10, TimeUnit.SECONDS);
+        c4.requestHelp().get(10, TimeUnit.SECONDS);
+
+        List<HelpRequestDto> helpRequests = c1.getHelpRequests();
+        Assert.assertEquals(3,helpRequests.size());
+
+        Assert.assertEquals(l1Id,helpRequests.get(0).getLearnerId());
+        Assert.assertEquals(l2Id,helpRequests.get(1).getLearnerId());
+        Assert.assertEquals(l99Id,helpRequests.get(2).getLearnerId());
+
+        c3.cancelHelpRequest().get(10, TimeUnit.SECONDS);
+
+        c1.getMessageReceived();
+
+        List<HelpRequestDto> helpRequests2 = c1.getHelpRequests();
+        Assert.assertEquals(2,c1.getHelpRequests().size());
+
+        Assert.assertEquals(l1Id,helpRequests2.get(0).getLearnerId());
+        Assert.assertEquals(l99Id,helpRequests2.get(1).getLearnerId());
     }
 
     @Test
-    public void helpRequestOrderingIsNotImpactedWhenStatusesAreChanged(){
+    public void helpRequestOrderingIsNotImpactedWhenStatusesAreChanged() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        TestClient c1 = connect(eduId, eduName, lesson2);
+        TestClient c2 = connect(l1Id, l1Name, lesson2);
+        TestClient c3 = connect(l2Id, l2Name, lesson2);
+        TestClient c4 = connect(l99Id, l99Name, lesson2);
+
+        c3.requestHelp().get(10, TimeUnit.SECONDS);
+        c2.requestHelp().get(10, TimeUnit.SECONDS);
+        c4.requestHelp().get(10, TimeUnit.SECONDS);
+
+        List<HelpRequestDto> helpRequests = c1.getHelpRequests();
+        Assert.assertEquals(3,helpRequests.size());
+
+        Assert.assertEquals(l2Id,helpRequests.get(0).getLearnerId());
+        Assert.assertEquals(l1Id,helpRequests.get(1).getLearnerId());
+        Assert.assertEquals(l99Id,helpRequests.get(2).getLearnerId());
+
+        c1.updateHelpRequest(helpRequests.get(1),Status.IN_PROGRESS);
+        c1.getMessageReceived();
+
+        List<HelpRequestDto> helpRequests2 = c1.getHelpRequests();
+        Assert.assertEquals(3,c1.getHelpRequests().size());
+
+        Assert.assertEquals(l2Id,helpRequests2.get(0).getLearnerId());
+        Assert.assertEquals(l1Id,helpRequests2.get(1).getLearnerId());
+        Assert.assertEquals(l99Id,helpRequests2.get(2).getLearnerId());
 
     }
 }

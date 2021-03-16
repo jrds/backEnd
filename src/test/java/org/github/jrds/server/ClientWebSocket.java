@@ -29,11 +29,12 @@ public class ClientWebSocket extends Endpoint
     private final BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
     private final ObjectMapper mapper;
     private final Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
+    private final String userId;
     private List<HelpRequestDto> openHelpRequests = new ArrayList<>();
 
     private Session session;
 
-    public ClientWebSocket()
+    public ClientWebSocket(String userId)
     {
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
@@ -44,8 +45,8 @@ public class ClientWebSocket extends Endpoint
                 new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests"),
                 new NamedType(InstructionMessage.class, "instruction"),
                 new NamedType(LessonStartMessage.class, "lessonStart")
-
         );
+        this.userId = userId;
     }
 
     public static ClientWebSocket connect(String userId, String lessonId)
@@ -55,7 +56,7 @@ public class ClientWebSocket extends Endpoint
             final URI uri = URI.create(BASE_URL + lessonId);
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            ClientWebSocket webSocket = new ClientWebSocket();
+            ClientWebSocket webSocket = new ClientWebSocket(userId);
             ClientEndpointConfig.Configurator configurator = new ClientEndpointConfig.Configurator()
             {
                 @Override
@@ -141,7 +142,7 @@ public class ClientWebSocket extends Endpoint
         {
             throw new RuntimeException(e);
         }
-        System.out.println("Client Received TEXT message: " + message);
+        System.out.println("Client Received:[" + userId + "]: " + message);
     }
 
     @Override
