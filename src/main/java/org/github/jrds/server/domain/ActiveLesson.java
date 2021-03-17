@@ -4,12 +4,14 @@ package org.github.jrds.server.domain;
 import org.github.jrds.server.extensions.help.UpdateHelpRequestStatusMessage;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class ActiveLesson
 {
     private final String id;
     private final LessonStructure associatedLessonStructure;
     private final List<Attendance> activeLessonAttendance = new ArrayList<>();
+    private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
 
     public ActiveLesson(LessonStructure associatedLessonStructure)
     {
@@ -55,5 +57,20 @@ public class ActiveLesson
         {
             return activeLessonAttendance.stream().filter(attendance -> attendance.getUser().equals(user)).findFirst().get();
         }
+    }
+
+    public Set<HelpRequest> getOpenHelpRequests()
+    {
+        return Collections.unmodifiableSet(openHelpRequests);
+    }
+
+    public void addHelpRequest(HelpRequest helpRequest)
+    {
+        openHelpRequests.add(helpRequest);
+    }
+
+    public void removeHelpRequest(HelpRequest toUpdate)
+    {
+        openHelpRequests.remove(toUpdate);
     }
 }

@@ -2,10 +2,7 @@ package org.github.jrds.server.extensions.lesson;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.Main;
-import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.LessonStructure;
-import org.github.jrds.server.domain.User;
+import org.github.jrds.server.domain.*;
 import org.github.jrds.server.dto.InstructionDto;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
@@ -30,11 +27,11 @@ public class LessonMessagingExtension implements MessagingExtension
     }
 
     @Override
-    public void handle(Request request, Attendance attendance, MessageSocket messageSocket)
+    public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
-        if (request.getFrom().equals(attendance.getLesson().getEducator().getId()))
+        if (request.getFrom().equals(activeLesson.getAssociatedLessonStructure().getEducator().getId()))
         {
-            LessonStructure lessonStructure = attendance.getLesson();
+            LessonStructure lessonStructure = activeLesson.getAssociatedLessonStructure();
             for (Instruction i : lessonStructure.getAllInstructions())
             {
                 for (User learner : lessonStructure.getLearners())

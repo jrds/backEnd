@@ -23,7 +23,7 @@ public class MessageSocket
     private final Main server;
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper;
-    //private final Map<String, Attendance> sessionAttendances = new HashMap<>();
+    private final Map<String, ActiveLesson> sessionLesson = new HashMap<>();
     private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
     private final MessageStats messageStats = new MessageStats();
     private String lessonId;
@@ -51,6 +51,7 @@ public class MessageSocket
         user = server.usersStore.getUser(userId);
         userSessions.put(userId, sess);
         lessonId = sess.getPathParameters().get("lessonId");
+        sessionLesson.put(userId, server.activeLessonStore.getActiveLesson(lessonId));
         // TODO add to assumptions documentation that a user will not have 2 classes at the same time.
     }
 
@@ -61,15 +62,15 @@ public class MessageSocket
         messageStats.incrementReceived(request.getFrom());
         LOGGER.info("Received request: " + message);
 
+        ActiveLesson activeLesson = sessionLesson.get(user.getId());
+
         if (request instanceof SessionStartMessage)
         {
-            ActiveLesson activeLesson = server.activeLessonStore.getActiveLesson(lessonId);
-
             if (activeLesson.getActiveLessonAttendance().stream().noneMatch(a -> a.getUser().equals(user)))
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
-                server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons - probably?
-                //sessionAttendances.put(sess.getId(), attendance);
+                server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons -
+                                                                    // probably as this record the times, and would be replaced by writing to a DB
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
             }
             else
@@ -79,7 +80,7 @@ public class MessageSocket
         }
         else
         {
-            Attendance attendance = Objects.requireNonNull(server.activeLessonStore.getActiveLesson(lessonId).getAttendance(user), "Invalid Session");
+            Attendance attendance = Objects.requireNonNull(activeLesson.getAttendance(user), "Invalid Session");
 
             if (request instanceof SessionEndMessage)
             {
@@ -87,7 +88,6 @@ public class MessageSocket
                 server.attendanceStore.removeAttendance(attendance);
                 userSessions.remove(sess.getUserPrincipal().getName());
                 server.activeLessonStore.getActiveLesson(lessonId).removeAttendance(attendance);
-                //sessionAttendances.remove(sess.getId());
             }
             else
             {
@@ -97,11 +97,14 @@ public class MessageSocket
                         .orElseThrow(() -> new IllegalStateException("Unknown message type: " + request.getClass().getName()));
                 try
                 {
-                    extension.handle(request, attendance, this);
+                    extension.handle(request, activeLesson, this);
                     sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
                 }
                 catch (Exception e)
                 {
+                    System.out.println(e.getMessage());
+                    System.out.println(e.getCause());
+                    System.out.println(e.toString());
                     sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
                 }
             }

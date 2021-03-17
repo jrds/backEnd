@@ -1,6 +1,7 @@
 package org.github.jrds.server.extensions.chat;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.github.jrds.server.domain.ActiveLesson;
 import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.messages.MessageSocket;
@@ -21,7 +22,7 @@ public class ChatMessagingExtension implements MessagingExtension
     }
 
     @Override
-    public void handle(Request request, Attendance attendance, MessageSocket messageSocket)
+    public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
         messageSocket.sendMessage(request);
     }

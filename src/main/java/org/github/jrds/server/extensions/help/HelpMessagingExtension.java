@@ -1,7 +1,8 @@
 package org.github.jrds.server.extensions.help;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.Main;
+import org.github.jrds.server.domain.ActiveLesson;
 import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
@@ -12,13 +13,11 @@ import org.github.jrds.server.messages.Request;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class HelpMessagingExtension implements MessagingExtension
 {
-    private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
+    //private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
 
     @Override
     public boolean handles(Request request)
@@ -27,16 +26,16 @@ public class HelpMessagingExtension implements MessagingExtension
     }
 
     @Override
-    public void handle(Request request, Attendance attendance, MessageSocket messageSocket)
+    public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
         try
         {
             if (request instanceof RequestHelpMessage)
             {
-                if (openHelpRequests.stream().noneMatch(hr -> hr.getLearner().getId().equals(request.getFrom())))
+                if (activeLesson.getOpenHelpRequests().stream().noneMatch(hr -> hr.getLearner().getId().equals(request.getFrom())))
                 {
-                    HelpRequest helpRequest = new HelpRequest(attendance.getUser());
-                    openHelpRequests.add(helpRequest);
+                    HelpRequest helpRequest = new HelpRequest(Main.defaultInstance.usersStore.getUser(request.getFrom()));
+                    activeLesson.addHelpRequest(helpRequest);
                 }
                 else
                 {
@@ -45,7 +44,7 @@ public class HelpMessagingExtension implements MessagingExtension
             }
             else if (request instanceof UpdateHelpRequestStatusMessage)
             {
-                Optional<HelpRequest> toUpdate = openHelpRequests.stream()
+                Optional<HelpRequest> toUpdate = activeLesson.getOpenHelpRequests().stream()
                         .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpRequestStatusMessage) request).getLearnerId()))
                         .findFirst();
                 if (toUpdate.isEmpty())
@@ -62,7 +61,11 @@ public class HelpMessagingExtension implements MessagingExtension
                     {
                         toUpdate.get().setStatus(((UpdateHelpRequestStatusMessage) request).getNewStatus());
                         //WOULD WRITE TO DB WHEN IT DEVELOPS BEYOND A PROTOTYPE
-                        toUpdate.ifPresent(openHelpRequests::remove);
+                        if(toUpdate.isPresent())
+                        {
+                            HelpRequest toDelete = toUpdate.get();
+                            activeLesson.removeHelpRequest(toDelete);
+                        }
                     }
                     else
                         throw new IllegalStateException("Once a request has been created, it cannot be reset to a NEW request");
@@ -70,16 +73,20 @@ public class HelpMessagingExtension implements MessagingExtension
             }
             else
             {
-                Optional<HelpRequest> toRemove = openHelpRequests.stream()
+                Optional<HelpRequest> toRemove = activeLesson.getOpenHelpRequests().stream()
                         .filter(hr -> hr.getLearner().getId().equals(request.getFrom()))
                         .findFirst();
-                toRemove.ifPresent(openHelpRequests::remove);
+                if(toRemove.isPresent())
+                {
+                    HelpRequest toDelete = toRemove.get();
+                    activeLesson.removeHelpRequest(toDelete);
+                }
             }
         }
         finally
         {
-            List<HelpRequestDto> dtos = openHelpRequests.stream().map(HelpRequestDto::new).collect(Collectors.toList());
-            messageSocket.sendMessage(new OpenHelpRequestsMessage(attendance.getLesson().getEducator().getId(), dtos));
+            List<HelpRequestDto> dtos = activeLesson.getOpenHelpRequests().stream().map(HelpRequestDto::new).collect(Collectors.toList());
+            messageSocket.sendMessage(new OpenHelpRequestsMessage(activeLesson.getAssociatedLessonStructure().getEducator().getId(), dtos));
         }
     }
 

@@ -1,5 +1,7 @@
 package org.github.jrds.server.domain;
 
+import org.github.jrds.server.Main;
+
 import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +26,18 @@ public class HelpRequest implements Comparable<HelpRequest>
         this.learner = Objects.requireNonNull(learner);
         this.status = Status.NEW;
     }
+
+//    public HelpRequest(String from)
+//    {
+//        // TODO - think about if this is the best way to do this...?
+//        synchronized (LOCK)
+//        {
+//            this.id = ID_GEN.incrementAndGet();
+//            this.timeReceived = Instant.now();
+//        }
+//        this.learner = Objects.requireNonNull(learner);
+//        this.status = Status.NEW;
+//    }
 
     public User getLearner()
     {
