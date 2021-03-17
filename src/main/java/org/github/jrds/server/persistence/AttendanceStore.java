@@ -1,7 +1,7 @@
 package org.github.jrds.server.persistence;
 
 import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
 
 import java.time.Instant;
@@ -28,9 +28,9 @@ public class AttendanceStore
         toBeReplacedWithDB.add(attendanceToBeStored);
     }
 
-    public Attendance getAttendance(User user, Lesson lesson)
+    public Attendance getAttendance(User user, LessonStructure lessonStructure)
     {
-        return attendanceStore.get(keyFor(user.getId(), lesson.getId()));
+        return attendanceStore.get(keyFor(user.getId(), lessonStructure.getId()));
     }
 
     public Set<Attendance> getAllAttendances()
@@ -38,10 +38,10 @@ public class AttendanceStore
         return new HashSet<>(attendanceStore.values());
     }
 
-    public Set<Attendance> getAttendancesForALesson(Lesson lesson)
+    public Set<Attendance> getAttendancesForALesson(LessonStructure lessonStructure)
     {
         return attendanceStore.values().stream()
-                .filter(a -> lesson.equals(a.getLesson()))
+                .filter(a -> lessonStructure.equals(a.getLesson()))
                 .collect(Collectors.toSet());
     }
 

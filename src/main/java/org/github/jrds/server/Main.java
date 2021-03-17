@@ -17,8 +17,9 @@ import org.github.jrds.server.extensions.lesson.LessonMessagingExtension;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessageStats;
 import org.github.jrds.server.messages.MessagingExtension;
+import org.github.jrds.server.persistence.ActiveLessonStore;
 import org.github.jrds.server.persistence.AttendanceStore;
-import org.github.jrds.server.persistence.LessonStore;
+import org.github.jrds.server.persistence.LessonStructureStore;
 import org.github.jrds.server.persistence.UsersStore;
 
 import javax.servlet.DispatcherType;
@@ -31,7 +32,8 @@ public class Main
     public static Main defaultInstance;
 
     public UsersStore usersStore = new UsersStore();
-    public LessonStore lessonStore = new LessonStore(usersStore);
+    public LessonStructureStore lessonStructureStore = new LessonStructureStore(usersStore);
+    public ActiveLessonStore activeLessonStore = new ActiveLessonStore(lessonStructureStore);
     public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;

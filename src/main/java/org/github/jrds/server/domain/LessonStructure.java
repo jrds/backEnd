@@ -3,14 +3,14 @@ package org.github.jrds.server.domain;
 
 import java.util.*;
 
-public class Lesson
+public class LessonStructure
 {
     private final String id;
     private final User educator;
     private final Set<User> learners;
     private final List<Instruction> instructions = new ArrayList<>();
 
-    public Lesson(String id, User educator, Set<User> learners)
+    public LessonStructure(String id, User educator, Set<User> learners)
     {
         this.id = Objects.requireNonNull(id);
         this.educator = Objects.requireNonNull(educator);
@@ -136,8 +136,8 @@ public class Lesson
         {
             return false;
         }
-        Lesson lesson = (Lesson) o;
-        return id.equals(lesson.id);
+        LessonStructure lessonStructure = (LessonStructure) o;
+        return id.equals(lessonStructure.id);
     }
 
     @Override

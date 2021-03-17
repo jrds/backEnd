@@ -23,9 +23,9 @@ public class AuthorisationFilter implements Filter
         String[] urlInfo = ((HttpServletRequest) request).getRequestURI().split("/");
         String lessonId = urlInfo[(urlInfo.length - 1)];
 
-        if (server.lessonStore.getLesson(lessonId) != null)
+        if (server.lessonStructureStore.getLessonStructure(lessonId) != null)
         {
-            if (server.lessonStore.getLesson(lessonId).canConnect(server.usersStore.getUser(user)))
+            if (server.lessonStructureStore.getLessonStructure(lessonId).canConnect(server.usersStore.getUser(user)))
             {
                 //carry on with the request
                 chain.doFilter(request, response);

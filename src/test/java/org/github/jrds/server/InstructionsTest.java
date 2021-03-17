@@ -1,7 +1,7 @@
 package org.github.jrds.server;
 
 import org.github.jrds.server.domain.Instruction;
-import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
 import org.github.jrds.server.extensions.lesson.InstructionMessage;
 import org.github.jrds.server.messages.*;
@@ -31,7 +31,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCreatesInstructionToLesson()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Assert.assertEquals(0, l.getAllInstructions().size());
@@ -50,7 +50,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCanCreateMultipleInstructions()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -72,7 +72,7 @@ public class InstructionsTest extends ApplicationTest
     public void canReorderInstructions()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -104,7 +104,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCanRemoveAnInstruction()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -128,7 +128,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCanRemoveAllInstructions()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         l.createInstruction(testTitle1, testBody1, u);
@@ -147,7 +147,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCanEditInstructionTitle()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Instruction instruction = l.createInstruction(testTitle1, testBody1, u);
@@ -163,7 +163,7 @@ public class InstructionsTest extends ApplicationTest
     public void educatorCanEditInstructionBody()
     {
         connect(eduId, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(eduId);
 
         Instruction instruction = l.createInstruction(testTitle1, testBody1, u);
@@ -179,7 +179,7 @@ public class InstructionsTest extends ApplicationTest
     public void studentCantCreateInstructionToLesson()
     {
         connect(l1Id, eduName, lesson1);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
         User u = server.usersStore.getUser(l1Id);
 
         try
@@ -201,7 +201,7 @@ public class InstructionsTest extends ApplicationTest
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
         User u = server.usersStore.getUser(eduId);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
 
         l.createInstruction(testTitle1, testBody1, u);
 
@@ -227,7 +227,7 @@ public class InstructionsTest extends ApplicationTest
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
         User u = server.usersStore.getUser(eduId);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
 
         l.createInstruction(testTitle1, testBody1, u);
         l.createInstruction(testTitle2, testBody2, u);
@@ -258,7 +258,7 @@ public class InstructionsTest extends ApplicationTest
         TestClient c3 = connect(l99Id, l99Name, lesson2);
 
         User u = server.usersStore.getUser(eduId);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
 
         l.createInstruction(testTitle1, testBody1, u);
 
@@ -277,7 +277,7 @@ public class InstructionsTest extends ApplicationTest
         TestClient c2 = connect(l1Id, l1Name, lesson1);
 
         User u = server.usersStore.getUser(eduId);
-        Lesson l = server.lessonStore.getLesson(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
 
         l.createInstruction(testTitle1, testBody1, u);
 

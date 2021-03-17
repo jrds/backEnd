@@ -6,16 +6,16 @@ public class Instruction
 {
 
     private String id;
-    private Lesson lesson;
+    private LessonStructure lessonStructure;
     private String title;
     private String body;
     private final User author;
 
 
-    Instruction(String id, Lesson lesson, String title, String body, User author)
+    Instruction(String id, LessonStructure lessonStructure, String title, String body, User author)
     {
         this.id = Objects.requireNonNull(id);
-        this.lesson = Objects.requireNonNull(lesson);
+        this.lessonStructure = Objects.requireNonNull(lessonStructure);
         this.title = Objects.requireNonNull(title);
         this.body = body;
         this.author = Objects.requireNonNull(author);
@@ -50,12 +50,12 @@ public class Instruction
 
     public void moveUp()
     {
-        lesson.moveUp(this);
+        lessonStructure.moveUp(this);
     }
 
     public void moveDown()
     {
-        lesson.moveDown(this);
+        lessonStructure.moveDown(this);
     }
 
     @Override

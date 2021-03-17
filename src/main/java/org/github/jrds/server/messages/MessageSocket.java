@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.Lesson;
+import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +63,11 @@ public class MessageSocket
 
         if (request instanceof SessionStartMessage)
         {
-            Lesson lesson = server.lessonStore.getLesson(lessonId);
+            LessonStructure lessonStructure = server.lessonStructureStore.getLessonStructure(lessonId);
 
-            if (server.attendanceStore.getAttendancesForALesson(lesson).stream().noneMatch(a -> a.getUser().equals(user)))
+            if (server.attendanceStore.getAttendancesForALesson(lessonStructure).stream().noneMatch(a -> a.getUser().equals(user)))
             {
-                Attendance attendance = new Attendance(user, lesson);
+                Attendance attendance = new Attendance(user, lessonStructure);
                 server.attendanceStore.storeAttendance(attendance);
                 sessionAttendances.put(sess.getId(), attendance);
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));

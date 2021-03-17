@@ -5,14 +5,14 @@ import java.util.Objects;
 public class Attendance
 {
     private final User user;
-    private final Lesson lesson;
+    private final LessonStructure lessonStructure;
     private final Role role;
 
-    public Attendance(User user, Lesson lesson)
+    public Attendance(User user, LessonStructure lessonStructure)
     {
         this.user = Objects.requireNonNull(user, "Invalid user");
-        this.lesson = Objects.requireNonNull(lesson, "Invalid lesson");
-        this.role = lesson.getUserRole(user);
+        this.lessonStructure = Objects.requireNonNull(lessonStructure, "Invalid lesson");
+        this.role = lessonStructure.getUserRole(user);
 
         if (this.role == Role.NONE)
         {
@@ -26,9 +26,9 @@ public class Attendance
         return user;
     }
 
-    public Lesson getLesson()
+    public LessonStructure getLesson()
     {
-        return lesson;
+        return lessonStructure;
     }
 
     public Role getRole()
@@ -48,12 +48,12 @@ public class Attendance
             return false;
         }
         Attendance that = (Attendance) o;
-        return user.equals(that.user) && lesson.equals(that.lesson);
+        return user.equals(that.user) && lessonStructure.equals(that.lessonStructure);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(user, lesson);
+        return Objects.hash(user, lessonStructure);
     }
 }
