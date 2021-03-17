@@ -18,7 +18,6 @@ import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessageStats;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.persistence.ActiveLessonStore;
-//import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStructureStore;
 import org.github.jrds.server.persistence.UsersStore;
 

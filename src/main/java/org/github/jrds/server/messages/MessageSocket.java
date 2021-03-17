@@ -74,7 +74,7 @@ public class MessageSocket
             if (activeLesson.getActiveLessonAttendances().stream().noneMatch(a -> a.getUser().equals(user)))
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
-                mockDB.add("JOINED - " + attendance.toString());
+                mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
             }
             else
