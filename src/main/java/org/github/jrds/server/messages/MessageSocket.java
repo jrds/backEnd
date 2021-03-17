@@ -3,8 +3,8 @@ package org.github.jrds.server.messages;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.Main;
+import org.github.jrds.server.domain.ActiveLesson;
 import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class MessageSocket
     private final Main server;
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper;
-    private final Map<String, Attendance> sessionAttendances = new HashMap<>();
+    //private final Map<String, Attendance> sessionAttendances = new HashMap<>();
     private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
     private final MessageStats messageStats = new MessageStats();
     private String lessonId;
@@ -63,13 +63,13 @@ public class MessageSocket
 
         if (request instanceof SessionStartMessage)
         {
-            LessonStructure lessonStructure = server.lessonStructureStore.getLessonStructure(lessonId);
+            ActiveLesson activeLesson = server.activeLessonStore.getActiveLesson(lessonId);
 
-            if (server.attendanceStore.getAttendancesForALesson(lessonStructure).stream().noneMatch(a -> a.getUser().equals(user)))
+            if (activeLesson.getActiveLessonAttendance().stream().noneMatch(a -> a.getUser().equals(user)))
             {
-                Attendance attendance = new Attendance(user, lessonStructure);
-                server.attendanceStore.storeAttendance(attendance);
-                sessionAttendances.put(sess.getId(), attendance);
+                Attendance attendance = activeLesson.registerAttendance(user);
+                server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons - probably?
+                //sessionAttendances.put(sess.getId(), attendance);
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
             }
             else
@@ -79,14 +79,15 @@ public class MessageSocket
         }
         else
         {
-            Attendance attendance = Objects.requireNonNull(sessionAttendances.get(sess.getId()), "Invalid Session");
+            Attendance attendance = Objects.requireNonNull(server.activeLessonStore.getActiveLesson(lessonId).getAttendance(user), "Invalid Session");
 
             if (request instanceof SessionEndMessage)
             {
                 sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
                 server.attendanceStore.removeAttendance(attendance);
                 userSessions.remove(sess.getUserPrincipal().getName());
-                sessionAttendances.remove(sess.getId());
+                server.activeLessonStore.getActiveLesson(lessonId).removeAttendance(attendance);
+                //sessionAttendances.remove(sess.getId());
             }
             else
             {
