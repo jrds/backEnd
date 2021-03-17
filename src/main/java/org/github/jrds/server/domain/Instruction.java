@@ -5,8 +5,8 @@ import java.util.Objects;
 public class Instruction
 {
 
-    private String id;
-    private LessonStructure lessonStructure;
+    private final String id;
+    private final LessonStructure lessonStructure;
     private String title;
     private String body;
     private final User author;

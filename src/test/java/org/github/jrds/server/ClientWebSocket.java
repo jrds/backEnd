@@ -1,18 +1,7 @@
 package org.github.jrds.server;
 
-import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.*;
-
-import javax.websocket.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
@@ -20,7 +9,18 @@ import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
 import org.github.jrds.server.extensions.help.RequestHelpMessage;
 import org.github.jrds.server.extensions.lesson.InstructionMessage;
 import org.github.jrds.server.extensions.lesson.LessonStartMessage;
-import org.github.jrds.server.messages.*;
+import org.github.jrds.server.messages.Message;
+import org.github.jrds.server.messages.Request;
+import org.github.jrds.server.messages.Response;
+import org.github.jrds.server.messages.SessionStartMessage;
+
+import javax.websocket.*;
+import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class ClientWebSocket extends Endpoint
 {
@@ -99,7 +99,7 @@ public class ClientWebSocket extends Endpoint
     @Override
     public void onOpen(Session session, EndpointConfig config)
     {
-        MessageHandler.Whole<String> handler = new MessageHandler.Whole<String>()
+        MessageHandler.Whole<String> handler = new MessageHandler.Whole<>()
         {
             @Override
             public void onMessage(String message)

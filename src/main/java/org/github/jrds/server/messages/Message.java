@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
         property = "_type")
 
 @JsonSubTypes({@JsonSubTypes.Type(Request.class),@JsonSubTypes.Type(Response.class),@JsonSubTypes.Type(Info.class)})

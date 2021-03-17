@@ -22,7 +22,7 @@ public abstract class ApplicationTest
     protected String l99Name = "Jack";
     protected String lesson1 = "2905";
     protected String lesson2 = "5029";
-    private final List<TestClient> testClients = new ArrayList<TestClient>();
+    private final List<TestClient> testClients = new ArrayList<>();
 
     @Before
     public void setUp()

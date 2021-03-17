@@ -102,9 +102,6 @@ public class MessageSocket
                 }
                 catch (Exception e)
                 {
-                    System.out.println(e.getMessage());
-                    System.out.println(e.getCause());
-                    System.out.println(e.toString());
                     sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
                 }
             }

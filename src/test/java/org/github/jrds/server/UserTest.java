@@ -25,7 +25,7 @@ public class UserTest extends ApplicationTest
     }
 
     @Test
-    public void nonStandardIDnotAssignedRole()
+    public void nonStandardIdNotAssignedRole()
     {
         // TODO - unsure on how to test this as they don't get passed the auth stage
         // feels wrong to add a "bad user" to the auth

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.dto.InstructionDto;
 import org.github.jrds.server.messages.Info;
-import org.github.jrds.server.messages.Request;
 
 import java.util.Objects;
 

@@ -42,11 +42,6 @@ public class LessonMessagingExtension implements MessagingExtension
                         InstructionMessage iM = new InstructionMessage(learner.getId(), instructionDto);
                         messageSocket.sendMessage(iM);
                     }
-//                    else
-//                    {
-//                        throw new IllegalArgumentException("Learner: " + learner.getId() +  " has no registered attendance");
-//                        // TODO - consider how to test this - as there could be several messages (mainly success) in the educators queue.
-//                    }
                 }
             }
         }

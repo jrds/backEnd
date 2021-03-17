@@ -1,10 +1,11 @@
 package org.github.jrds.server.persistence;
 
 import org.github.jrds.server.domain.ActiveLesson;
-import org.github.jrds.server.domain.LessonStructure;
-import org.github.jrds.server.domain.User;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ActiveLessonStore
 {
@@ -24,14 +25,8 @@ public class ActiveLessonStore
 
     public ActiveLesson getActiveLesson(String lessonId)
     {
-        if (activeLessonStore.containsKey(lessonId))
-        {
-            return activeLessonStore.get(lessonId);
-        }
-        else
-        {
-            return null;
-        }
+        return activeLessonStore.getOrDefault(lessonId, null);
+        // TODO IntelliJ suggested getOrDefault instead of if, else. Check how this works
     }
 
     public void storeActiveLesson(ActiveLesson activeLesson)

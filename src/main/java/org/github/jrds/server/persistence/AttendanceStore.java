@@ -38,13 +38,6 @@ public class AttendanceStore
         return new HashSet<>(attendanceStore.values());
     }
 
-    public Set<Attendance> getAttendancesForALesson(LessonStructure lessonStructure)
-    {
-        return attendanceStore.values().stream()
-                .filter(a -> lessonStructure.equals(a.getLesson()))
-                .collect(Collectors.toSet());
-    }
-
     private AttendanceKey keyFor(String userId, String lessonId)
     {
         return new AttendanceKey(userId, lessonId);

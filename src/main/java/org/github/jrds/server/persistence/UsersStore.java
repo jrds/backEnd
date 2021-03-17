@@ -27,14 +27,7 @@ public class UsersStore
 
     public User getUser(String userId)
     {
-        if (usersStore.containsKey(userId))
-        {
-            return usersStore.get(userId);
-        }
-        else
-        {
-            return null;
-        }
+        return usersStore.getOrDefault(userId, null);
     }
 
     public void storeUser(User user)

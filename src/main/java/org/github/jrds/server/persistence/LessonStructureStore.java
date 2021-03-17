@@ -16,11 +16,8 @@ public class LessonStructureStore
 
         // Mocked up lesson store for prototype 
         // These match to the values defined in ApplicationTest.java
-        Set<User> learners2905 = new HashSet<User>();
-        learners2905.addAll(Arrays.asList(usersStore.getUser("u1900"), usersStore.getUser("u1901")));
-
-        Set<User> learners5029 = new HashSet<User>();
-        learners5029.addAll(Arrays.asList(usersStore.getUser("u1900"), usersStore.getUser("u1901"), usersStore.getUser("u9999")));
+        Set<User> learners2905 = new HashSet<>(Arrays.asList(usersStore.getUser("u1900"), usersStore.getUser("u1901")));
+        Set<User> learners5029 = new HashSet<>(Arrays.asList(usersStore.getUser("u1900"), usersStore.getUser("u1901"), usersStore.getUser("u9999")));
 
         LessonStructure l1 = new LessonStructure("2905", usersStore.getUser("e0001"), learners2905);
         LessonStructure l2 = new LessonStructure("5029", usersStore.getUser("e0001"), learners5029);
@@ -32,14 +29,7 @@ public class LessonStructureStore
 
     public LessonStructure getLessonStructure(String lessonId)
     {
-        if (lessonStructureStore.containsKey(lessonId))
-        {
-            return lessonStructureStore.get(lessonId);
-        }
-        else
-        {
-            return null;
-        }
+        return lessonStructureStore.getOrDefault(lessonId, null);
     }
 
     public void storeLessonStructure(LessonStructure lessonStructure)

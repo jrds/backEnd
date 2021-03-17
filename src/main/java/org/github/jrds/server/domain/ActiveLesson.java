@@ -1,8 +1,5 @@
 package org.github.jrds.server.domain;
 
-
-import org.github.jrds.server.extensions.help.UpdateHelpRequestStatusMessage;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 

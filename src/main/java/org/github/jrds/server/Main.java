@@ -31,13 +31,15 @@ public class Main
 {
     public static Main defaultInstance;
 
+    private final Collection<? extends MessagingExtension> extensions;
+
+    //Store creations:
     public UsersStore usersStore = new UsersStore();
     public LessonStructureStore lessonStructureStore = new LessonStructureStore(usersStore);
     public ActiveLessonStore activeLessonStore = new ActiveLessonStore(lessonStructureStore);
     public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;
-    private Collection<? extends MessagingExtension> extensions;
     private MessageStats messageStats;
 
     public Main()

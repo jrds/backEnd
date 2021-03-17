@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 public class HelpMessagingExtension implements MessagingExtension
 {
-    //private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
 
     @Override
     public boolean handles(Request request)
