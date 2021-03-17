@@ -37,7 +37,6 @@ public class Main
     public UsersStore usersStore = new UsersStore();
     public LessonStructureStore lessonStructureStore = new LessonStructureStore(usersStore);
     public ActiveLessonStore activeLessonStore = new ActiveLessonStore(lessonStructureStore);
-    //public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;
     private MessageStats messageStats;

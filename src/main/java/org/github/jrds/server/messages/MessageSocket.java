@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -72,8 +74,7 @@ public class MessageSocket
             if (activeLesson.getActiveLessonAttendances().stream().noneMatch(a -> a.getUser().equals(user)))
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
-                //server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons -
-                                                                    // probably as this record the times, and would be replaced by writing to a DB
+                mockDB.add("JOINED - " + attendance.toString());
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
             }
             else
@@ -88,7 +89,7 @@ public class MessageSocket
             if (request instanceof SessionEndMessage)
             {
                 sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-                //server.attendanceStore.removeAttendance(attendance);
+                mockDB.add("LEFT - " + attendance.toString());
                 userSessions.remove(sess.getUserPrincipal().getName());
                 server.activeLessonStore.getActiveLesson(lessonId).removeAttendance(attendance);
             }
@@ -146,15 +147,4 @@ public class MessageSocket
     }
 
 }
-
-
-//TODO - clean up
-
-//TODO - tests to new scenarios
-//TODO - full scenario, break it down, keep extending
-// e.g writes code that compiles, write code that doesn't compile
-// lesson is initated and instructions are sent
-// educator prepares instructions in advance, and are released meaning 
-// lesson will have instructions, and there's a new messsage type e.g lessonMessage or InstructionMessage.
-// will need some trigger/message from the educator
 
