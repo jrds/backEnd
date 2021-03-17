@@ -20,12 +20,15 @@ public class MessageSocket
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSocket.class);
     private static final Map<String, Session> userSessions = new HashMap<>();
+
     private final Main server;
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper;
     private final Map<String, ActiveLesson> sessionLesson = new HashMap<>();
     private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
     private final MessageStats messageStats = new MessageStats();
+    private final List<String> mockDB = new ArrayList<>();
+
     private String lessonId;
     private User user;
 
@@ -66,10 +69,10 @@ public class MessageSocket
 
         if (request instanceof SessionStartMessage)
         {
-            if (activeLesson.getActiveLessonAttendance().stream().noneMatch(a -> a.getUser().equals(user)))
+            if (activeLesson.getActiveLessonAttendances().stream().noneMatch(a -> a.getUser().equals(user)))
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
-                server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons -
+                //server.attendanceStore.storeAttendance(attendance); // TODO - should i still be keeping a separate store of attendances separate to those in active lessons -
                                                                     // probably as this record the times, and would be replaced by writing to a DB
                 sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
             }
@@ -85,7 +88,7 @@ public class MessageSocket
             if (request instanceof SessionEndMessage)
             {
                 sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
-                server.attendanceStore.removeAttendance(attendance);
+                //server.attendanceStore.removeAttendance(attendance);
                 userSessions.remove(sess.getUserPrincipal().getName());
                 server.activeLessonStore.getActiveLesson(lessonId).removeAttendance(attendance);
             }

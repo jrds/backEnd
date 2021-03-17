@@ -33,7 +33,7 @@ public class ActiveLesson
         return attendanceToRegister;
     }
 
-    public List<Attendance> getActiveLessonAttendance()
+    public List<Attendance> getActiveLessonAttendances()
     {
         return Collections.unmodifiableList(activeLessonAttendance);
     }

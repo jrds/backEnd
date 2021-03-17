@@ -18,7 +18,7 @@ import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessageStats;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.persistence.ActiveLessonStore;
-import org.github.jrds.server.persistence.AttendanceStore;
+//import org.github.jrds.server.persistence.AttendanceStore;
 import org.github.jrds.server.persistence.LessonStructureStore;
 import org.github.jrds.server.persistence.UsersStore;
 
@@ -37,7 +37,7 @@ public class Main
     public UsersStore usersStore = new UsersStore();
     public LessonStructureStore lessonStructureStore = new LessonStructureStore(usersStore);
     public ActiveLessonStore activeLessonStore = new ActiveLessonStore(lessonStructureStore);
-    public AttendanceStore attendanceStore = new AttendanceStore();
+    //public AttendanceStore attendanceStore = new AttendanceStore();
 
     private Server server;
     private MessageStats messageStats;

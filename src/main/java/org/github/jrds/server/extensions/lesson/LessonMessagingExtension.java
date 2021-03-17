@@ -32,16 +32,14 @@ public class LessonMessagingExtension implements MessagingExtension
         if (request.getFrom().equals(activeLesson.getAssociatedLessonStructure().getEducator().getId()))
         {
             LessonStructure lessonStructure = activeLesson.getAssociatedLessonStructure();
-            for (Instruction i : lessonStructure.getAllInstructions())
+            for (Attendance a : activeLesson.getActiveLessonAttendances())
             {
-                for (User learner : lessonStructure.getLearners())
+                for (Instruction i: lessonStructure.getAllInstructions())
                 {
-                    if (server.attendanceStore.getAttendance(learner, lessonStructure) != null)
-                    {
-                        InstructionDto instructionDto = new InstructionDto(i);
-                        InstructionMessage iM = new InstructionMessage(learner.getId(), instructionDto);
-                        messageSocket.sendMessage(iM);
-                    }
+                    InstructionDto instructionDto = new InstructionDto(i);
+                    InstructionMessage iM = new InstructionMessage(a.getUser().getId(), instructionDto);
+                    messageSocket.sendMessage(iM);
+
                 }
             }
         }
