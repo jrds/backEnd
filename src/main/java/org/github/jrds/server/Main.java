@@ -5,8 +5,7 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
@@ -20,6 +19,8 @@ import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.persistence.ActiveLessonStore;
 import org.github.jrds.server.persistence.LessonStructureStore;
 import org.github.jrds.server.persistence.UsersStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.EnumSet;
 public class Main
 {
     public static Main defaultInstance;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private final Collection<? extends MessagingExtension> extensions;
 
@@ -62,6 +64,7 @@ public class Main
     public void start()
     {
         server = new Server();
+        server.setRequestLog(new CustomRequestLog(s -> LOGGER.info(s), CustomRequestLog.EXTENDED_NCSA_FORMAT));
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8080);
         server.addConnector(connector);
@@ -131,5 +134,11 @@ public class Main
     public Collection<? extends MessagingExtension> getMessagingExtension()
     {
         return extensions;
+    }
+
+    public static void main(String[] args)
+    {
+        Main server = new Main();
+        server.start();
     }
 }
