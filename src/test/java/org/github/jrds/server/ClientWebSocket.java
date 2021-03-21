@@ -9,10 +9,7 @@ import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
 import org.github.jrds.server.extensions.help.RequestHelpMessage;
 import org.github.jrds.server.extensions.lesson.InstructionMessage;
 import org.github.jrds.server.extensions.lesson.LessonStartMessage;
-import org.github.jrds.server.messages.Message;
-import org.github.jrds.server.messages.Request;
-import org.github.jrds.server.messages.Response;
-import org.github.jrds.server.messages.SessionStartMessage;
+import org.github.jrds.server.messages.*;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -36,18 +33,20 @@ public class ClientWebSocket extends Endpoint
     private List<HelpRequestDto> openHelpRequests = new ArrayList<>();
 
     private Session session;
+    private Response sessionStartResponse;
 
     public ClientWebSocket(String userId)
     {
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         mapper.registerSubtypes(
-                new NamedType(RequestHelpMessage.class, "requestHelp"),
-                new NamedType(CancelHelpRequestMessage.class, "requestHelpCancel"),
-                new NamedType(ChatMessage.class, "chat"),
-                new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests"),
-                new NamedType(InstructionMessage.class, "instruction"),
-                new NamedType(LessonStartMessage.class, "lessonStart")
+                RequestHelpMessage.class,
+                CancelHelpRequestMessage.class,
+                ChatMessage.class,
+                OpenHelpRequestsMessage.class,
+                InstructionMessage.class,
+                LessonStartMessage.class,
+                LearnerLessonStateMessage.class
         );
         this.userId = userId;
     }
@@ -81,6 +80,7 @@ public class ClientWebSocket extends Endpoint
             {
                 webSocket.session = newSession;
                 Response response = webSocket.sendMessage(new SessionStartMessage(userId)).get(10, TimeUnit.SECONDS);
+                webSocket.setSessionStartResponse(response);
                 if (response.isFailure())
                 {
                     throw new IllegalStateException("Failed to start session: " + response.asFailure().getFailureReason());
@@ -95,6 +95,15 @@ public class ClientWebSocket extends Endpoint
         }
     }
 
+    private void setSessionStartResponse(Response response)
+    {
+        this.sessionStartResponse = response;
+    }
+
+    public Response getSessionStartResponse()
+    {
+        return sessionStartResponse;
+    }
 
     @Override
     public void onOpen(Session session, EndpointConfig config)

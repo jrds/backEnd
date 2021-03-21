@@ -3,6 +3,7 @@ package org.github.jrds.server;
 import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
+import org.github.jrds.server.extensions.lesson.ActiveLessonState;
 import org.github.jrds.server.extensions.lesson.InstructionMessage;
 import org.github.jrds.server.messages.*;
 import org.junit.Assert;
@@ -205,7 +206,12 @@ public class InstructionsTest extends ApplicationTest
 
         l.createInstruction(testTitle1, testBody1, u);
 
+        Assert.assertEquals(ActiveLessonState.NOT_STARTED, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson1).getActiveLessonState());
         c1.startLesson();
+
+        c1.getMessageReceived();
+        Assert.assertEquals(ActiveLessonState.IN_PROGRESS, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson1).getActiveLessonState());
+
         Message received1 = c2.getMessageReceived();
         Message received2 = c3.getMessageReceived();
 
@@ -263,6 +269,7 @@ public class InstructionsTest extends ApplicationTest
         l.createInstruction(testTitle1, testBody1, u);
 
         c1.startLesson();
+        c1.getMessageReceived();
 
         Assert.assertNotNull(c2.getMessageReceived());
         Assert.assertEquals(0, server.getMessageStats().forUser(l99Id).getSent());

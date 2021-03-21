@@ -1,6 +1,5 @@
 package org.github.jrds.server.extensions.help;
 
-import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.ActiveLesson;
 import org.github.jrds.server.domain.HelpRequest;
@@ -90,13 +89,13 @@ public class HelpMessagingExtension implements MessagingExtension
     }
 
     @Override
-    public List<NamedType> getRequestNamedTypes()
+    public List<Class<?>> getRequestTypes()
     {
         return Arrays.asList(
-                new NamedType(RequestHelpMessage.class, "requestHelp"),
-                new NamedType(CancelHelpRequestMessage.class, "requestHelpCancel"),
-                new NamedType(OpenHelpRequestsMessage.class, "openHelpRequests"),
-                new NamedType(UpdateHelpRequestStatusMessage.class, "UpdateHelpRequestStatusMessage")
+                RequestHelpMessage.class,
+                CancelHelpRequestMessage.class,
+                OpenHelpRequestsMessage.class,
+                UpdateHelpRequestStatusMessage.class
         );
     }
 }

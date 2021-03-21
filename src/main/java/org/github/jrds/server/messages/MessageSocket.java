@@ -42,7 +42,7 @@ public class MessageSocket
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         messagingExtensions.stream()
-                .map(MessagingExtension::getRequestNamedTypes)
+                .map(MessagingExtension::getRequestTypes)
                 .flatMap(Collection::stream)
                 .forEach(mapper::registerSubtypes);
     }
@@ -75,7 +75,7 @@ public class MessageSocket
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
                 mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
-                sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+                sendMessage(new SessionStartResponseMessage(request.getFrom(), request.getId(), attendance.getRole().toString()));
             }
             else
             {

@@ -1,5 +1,9 @@
 package org.github.jrds.server.domain;
 
+import org.github.jrds.server.extensions.chat.ChatMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Attendance
@@ -7,6 +11,7 @@ public class Attendance
     private final User user;
     private final LessonStructure lessonStructure;
     private final Role role;
+    private List<ChatMessage> chatHistory = new ArrayList<>();
 
     public Attendance(User user, LessonStructure lessonStructure)
     {
@@ -34,6 +39,15 @@ public class Attendance
     public Role getRole()
     {
         return role;
+    }
+
+    public List<ChatMessage> getChatHistory(){
+        return chatHistory;
+    }
+
+    public List<ChatMessage> addMessageToChatHistory(ChatMessage newMessage){
+        chatHistory.add(newMessage);
+        return chatHistory;
     }
 
     @Override

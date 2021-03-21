@@ -52,6 +52,10 @@ public class TestClient
         }
     }
 
+    public Response getSessionStartResponse()
+    {
+        return clientWebSocket.getSessionStartResponse();
+    }
 
     public Future<Response> sendChatMessage(String msg, String to)
     {
@@ -64,8 +68,6 @@ public class TestClient
         RequestHelpMessage m = new RequestHelpMessage(id);
         return clientWebSocket.sendMessage(m);
     }
-
-
 
     public Future<Response> startLesson()
     {

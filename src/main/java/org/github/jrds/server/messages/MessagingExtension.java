@@ -11,5 +11,5 @@ public interface MessagingExtension
 
     void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket);
 
-    List<NamedType> getRequestNamedTypes();
+    List<Class<?>> getRequestTypes();
 }

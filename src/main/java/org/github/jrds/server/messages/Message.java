@@ -10,7 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
         use = JsonTypeInfo.Id.NAME,
         property = "_type")
 
-@JsonSubTypes({@JsonSubTypes.Type(Request.class),@JsonSubTypes.Type(Response.class),@JsonSubTypes.Type(Info.class)})
+@JsonSubTypes({
+        @JsonSubTypes.Type(Request.class),
+        @JsonSubTypes.Type(Response.class),
+        @JsonSubTypes.Type(Info.class)})
 
 public abstract class Message
 {

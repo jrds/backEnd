@@ -1,5 +1,8 @@
 package org.github.jrds.server.domain;
 
+import org.github.jrds.server.dto.InstructionDto;
+import org.github.jrds.server.extensions.lesson.ActiveLessonState;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -9,6 +12,8 @@ public class ActiveLesson
     private final LessonStructure associatedLessonStructure;
     private final List<Attendance> activeLessonAttendance = new ArrayList<>();
     private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
+    private ActiveLessonState activeLessonState = ActiveLessonState.NOT_STARTED;
+    private List<InstructionDto> instructionsSent = new ArrayList<>();
 
     public ActiveLesson(LessonStructure associatedLessonStructure)
     {
@@ -69,5 +74,25 @@ public class ActiveLesson
     public void removeHelpRequest(HelpRequest toUpdate)
     {
         openHelpRequests.remove(toUpdate);
+    }
+
+    public ActiveLessonState getActiveLessonState()
+    {
+        return activeLessonState;
+    }
+
+    public void setActiveLessonState(ActiveLessonState activeLessonState)
+    {
+        this.activeLessonState = activeLessonState;
+    }
+
+    public List<InstructionDto> getInstructionsSent()
+    {
+        return instructionsSent;
+    }
+
+    public void addToInstructionSent(InstructionDto i)
+    {
+        instructionsSent.add(i);
     }
 }

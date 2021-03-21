@@ -1,9 +1,9 @@
 package org.github.jrds.server.extensions.lesson;
 
-import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.*;
 import org.github.jrds.server.dto.InstructionDto;
+import org.github.jrds.server.messages.LearnerLessonStateMessage;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
@@ -31,16 +31,30 @@ public class LessonMessagingExtension implements MessagingExtension
     {
         if (request.getFrom().equals(activeLesson.getAssociatedLessonStructure().getEducator().getId()))
         {
+            activeLesson.setActiveLessonState(ActiveLessonState.IN_PROGRESS);
             LessonStructure lessonStructure = activeLesson.getAssociatedLessonStructure();
+
+            for (Instruction i: lessonStructure.getAllInstructions()){
+                InstructionDto instructionDto = new InstructionDto(i);
+                activeLesson.addToInstructionSent(instructionDto);
+            }
+
             for (Attendance a : activeLesson.getActiveLessonAttendances())
             {
-                for (Instruction i: lessonStructure.getAllInstructions())
+                if (a.getRole().equals(Role.LEARNER))
                 {
-                    InstructionDto instructionDto = new InstructionDto(i);
-                    InstructionMessage iM = new InstructionMessage(a.getUser().getId(), instructionDto);
-                    messageSocket.sendMessage(iM);
+                    String learnerId = a.getUser().getId();
 
+                    for (Instruction i : lessonStructure.getAllInstructions())
+                    {
+                        InstructionDto instructionDto = new InstructionDto(i);
+                        InstructionMessage iM = new InstructionMessage(learnerId, instructionDto);
+                        messageSocket.sendMessage(iM);
+                    }
+                    LearnerLessonStateMessage llsm = new LearnerLessonStateMessage(learnerId, activeLesson);
+                    messageSocket.sendMessage(llsm);
                 }
+                // TODO send educator lesson state message to a.getEducator()
             }
         }
         else
@@ -49,13 +63,12 @@ public class LessonMessagingExtension implements MessagingExtension
         }
     }
 
-
     @Override
-    public List<NamedType> getRequestNamedTypes()
+    public List<Class<?>> getRequestTypes()
     {
         return Arrays.asList(
-                new NamedType(InstructionMessage.class, "instruction"),
-                new NamedType(LessonStartMessage.class, "lessonStart")
+                InstructionMessage.class,
+                LessonStartMessage.class
         );
     }
 }

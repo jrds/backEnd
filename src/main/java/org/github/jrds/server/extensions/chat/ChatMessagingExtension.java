@@ -1,13 +1,18 @@
 package org.github.jrds.server.extensions.chat;
 
-import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.ActiveLesson;
+import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Role;
+import org.github.jrds.server.domain.User;
+import org.github.jrds.server.messages.LearnerLessonStateMessage;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class ChatMessagingExtension implements MessagingExtension
 {
@@ -21,11 +26,33 @@ public class ChatMessagingExtension implements MessagingExtension
     public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
         messageSocket.sendMessage(request);
+
+        User from = Main.defaultInstance.usersStore.getUser(request.getFrom());
+        Attendance fromAttendance = activeLesson.getAttendance(from);
+        Role fromRole = fromAttendance.getRole();
+
+        User to = Main.defaultInstance.usersStore.getUser(request.getTo());
+        Attendance toAttendance = activeLesson.getAttendance(to);
+        Role toRole = toAttendance.getRole();
+
+        fromAttendance.addMessageToChatHistory((ChatMessage) request);
+        toAttendance.addMessageToChatHistory((ChatMessage) request);
+
+//        if (fromRole.equals(Role.LEARNER) && toRole.equals(Role.EDUCATOR)){
+//            messageSocket.sendMessage(new LearnerLessonStateMessage(from.getId(), activeLesson));
+//            //            messageSocket.sendMessage(new EducatorLessonStateMessage(to.getId(), activeLesson));
+//        }
+//        else if (fromRole.equals(Role.EDUCATOR) && toRole.equals(Role.LEARNER)){
+//            messageSocket.sendMessage(new LearnerLessonStateMessage(to.getId(), activeLesson));
+//            //            messageSocket.sendMessage(new EducatorLessonStateMessage(from.getId(), activeLesson));
+//        }
+
+
     }
 
     @Override
-    public List<NamedType> getRequestNamedTypes()
+    public List<Class<?>> getRequestTypes()
     {
-        return Collections.singletonList(new NamedType(ChatMessage.class, "chat"));
+        return Collections.singletonList(ChatMessage.class);
     }
 }

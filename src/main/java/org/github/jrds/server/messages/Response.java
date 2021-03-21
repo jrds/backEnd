@@ -1,6 +1,7 @@
 package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -9,9 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "_type")
 
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = FailureMessage.class, name = "failure"),
-        @JsonSubTypes.Type(value = SuccessMessage.class, name = "success")})
-
+        @JsonSubTypes.Type(value = FailureMessage.class),
+        @JsonSubTypes.Type(value = SuccessMessage.class)})
 
 public abstract class Response extends Message
 {

@@ -80,6 +80,7 @@ public class Main
 
         WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
+            wsContainer.setDefaultMaxSessionIdleTimeout(60 * 60 * 1000);
             wsContainer.addEndpoint(MessageSocket.class);
         });
 
