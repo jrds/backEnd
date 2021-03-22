@@ -27,6 +27,7 @@ public class ClientWebSocket extends Endpoint
 
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final BlockingQueue<Message> messagesReceived = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> stateMessagesReceived = new LinkedBlockingQueue<>();
     private final ObjectMapper mapper;
     private final Map<Integer, CompletableFuture<Response>> uncompletedFutures = new ConcurrentHashMap<>();
     private final String userId;
@@ -136,6 +137,9 @@ public class ClientWebSocket extends Endpoint
                 {
                     throw new IllegalStateException("Unexpected message");
                 }
+            }
+            else if (msg instanceof LearnerLessonStateMessage){
+                stateMessagesReceived.add(msg);
             }
             else
             {

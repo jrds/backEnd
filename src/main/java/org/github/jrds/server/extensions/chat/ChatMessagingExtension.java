@@ -12,7 +12,6 @@ import org.github.jrds.server.messages.Request;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class ChatMessagingExtension implements MessagingExtension
 {
@@ -38,14 +37,14 @@ public class ChatMessagingExtension implements MessagingExtension
         fromAttendance.addMessageToChatHistory((ChatMessage) request);
         toAttendance.addMessageToChatHistory((ChatMessage) request);
 
-//        if (fromRole.equals(Role.LEARNER) && toRole.equals(Role.EDUCATOR)){
-//            messageSocket.sendMessage(new LearnerLessonStateMessage(from.getId(), activeLesson));
-//            //            messageSocket.sendMessage(new EducatorLessonStateMessage(to.getId(), activeLesson));
-//        }
-//        else if (fromRole.equals(Role.EDUCATOR) && toRole.equals(Role.LEARNER)){
-//            messageSocket.sendMessage(new LearnerLessonStateMessage(to.getId(), activeLesson));
-//            //            messageSocket.sendMessage(new EducatorLessonStateMessage(from.getId(), activeLesson));
-//        }
+        if (fromRole.equals(Role.LEARNER) && toRole.equals(Role.EDUCATOR)){
+            messageSocket.sendMessage(new LearnerLessonStateMessage(from.getId(), activeLesson));
+            //            messageSocket.sendMessage(new EducatorLessonStateMessage(to.getId(), activeLesson));
+        }
+        else if (fromRole.equals(Role.EDUCATOR) && toRole.equals(Role.LEARNER)){
+            messageSocket.sendMessage(new LearnerLessonStateMessage(to.getId(), activeLesson));
+            //            messageSocket.sendMessage(new EducatorLessonStateMessage(from.getId(), activeLesson));
+        }
 
 
     }

@@ -11,13 +11,14 @@ public class Attendance
     private final User user;
     private final LessonStructure lessonStructure;
     private final Role role;
-    private List<ChatMessage> chatHistory = new ArrayList<>();
+    private List<ChatMessage> chatHistory;
 
     public Attendance(User user, LessonStructure lessonStructure)
     {
         this.user = Objects.requireNonNull(user, "Invalid user");
         this.lessonStructure = Objects.requireNonNull(lessonStructure, "Invalid lesson");
         this.role = lessonStructure.getUserRole(user);
+        this.chatHistory = new ArrayList<>();
 
         if (this.role == Role.NONE)
         {

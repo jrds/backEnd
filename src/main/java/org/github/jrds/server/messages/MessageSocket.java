@@ -75,7 +75,7 @@ public class MessageSocket
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
                 mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
-                sendMessage(new SessionStartResponseMessage(request.getFrom(), request.getId(), attendance.getRole().toString()));
+                sendMessage(new SessionStartResponseMessage(request.getFrom(), request.getId(), attendance.getRole().toString(), activeLesson.getActiveLessonState().toString()));
             }
             else
             {
