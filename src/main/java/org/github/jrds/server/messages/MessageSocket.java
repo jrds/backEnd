@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.ActiveLesson;
 import org.github.jrds.server.domain.Attendance;
+import org.github.jrds.server.domain.Role;
 import org.github.jrds.server.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,9 @@ public class MessageSocket
                 Attendance attendance = activeLesson.registerAttendance(user);
                 mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
                 sendMessage(new SessionStartResponseMessage(request.getFrom(), request.getId(), attendance.getRole().toString(), activeLesson.getActiveLessonState().toString()));
+                if (attendance.getRole() == Role.LEARNER){
+                    sendMessage(new LearnerLessonStateMessage(request.getFrom(), activeLesson));
+                }
             }
             else
             {
