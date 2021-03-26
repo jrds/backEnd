@@ -11,6 +11,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.github.jrds.server.extensions.chat.ChatMessagingExtension;
+import org.github.jrds.server.extensions.code.CodeMessageExtension;
 import org.github.jrds.server.extensions.help.HelpMessagingExtension;
 import org.github.jrds.server.extensions.lesson.LessonMessagingExtension;
 import org.github.jrds.server.messages.MessageSocket;
@@ -48,6 +49,7 @@ public class Main
         extensions = Arrays.asList(
             new HelpMessagingExtension(),
             new ChatMessagingExtension(),
+            new CodeMessageExtension(),
             new LessonMessagingExtension(this));
     }
 

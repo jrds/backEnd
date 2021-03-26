@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
+import org.github.jrds.server.extensions.code.CodeToCompileMessage;
+import org.github.jrds.server.extensions.code.CompiledCodeMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
 import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
 import org.github.jrds.server.extensions.help.RequestHelpMessage;
@@ -47,7 +49,9 @@ public class ClientWebSocket extends Endpoint
                 OpenHelpRequestsMessage.class,
                 InstructionMessage.class,
                 LessonStartMessage.class,
-                LearnerLessonStateMessage.class
+                LearnerLessonStateMessage.class,
+                CodeToCompileMessage.class,
+                CompiledCodeMessage.class
         );
         this.userId = userId;
     }
