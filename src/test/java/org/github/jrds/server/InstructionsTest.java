@@ -31,8 +31,8 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void educatorCreatesInstructionToLesson()
     {
-        connect(eduId, eduName, lesson1);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        connect(eduId, eduName, lesson2);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
         User u = server.usersStore.getUser(eduId);
 
         Assert.assertEquals(0, l.getAllInstructions().size());
@@ -50,8 +50,8 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void educatorCanCreateMultipleInstructions()
     {
-        connect(eduId, eduName, lesson1);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        connect(eduId, eduName, lesson2);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -72,8 +72,8 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void canReorderInstructions()
     {
-        connect(eduId, eduName, lesson1);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        connect(eduId, eduName, lesson2);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -104,8 +104,8 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void educatorCanRemoveAnInstruction()
     {
-        connect(eduId, eduName, lesson1);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        connect(eduId, eduName, lesson2);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
         User u = server.usersStore.getUser(eduId);
 
         Instruction i1 = l.createInstruction(testTitle1, testBody1, u);
@@ -128,8 +128,8 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void educatorCanRemoveAllInstructions()
     {
-        connect(eduId, eduName, lesson1);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        connect(eduId, eduName, lesson2);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
         User u = server.usersStore.getUser(eduId);
 
         l.createInstruction(testTitle1, testBody1, u);
@@ -197,20 +197,20 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void startLessonSendsOneInstructionToAllLearners()
     {
-        TestClient c1 = connect(eduId, eduName, lesson1);
-        TestClient c2 = connect(l1Id, l1Name, lesson1);
-        TestClient c3 = connect(l2Id, l2Name, lesson1);
+        TestClient c1 = connect(eduId, eduName, lesson2);
+        TestClient c2 = connect(l1Id, l1Name, lesson2);
+        TestClient c3 = connect(l2Id, l2Name, lesson2);
 
         User u = server.usersStore.getUser(eduId);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
 
         l.createInstruction(testTitle1, testBody1, u);
 
-        Assert.assertEquals(ActiveLessonState.NOT_STARTED, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson1).getActiveLessonState());
+        Assert.assertEquals(ActiveLessonState.NOT_STARTED, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson2).getActiveLessonState());
         c1.startLesson();
 
         c1.getMessageReceived();
-        Assert.assertEquals(ActiveLessonState.IN_PROGRESS, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson1).getActiveLessonState());
+        Assert.assertEquals(ActiveLessonState.IN_PROGRESS, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson2).getActiveLessonState());
 
         Message received1 = c2.getMessageReceived();
         Message received2 = c3.getMessageReceived();
@@ -228,12 +228,12 @@ public class InstructionsTest extends ApplicationTest
     @Test
     public void startLessonSendsMultipleInstructionsToAllLearners()
     {
-        TestClient c1 = connect(eduId, eduName, lesson1);
-        TestClient c2 = connect(l1Id, l1Name, lesson1);
-        TestClient c3 = connect(l2Id, l2Name, lesson1);
+        TestClient c1 = connect(eduId, eduName, lesson2);
+        TestClient c2 = connect(l1Id, l1Name, lesson2);
+        TestClient c3 = connect(l2Id, l2Name, lesson2);
 
         User u = server.usersStore.getUser(eduId);
-        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson1);
+        LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
 
         l.createInstruction(testTitle1, testBody1, u);
         l.createInstruction(testTitle2, testBody2, u);

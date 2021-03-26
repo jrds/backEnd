@@ -81,7 +81,6 @@ public class Code
                                 .lines()
                                 .collect(Collectors.joining("\n"));
                         System.out.println(stdOut);
-                        //compilationResult = stdOut;
                         allCompiledCode.add(new CompiledCode(code, stdOut, CompilationStatus.COMPILED_SUCCESSFULLY));
                     }
                     else
@@ -91,7 +90,6 @@ public class Code
                                 .lines()
                                 .collect(Collectors.joining("\n"));
                         System.out.println(stdErr);
-                        //executionError = stdErr;
                         allCompiledCode.add(new CompiledCode(code,stdErr, CompilationStatus.EXECUTION_ERROR));
                     }
                 }
@@ -102,7 +100,6 @@ public class Code
                             .lines()
                             .collect(Collectors.joining("\n"));
                     System.out.println(stdErr);
-                    //compilationError = stdErr;
                     allCompiledCode.add(new CompiledCode(code,stdErr, CompilationStatus.COMPILATION_ERROR));
                 }
             }
@@ -117,7 +114,9 @@ public class Code
         }
         else
         {
+
             throw new IllegalArgumentException("Not a valid class definition");
+
         }
         System.out.println("Time taken: " + (System.currentTimeMillis() - t0));
     }

@@ -2,8 +2,6 @@ package org.github.jrds.server.extensions.code;
 
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.*;
-import org.github.jrds.server.extensions.chat.ChatMessage;
-import org.github.jrds.server.messages.LearnerLessonStateMessage;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
@@ -34,12 +32,10 @@ public class CodeMessageExtension implements MessagingExtension
             code.compileCode();
 
 
-            //wait?
-
             if (attendance.getCode().getLatestCompiledCode() != null)
             {
                 CompiledCode latestCompiledCode= attendance.getCode().getLatestCompiledCode();
-                messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), latestCompiledCode.getCompilationStatus().toString(), latestCompiledCode.getCompilationResult()));
+                messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), latestCompiledCode.getCompilationStatus().toString(), latestCompiledCode.getCompilationResult(), latestCompiledCode.getTimeCompiled().toString()));
             }
         }
         else
