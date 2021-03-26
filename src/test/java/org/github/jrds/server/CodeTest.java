@@ -11,7 +11,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class CodeTest extends ApplicationTest
 {
@@ -90,14 +93,15 @@ public class CodeTest extends ApplicationTest
 
     // FIX THIS
     @Test
-    public void invalidClassDefinitionsThrowException(){
+    public void invalidClassDefinitionsThrowException() throws ExecutionException, InterruptedException, TimeoutException
+    {
 
         TestClient c1 = connect(l1Id, l1Name, lesson1);
 
         String learnersCode = "class Hello ( public static void main(String[] args) { System.out.println(\"Hello World :)\"); } )";
 
 
-        Future<Response> response = c1.compileCode(learnersCode);
+        Response response = c1.compileCode(learnersCode).get(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(response instanceof FailureMessage);
         Assert.assertEquals("Not a valid class definition", ((FailureMessage) response).getFailureReason());
