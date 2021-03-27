@@ -1,0 +1,6 @@
+package org.github.jrds.server.domain;
+
+public enum ExecutionStatus
+{
+    NEW, COMPILE_SUCCEEDED, COMPILE_FAILED, EXECUTION_STARTED, EXECUTION_FAILED_TO_START, EXECUTION_FINISHED, EXECUTION_ERROR
+}

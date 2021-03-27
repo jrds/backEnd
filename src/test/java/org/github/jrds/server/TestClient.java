@@ -76,7 +76,7 @@ public class TestClient
         return clientWebSocket.sendMessage(m);
     }
 
-    public Future<Response> compileCode(String code)
+    public Future<Response> executeCode(String code)
     {
         CodeToCompileMessage m = new CodeToCompileMessage(id, code);
         return clientWebSocket.sendMessage(m);

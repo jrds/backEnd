@@ -29,13 +29,27 @@ public class CodeMessageExtension implements MessagingExtension
             Code code = attendance.getCode();
 
             code.setCode(codeToCompile);
-            code.compileCode();
+            code.executeCode();
 
-
-            if (attendance.getCode().getLatestCompiledCode() != null)
+            ExecuteCodeProcess process = attendance.getCode().getExecuteCodeProcess();
+            if (process != null)
             {
-                CompiledCode latestCompiledCode= attendance.getCode().getLatestCompiledCode();
-                messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), latestCompiledCode.getCompilationStatus().toString(), latestCompiledCode.getCompilationResult(), latestCompiledCode.getTimeCompiled().toString()));
+                if (process.getStatus() == ExecutionStatus.COMPILE_FAILED)
+                {
+                    messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), process.getStatus().toString(), process.getCompilationErrors(), process.getTimeCompiled().toString()));
+                }
+                else if (process.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
+                {
+                    messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), process.getStatus().toString(), "", process.getTimeExecutionStarted().toString()));
+                }
+                else if (process.getStatus() == ExecutionStatus.EXECUTION_STARTED)
+                {
+                    messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), process.getStatus().toString(), process.getOutput(), process.getTimeExecutionStarted().toString()));
+                }
+                else if (process.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
+                {
+                    messageSocket.sendMessage(new CompiledCodeMessage(from.getId(), process.getStatus().toString(), process.getOutput(), process.getTimeExecutionStarted().toString()));
+                }
             }
         }
         else
