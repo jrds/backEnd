@@ -2,7 +2,7 @@ package org.github.jrds.server;
 
 import org.github.jrds.server.domain.ExecutionStatus;
 
-import org.github.jrds.server.extensions.code.CompiledCodeMessage;
+import org.github.jrds.server.extensions.code.ExecuteProcessMessage;
 import org.github.jrds.server.messages.FailureMessage;
 import org.github.jrds.server.messages.Message;
 import org.github.jrds.server.messages.Response;
@@ -24,17 +24,9 @@ public class CodeTest extends ApplicationTest
         String learnersCode = "class Hello { public static void main(String[] args) { System.out.println(\"Hello World :)\"); } }";
 
         c1.executeCode(learnersCode);
-
-        Message m = c1.getMessageReceived();
-        Assert.assertTrue(m instanceof CompiledCodeMessage);
-
-        CompiledCodeMessage compiledCodeMessage = ((CompiledCodeMessage)m);
-
-        Assert.assertEquals(ExecutionStatus.COMPILE_SUCCEEDED.toString(), compiledCodeMessage.getCompilationStatus());
-        Assert.assertEquals("Hello World :)",compiledCodeMessage.getCompilationResult());
-
+        String output = waitForExecutionToComplete(c1);
+        Assert.assertEquals("Hello World :)" + System.getProperty("line.separator"), output);
     }
-
 
     @Test
     public void newCodeIsProperlyExecuted()
@@ -45,16 +37,11 @@ public class CodeTest extends ApplicationTest
         String newCode = "class Smile { public static void main(String[] args) { System.out.println(\":)\"); } }";
 
         c1.executeCode(originalCode);
-        c1.getMessageReceived();
+        waitForExecutionToComplete(c1);
 
         c1.executeCode(newCode);
-        Message m = c1.getMessageReceived();
-
-        Assert.assertTrue(m instanceof CompiledCodeMessage);
-
-        CompiledCodeMessage compiledCodeMessage = ((CompiledCodeMessage)m);
-        Assert.assertEquals(ExecutionStatus.COMPILE_SUCCEEDED.toString(), compiledCodeMessage.getCompilationStatus());
-        Assert.assertEquals(":)",compiledCodeMessage.getCompilationResult());
+        String output = waitForExecutionToComplete(c1);
+        Assert.assertEquals(":)" + System.getProperty("line.separator"), output);
     }
 
     @Test
@@ -80,13 +67,27 @@ public class CodeTest extends ApplicationTest
         Response response = c1.executeCode(learnersCode).get(10, TimeUnit.SECONDS);
         Message m = c1.getMessageReceived();
 
-        Assert.assertTrue(m instanceof CompiledCodeMessage);
+        Assert.assertTrue(m instanceof ExecuteProcessMessage);
 
-        CompiledCodeMessage compiledCodeMessage = ((CompiledCodeMessage)m);
-        Assert.assertEquals(ExecutionStatus.COMPILE_FAILED.toString(), compiledCodeMessage.getCompilationStatus());
+        ExecuteProcessMessage executeProcessMessage = ((ExecuteProcessMessage)m);
+        Assert.assertEquals(ExecutionStatus.COMPILE_FAILED.toString(), executeProcessMessage.getExecutionStatus());
         Assert.assertEquals("Hello.java:1: error: reached end of file while parsing\n" +
                 "class Hello { public static void main(String[] args) { System.out.println(\"Hello World\"); }\n" +
                 "                                                                                           ^\n" +
-                "1 error",compiledCodeMessage.getCompilationResult());
+                "1 error", executeProcessMessage.getExecutionOutput());
+    }
+
+    private String waitForExecutionToComplete(TestClient c1)
+    {
+        StringBuilder output = new StringBuilder();
+        boolean isFinished = false;
+        do
+        {
+            ExecuteProcessMessage m = (ExecuteProcessMessage) c1.getMessageReceived();
+            output.append(m.getExecutionOutput());
+            isFinished = m.getExecutionStatus().equals(ExecutionStatus.EXECUTION_FINISHED.toString());
+        }
+        while (!isFinished);
+        return output.toString();
     }
 }

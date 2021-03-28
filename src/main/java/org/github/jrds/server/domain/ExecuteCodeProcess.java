@@ -3,6 +3,7 @@ package org.github.jrds.server.domain;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +22,7 @@ public class ExecuteCodeProcess
     private static final Path JAVA_CMD = JAVA_BIN.resolve(IS_WINDOWS ? "java.exe" : "java");
     private static final Path JAVAC_CMD = JAVA_BIN.resolve(IS_WINDOWS ? "javac.exe" : "javac");
 
+    private final Object processLock = new Object();
     private final String className;
     private final String fileName;
     private final String codeToExecute;
@@ -31,7 +33,8 @@ public class ExecuteCodeProcess
     private Instant timeExecutionStarted;
     private Instant timeExecutionEnded;
     private String compilationErrors;
-    Process executionProcess;
+    private Process executionProcess;
+    private Reader processStdOutReader;
 
     ExecuteCodeProcess(String codeToExecute, Path codeDirectory)
     {
@@ -61,30 +64,14 @@ public class ExecuteCodeProcess
                 timeExecutionStarted = Instant.now();
                 executionProcess = new ProcessBuilder().command(JAVA_CMD.toString(), className).directory(codeDirectory.toFile()).start();
                 System.out.println("Execution started");
-                status = ExecutionStatus.EXECUTION_STARTED;
-
-                new Thread(() -> {
-                    try
-                    {
-                        executionProcess.waitFor();
+                status = ExecutionStatus.EXECUTION_IN_PROGRESS;
+                processStdOutReader = new InputStreamReader(executionProcess.getInputStream());
+                executionProcess.onExit().thenRun(() -> {
+                    synchronized (processLock) {
                         status = ExecutionStatus.EXECUTION_FINISHED;
+                        timeExecutionEnded = Instant.now();
                     }
-                    catch (InterruptedException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-
-                }).start();
-
-                // TODO Temporary
-                try
-                {
-                    Thread.sleep(5000);
-                }
-                catch (InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
+                });
             }
             catch (IOException e)
             {
@@ -125,7 +112,10 @@ public class ExecuteCodeProcess
 
     public ExecutionStatus getStatus()
     {
-        return status;
+        synchronized (processLock)
+        {
+            return status;
+        }
     }
 
     public String getCompilationErrors()
@@ -153,8 +143,22 @@ public class ExecuteCodeProcess
         return timeExecutionEnded;
     }
 
-    public String getOutput()
+    public String getUnreadOutput()
     {
-        return "";
+        try
+        {
+            StringBuilder builder = new StringBuilder();
+            char[] chars = new char[1024];
+            while (processStdOutReader.ready())
+            {
+                int read = processStdOutReader.read(chars);
+                builder.append(chars, 0, read);
+            }
+            return builder.toString();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }
