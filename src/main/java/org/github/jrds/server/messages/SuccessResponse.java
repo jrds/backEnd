@@ -10,15 +10,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "_type")
 
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SessionStartResponseMessage.class),
-        @JsonSubTypes.Type(value = SuccessMessage.class)
+        @JsonSubTypes.Type(value = SessionStartResponse.class),
+        @JsonSubTypes.Type(value = SuccessResponse.class)
 })
 
-public class SuccessMessage extends Response
+public class SuccessResponse extends Response
 {
 
     @JsonCreator
-    public SuccessMessage(@JsonProperty("to") String to, @JsonProperty("id") int id)
+    public SuccessResponse(@JsonProperty("to") String to, @JsonProperty("id") int id)
     {
         super(to, id);
     }
@@ -30,7 +30,7 @@ public class SuccessMessage extends Response
     }
 
     @Override
-    public FailureMessage asFailure()
+    public FailureResponse asFailure()
     {
         throw new UnsupportedOperationException("Not a failure");
     }

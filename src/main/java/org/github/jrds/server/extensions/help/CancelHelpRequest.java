@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Request;
 
-public class CancelHelpRequestMessage extends Request
+public class CancelHelpRequest extends Request
 {
     @JsonCreator
-    public CancelHelpRequestMessage(@JsonProperty ("leanerId") String leanerId)
+    public CancelHelpRequest(@JsonProperty ("leanerId") String leanerId)
     {
         super(leanerId, null);
     }

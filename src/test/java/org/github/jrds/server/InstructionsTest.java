@@ -4,7 +4,7 @@ import org.github.jrds.server.domain.Instruction;
 import org.github.jrds.server.domain.LessonStructure;
 import org.github.jrds.server.domain.User;
 import org.github.jrds.server.extensions.lesson.ActiveLessonState;
-import org.github.jrds.server.extensions.lesson.InstructionMessage;
+import org.github.jrds.server.extensions.lesson.InstructionInfo;
 import org.github.jrds.server.messages.*;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -215,13 +215,13 @@ public class InstructionsTest extends ApplicationTest
         Message received1 = c2.getMessageReceived();
         Message received2 = c3.getMessageReceived();
 
-        Assert.assertTrue(received1 instanceof InstructionMessage);
-        Assert.assertTrue(received2 instanceof InstructionMessage);
+        Assert.assertTrue(received1 instanceof InstructionInfo);
+        Assert.assertTrue(received2 instanceof InstructionInfo);
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getInstruction().getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getInstruction().getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received2).getInstruction().getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received2).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionInfo) received1).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionInfo) received1).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionInfo) received2).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionInfo) received2).getInstruction().getBody());
     }
 
 
@@ -245,15 +245,15 @@ public class InstructionsTest extends ApplicationTest
         Message received3 = c3.getMessageReceived();
         Message received4 = c3.getMessageReceived();
 
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received1).getInstruction().getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received1).getInstruction().getBody());
-        Assert.assertEquals(testTitle1, ((InstructionMessage) received3).getInstruction().getTitle());
-        Assert.assertEquals(testBody1, ((InstructionMessage) received3).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionInfo) received1).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionInfo) received1).getInstruction().getBody());
+        Assert.assertEquals(testTitle1, ((InstructionInfo) received3).getInstruction().getTitle());
+        Assert.assertEquals(testBody1, ((InstructionInfo) received3).getInstruction().getBody());
 
-        Assert.assertEquals(testTitle2, ((InstructionMessage) received2).getInstruction().getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage) received2).getInstruction().getBody());
-        Assert.assertEquals(testTitle2, ((InstructionMessage) received4).getInstruction().getTitle());
-        Assert.assertEquals(testBody2, ((InstructionMessage) received4).getInstruction().getBody());
+        Assert.assertEquals(testTitle2, ((InstructionInfo) received2).getInstruction().getTitle());
+        Assert.assertEquals(testBody2, ((InstructionInfo) received2).getInstruction().getBody());
+        Assert.assertEquals(testTitle2, ((InstructionInfo) received4).getInstruction().getTitle());
+        Assert.assertEquals(testBody2, ((InstructionInfo) received4).getInstruction().getBody());
     }
 
     @Test

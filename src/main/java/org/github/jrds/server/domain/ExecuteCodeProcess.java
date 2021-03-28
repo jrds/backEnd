@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
 
 public class ExecuteCodeProcess
 {
-    private static final Pattern CLASS = Pattern.compile(".*?class\\s+([A-Za-z_][A-Za-z_]*)\\s*\\{.*");
+    public static final int STD_OUT = 0;
+    public static final int STD_ERR = 1;
+
+    private static final Pattern CLASS = Pattern.compile(".*?class\\s+([A-Za-z_][A-Za-z_]*)\\s*\\{.*", Pattern.DOTALL);
     private static final Path JAVA_HOME = Paths.get(Objects.requireNonNull(System.getenv("JAVA_HOME"), "You must define JAVA_HOME environment variable"));
     private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows");
     private static final Path JAVA_BIN = JAVA_HOME.resolve("bin");
@@ -35,6 +38,7 @@ public class ExecuteCodeProcess
     private String compilationErrors;
     private Process executionProcess;
     private Reader processStdOutReader;
+    private Reader processStdErrReader;
 
     ExecuteCodeProcess(String codeToExecute, Path codeDirectory)
     {
@@ -66,6 +70,7 @@ public class ExecuteCodeProcess
                 System.out.println("Execution started");
                 status = ExecutionStatus.EXECUTION_IN_PROGRESS;
                 processStdOutReader = new InputStreamReader(executionProcess.getInputStream());
+                processStdErrReader = new InputStreamReader(executionProcess.getErrorStream());
                 executionProcess.onExit().thenRun(() -> {
                     synchronized (processLock) {
                         status = ExecutionStatus.EXECUTION_FINISHED;
@@ -143,22 +148,31 @@ public class ExecuteCodeProcess
         return timeExecutionEnded;
     }
 
-    public String getUnreadOutput()
+    public String[] getUnreadOutput()
     {
         try
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder stdOut = new StringBuilder();
+            StringBuilder stdErr = new StringBuilder();
             char[] chars = new char[1024];
             long t0 = System.currentTimeMillis();
             synchronized (processLock)
             {
-                while (processStdOutReader.ready() && (System.currentTimeMillis() - t0) < 800)
+                while ((processStdOutReader.ready() || processStdErrReader.ready()) && (System.currentTimeMillis() - t0) < 800 && stdOut.length() + stdErr.length() < 32768)
                 {
-                    int read = processStdOutReader.read(chars);
-                    builder.append(chars, 0, read);
+                    if (processStdOutReader.ready())
+                    {
+                        int read = processStdOutReader.read(chars);
+                        stdOut.append(chars, 0, read);
+                    }
+                    if (processStdErrReader.ready())
+                    {
+                        int read = processStdErrReader.read(chars);
+                        stdErr.append(chars, 0, read);
+                    }
                 }
             }
-            return builder.toString();
+            return new String[] {stdOut.toString(), stdErr.toString()};
         }
         catch (IOException e)
         {

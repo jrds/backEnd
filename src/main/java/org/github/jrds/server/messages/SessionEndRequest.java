@@ -3,11 +3,11 @@ package org.github.jrds.server.messages;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SessionEndMessage extends Request
+public class SessionEndRequest extends Request
 {
 
     @JsonCreator
-    public SessionEndMessage(@JsonProperty("from") String from)
+    public SessionEndRequest(@JsonProperty("from") String from)
     {
         super(from, null);
     }

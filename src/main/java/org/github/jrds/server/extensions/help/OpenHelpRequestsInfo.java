@@ -7,12 +7,12 @@ import org.github.jrds.server.messages.Info;
 
 import java.util.List;
 
-public class OpenHelpRequestsMessage extends Info
+public class OpenHelpRequestsInfo extends Info
 {
     private final List<HelpRequestDto> openHelpRequests;
 
     @JsonCreator
-    public OpenHelpRequestsMessage(
+    public OpenHelpRequestsInfo(
             @JsonProperty("to") String to,
             @JsonProperty("openHelpRequests") List<HelpRequestDto> openHelpRequests
     )

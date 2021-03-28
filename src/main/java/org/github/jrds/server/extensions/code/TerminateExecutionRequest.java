@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Request;
 
-public class TerminateExecutionMessage extends Request
+public class TerminateExecutionRequest extends Request
 {
     @JsonCreator
-    public TerminateExecutionMessage(@JsonProperty("from") String from)
+    public TerminateExecutionRequest(@JsonProperty("from") String from)
     {
         super(from, null);
     }

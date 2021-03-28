@@ -3,7 +3,7 @@ package org.github.jrds.server.extensions.lesson;
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.*;
 import org.github.jrds.server.dto.InstructionDto;
-import org.github.jrds.server.messages.LearnerLessonStateMessage;
+import org.github.jrds.server.messages.LearnerLessonStateInfo;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
@@ -23,7 +23,7 @@ public class LessonMessagingExtension implements MessagingExtension
     @Override
     public boolean handles(Request request)
     {
-        return request instanceof LessonStartMessage;
+        return request instanceof LessonStartRequest;
     }
 
     @Override
@@ -48,10 +48,10 @@ public class LessonMessagingExtension implements MessagingExtension
                     for (Instruction i : lessonStructure.getAllInstructions())
                     {
                         InstructionDto instructionDto = new InstructionDto(i);
-                        InstructionMessage iM = new InstructionMessage(learnerId, instructionDto);
+                        InstructionInfo iM = new InstructionInfo(learnerId, instructionDto);
                         messageSocket.sendMessage(iM);
                     }
-                    LearnerLessonStateMessage llsm = new LearnerLessonStateMessage(learnerId, activeLesson);
+                    LearnerLessonStateInfo llsm = new LearnerLessonStateInfo(learnerId, activeLesson);
                     messageSocket.sendMessage(llsm);
                 }
                 // TODO send educator lesson state message to a.getEducator()
@@ -67,8 +67,8 @@ public class LessonMessagingExtension implements MessagingExtension
     public List<Class<?>> getRequestTypes()
     {
         return Arrays.asList(
-                InstructionMessage.class,
-                LessonStartMessage.class
+                InstructionInfo.class,
+                LessonStartRequest.class
         );
     }
 }

@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.time.Clock;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -70,27 +68,27 @@ public class MessageSocket
 
         ActiveLesson activeLesson = sessionLesson.get(user.getId());
 
-        if (request instanceof SessionStartMessage)
+        if (request instanceof SessionStartRequest)
         {
             if (activeLesson.getActiveLessonAttendances().stream().noneMatch(a -> a.getUser().equals(user)))
             {
                 Attendance attendance = activeLesson.registerAttendance(user);
                 mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
-                sendMessage(new SessionStartResponseMessage(request.getFrom(), request.getId(), attendance.getRole().toString(), activeLesson.getActiveLessonState().toString()));
+                sendMessage(new SessionStartResponse(request.getFrom(), request.getId(), attendance.getRole().toString(), activeLesson.getActiveLessonState().toString()));
                 if (attendance.getRole() == Role.LEARNER){
-                    sendMessage(new LearnerLessonStateMessage(request.getFrom(), activeLesson));
+                    sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
                 }
             }
             else
             {
-                sendMessage(new FailureMessage(request.getFrom(), "Attendance already in existence for this user, in this lesson", request.getId()));
+                sendMessage(new FailureResponse(request.getFrom(), "Attendance already in existence for this user, in this lesson", request.getId()));
             }
         }
         else
         {
             Attendance attendance = Objects.requireNonNull(activeLesson.getAttendance(user), "Invalid Session");
 
-            if (request instanceof SessionEndMessage)
+            if (request instanceof SessionEndRequest)
             {
                 sess.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Thanks"));
                 mockDB.add("LEFT - " + attendance.toString());
@@ -106,11 +104,11 @@ public class MessageSocket
                 try
                 {
                     extension.handle(request, activeLesson, this);
-                    sendMessage(new SuccessMessage(request.getFrom(), request.getId()));
+                    sendMessage(new SuccessResponse(request.getFrom(), request.getId()));
                 }
                 catch (Exception e)
                 {
-                    sendMessage(new FailureMessage(request.getFrom(), e.getMessage(), request.getId()));
+                    sendMessage(new FailureResponse(request.getFrom(), e.getMessage(), request.getId()));
                 }
             }
         }

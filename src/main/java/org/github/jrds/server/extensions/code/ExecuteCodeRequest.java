@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Request;
 
-public class ExecuteCodeMessage extends Request
+public class ExecuteCodeRequest extends Request
 {
     private final String codeToExecute;
 
     @JsonCreator
-    public ExecuteCodeMessage(
+    public ExecuteCodeRequest(
             @JsonProperty("from") String from,
             @JsonProperty("codeToExecute") String codeToExecute)
     {

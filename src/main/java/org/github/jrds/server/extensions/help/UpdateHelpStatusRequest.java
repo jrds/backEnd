@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.messages.Request;
 
-public class UpdateHelpRequestStatusMessage extends Request
+public class UpdateHelpStatusRequest extends Request
 {
     private final String learnerId;
     private final Status newStatus;
 
     @JsonCreator
-    public UpdateHelpRequestStatusMessage(
+    public UpdateHelpStatusRequest(
             @JsonProperty ("from") String from,
             @JsonProperty ("learnerId") String learnerId,
             @JsonProperty ("status") Status newStatus

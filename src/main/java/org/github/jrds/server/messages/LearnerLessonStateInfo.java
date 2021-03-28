@@ -10,7 +10,7 @@ import org.github.jrds.server.extensions.lesson.ActiveLessonState;
 import java.util.List;
 
 
-public class LearnerLessonStateMessage extends Info
+public class LearnerLessonStateInfo extends Info
 {
     private List<InstructionDto> instructionsSent;
     private boolean openHelpRequestForThisLearner;
@@ -18,7 +18,7 @@ public class LearnerLessonStateMessage extends Info
     private List<ChatMessage> learnerChatMessages;
     private String educatorId;
 
-    public LearnerLessonStateMessage(String to, ActiveLesson activeLesson)
+    public LearnerLessonStateInfo(String to, ActiveLesson activeLesson)
     {
         super(to);
         this.activeLessonState = activeLesson.getActiveLessonState();
@@ -29,7 +29,7 @@ public class LearnerLessonStateMessage extends Info
     }
 
     @JsonCreator
-    public LearnerLessonStateMessage(
+    public LearnerLessonStateInfo(
             @JsonProperty("to") String to,
             @JsonProperty("activeLesson") ActiveLessonState activeLessonState,
             @JsonProperty("openHelpRequestForThisLearner") boolean openHelpRequestForThisLearner,

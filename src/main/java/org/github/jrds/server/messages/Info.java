@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "_type")
 
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = LearnerLessonStateMessage.class)
+        @JsonSubTypes.Type(value = LearnerLessonStateInfo.class)
 })
 
 public abstract class Info extends Message

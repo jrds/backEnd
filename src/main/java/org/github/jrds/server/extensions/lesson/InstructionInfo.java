@@ -7,13 +7,13 @@ import org.github.jrds.server.messages.Info;
 
 import java.util.Objects;
 
-public class InstructionMessage extends Info
+public class InstructionInfo extends Info
 {
 
     private final InstructionDto instruction;
 
     @JsonCreator
-    public InstructionMessage(
+    public InstructionInfo(
             @JsonProperty("to") String to,
             @JsonProperty("instruction") InstructionDto instruction)
     {
@@ -47,7 +47,7 @@ public class InstructionMessage extends Info
         {
             return false;
         }
-        InstructionMessage that = (InstructionMessage) o;
+        InstructionInfo that = (InstructionInfo) o;
         return Objects.equals(instruction, that.instruction);
     }
 

@@ -9,13 +9,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
-import org.github.jrds.server.extensions.code.ExecuteCodeMessage;
-import org.github.jrds.server.extensions.code.TerminateExecutionMessage;
-import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
-import org.github.jrds.server.extensions.help.RequestHelpMessage;
-import org.github.jrds.server.extensions.help.UpdateHelpRequestStatusMessage;
-import org.github.jrds.server.extensions.lesson.LessonStartMessage;
-import org.github.jrds.server.messages.SessionEndMessage;
+import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
+import org.github.jrds.server.extensions.code.TerminateExecutionRequest;
+import org.github.jrds.server.extensions.help.CancelHelpRequest;
+import org.github.jrds.server.extensions.help.HelpRequest;
+import org.github.jrds.server.extensions.help.UpdateHelpStatusRequest;
+import org.github.jrds.server.extensions.lesson.LessonStartRequest;
+import org.github.jrds.server.messages.SessionEndRequest;
 import org.github.jrds.server.messages.*;
 
 public class TestClient
@@ -67,43 +67,43 @@ public class TestClient
 
     public Future<Response> requestHelp()
     {
-        RequestHelpMessage m = new RequestHelpMessage(id);
+        HelpRequest m = new HelpRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> startLesson()
     {
-        LessonStartMessage m = new LessonStartMessage(id);
+        LessonStartRequest m = new LessonStartRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> executeCode(String code)
     {
-        ExecuteCodeMessage m = new ExecuteCodeMessage(id, code);
+        ExecuteCodeRequest m = new ExecuteCodeRequest(id, code);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> terminateCode()
     {
-        TerminateExecutionMessage m = new TerminateExecutionMessage(id);
+        TerminateExecutionRequest m = new TerminateExecutionRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> sendSessionEndMessage()
     {
-        SessionEndMessage m = new SessionEndMessage(id);
+        SessionEndRequest m = new SessionEndRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> cancelHelpRequest()
     {
-        CancelHelpRequestMessage m = new CancelHelpRequestMessage(id);
+        CancelHelpRequest m = new CancelHelpRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
     public Future<Response> updateHelpRequest(HelpRequestDto helpRequestToUpdate, Status newStatus)
     {
-        UpdateHelpRequestStatusMessage m = new UpdateHelpRequestStatusMessage(id, helpRequestToUpdate.getLearnerId(), newStatus);
+        UpdateHelpStatusRequest m = new UpdateHelpStatusRequest(id, helpRequestToUpdate.getLearnerId(), newStatus);
         return clientWebSocket.sendMessage(m);
     }
 

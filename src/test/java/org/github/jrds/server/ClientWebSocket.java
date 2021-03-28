@@ -3,13 +3,13 @@ package org.github.jrds.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
-import org.github.jrds.server.extensions.code.ExecuteCodeMessage;
-import org.github.jrds.server.extensions.code.ExecuteProcessMessage;
-import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
-import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
-import org.github.jrds.server.extensions.help.RequestHelpMessage;
-import org.github.jrds.server.extensions.lesson.InstructionMessage;
-import org.github.jrds.server.extensions.lesson.LessonStartMessage;
+import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
+import org.github.jrds.server.extensions.code.CodeExecutionInfo;
+import org.github.jrds.server.extensions.help.CancelHelpRequest;
+import org.github.jrds.server.extensions.help.OpenHelpRequestsInfo;
+import org.github.jrds.server.extensions.help.HelpRequest;
+import org.github.jrds.server.extensions.lesson.InstructionInfo;
+import org.github.jrds.server.extensions.lesson.LessonStartRequest;
 import org.github.jrds.server.messages.*;
 
 import javax.websocket.*;
@@ -42,15 +42,15 @@ public class ClientWebSocket extends Endpoint
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         mapper.registerSubtypes(
-                RequestHelpMessage.class,
-                CancelHelpRequestMessage.class,
+                HelpRequest.class,
+                CancelHelpRequest.class,
                 ChatMessage.class,
-                OpenHelpRequestsMessage.class,
-                InstructionMessage.class,
-                LessonStartMessage.class,
-                LearnerLessonStateMessage.class,
-                ExecuteCodeMessage.class,
-                ExecuteProcessMessage.class
+                OpenHelpRequestsInfo.class,
+                InstructionInfo.class,
+                LessonStartRequest.class,
+                LearnerLessonStateInfo.class,
+                ExecuteCodeRequest.class,
+                CodeExecutionInfo.class
         );
         this.userId = userId;
     }
@@ -83,7 +83,7 @@ public class ClientWebSocket extends Endpoint
             else
             {
                 webSocket.session = newSession;
-                Response response = webSocket.sendMessage(new SessionStartMessage(userId)).get(10, TimeUnit.SECONDS);
+                Response response = webSocket.sendMessage(new SessionStartRequest(userId)).get(10, TimeUnit.SECONDS);
                 webSocket.setSessionStartResponse(response);
                 if (response.isFailure())
                 {
@@ -141,14 +141,14 @@ public class ClientWebSocket extends Endpoint
                     throw new IllegalStateException("Unexpected message");
                 }
             }
-            else if (msg instanceof LearnerLessonStateMessage){
+            else if (msg instanceof LearnerLessonStateInfo){
                 stateMessagesReceived.add(msg);
             }
             else
             {
-                if (msg instanceof OpenHelpRequestsMessage)
+                if (msg instanceof OpenHelpRequestsInfo)
                 {
-                    openHelpRequests = ((OpenHelpRequestsMessage) msg).getOpenHelpRequests();
+                    openHelpRequests = ((OpenHelpRequestsInfo) msg).getOpenHelpRequests();
                 }
                 messagesReceived.add(msg);
             }

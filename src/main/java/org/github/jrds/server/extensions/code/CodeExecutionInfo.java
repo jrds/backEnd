@@ -4,25 +4,26 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Info;
 
-public class ExecuteProcessMessage extends Info
+public class CodeExecutionInfo extends Info
 {
     private String executionStatus;
-    private String executionOutput; //TODO output rather than result
+    private String executionOutput;
+    private String executionErrorOutput;
     private String executionEventTime;
-    // TODO - take the instant from the compiledCode obj, and convert to time, and send in the message
-
     // TODO - Write up Future feature for report, visualisation of number of compiler errors over time, and repeated errors.
 
     @JsonCreator
-    public ExecuteProcessMessage(
+    public CodeExecutionInfo(
             @JsonProperty("to") String to,
             @JsonProperty("executionStatus") String executionStatus,
             @JsonProperty("executionOutput") String executionOutput,
+            @JsonProperty("executionErrorOutput") String executionErrorOutput,
             @JsonProperty("executionEventTime") String executionEventTime)
     {
         super(to);
         this.executionStatus = executionStatus;
         this.executionOutput = executionOutput;
+        this.executionErrorOutput = executionErrorOutput;
         this.executionEventTime = executionEventTime;
     }
 
@@ -34,6 +35,11 @@ public class ExecuteProcessMessage extends Info
     public String getExecutionOutput()
     {
         return executionOutput;
+    }
+
+    public String getExecutionErrorOutput()
+    {
+        return executionErrorOutput;
     }
 
     public String getExecutionEventTime()

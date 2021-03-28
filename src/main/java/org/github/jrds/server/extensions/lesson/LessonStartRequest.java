@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Request;
 
-public class LessonStartMessage extends Request
+public class LessonStartRequest extends Request
 {
 
     @JsonCreator
-    public LessonStartMessage(@JsonProperty("from") String from)
+    public LessonStartRequest(@JsonProperty("from") String from)
     {
         super(from, null);
     }

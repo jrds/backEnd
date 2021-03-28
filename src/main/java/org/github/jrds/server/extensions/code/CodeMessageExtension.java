@@ -32,13 +32,13 @@ public class CodeMessageExtension implements MessagingExtension
 
         if ( attendance != null)
         {
-            if (request instanceof ExecuteCodeMessage)
+            if (request instanceof ExecuteCodeRequest)
             {
-                handleExecuteCodeMessage((ExecuteCodeMessage) request, attendance, messageSocket);
+                handleExecuteCodeMessage((ExecuteCodeRequest) request, attendance, messageSocket);
             }
             else
             {
-                handleTerminateExecutionMessage((TerminateExecutionMessage) request, attendance, messageSocket);
+                handleTerminateExecutionMessage((TerminateExecutionRequest) request, attendance, messageSocket);
             }
         }
         else
@@ -47,7 +47,7 @@ public class CodeMessageExtension implements MessagingExtension
         }
     }
 
-    private void handleExecuteCodeMessage(ExecuteCodeMessage message, Attendance attendance, MessageSocket messageSocket)
+    private void handleExecuteCodeMessage(ExecuteCodeRequest message, Attendance attendance, MessageSocket messageSocket)
     {
         String codeToExecute = message.getCodeToExecute();
         Code code = attendance.getCode();
@@ -61,15 +61,16 @@ public class CodeMessageExtension implements MessagingExtension
         {
             if (process.getStatus() == ExecutionStatus.COMPILE_FAILED)
             {
-                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getCompilationErrors(), process.getTimeCompiled().toString()));
+                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), "", process.getCompilationErrors(), process.getTimeCompiled().toString()));
             }
             else if (process.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
             {
-                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), "", process.getTimeExecutionStarted().toString()));
+                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), "", "", process.getTimeExecutionStarted().toString()));
             }
             else if (process.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS)
             {
-                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionStarted().toString()));
+                String[] outputs = process.getUnreadOutput();
+                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), outputs[ExecuteCodeProcess.STD_OUT], outputs[ExecuteCodeProcess.STD_ERR], process.getTimeExecutionStarted().toString()));
                 synchronized (currentProcessLock)
                 {
                     currentProcess = process;
@@ -80,12 +81,13 @@ public class CodeMessageExtension implements MessagingExtension
             }
             else if (process.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
             {
-                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionEnded().toString()));
+                String[] outputs = process.getUnreadOutput();
+                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), outputs[ExecuteCodeProcess.STD_OUT], outputs[ExecuteCodeProcess.STD_ERR], process.getTimeExecutionEnded().toString()));
             }
         }
     }
 
-    private void handleTerminateExecutionMessage(TerminateExecutionMessage message, Attendance attendance, MessageSocket messageSocket)
+    private void handleTerminateExecutionMessage(TerminateExecutionRequest message, Attendance attendance, MessageSocket messageSocket)
     {
         attendance.getCode().terminateExecutionProcess();
     }
@@ -99,14 +101,14 @@ public class CodeMessageExtension implements MessagingExtension
                 if (!currentProcessScheduledFuture.isCancelled())
                 {
                     String executionStatus = currentProcess.getStatus().toString();
-                    String unreadOutput = currentProcess.getUnreadOutput();
-                    if (currentProcess.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS && !unreadOutput.isEmpty())
+                    String[] unreadOutputs = currentProcess.getUnreadOutput();
+                    if (currentProcess.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS && (!unreadOutputs[ExecuteCodeProcess.STD_OUT].isEmpty() || !unreadOutputs[ExecuteCodeProcess.STD_ERR].isEmpty()))
                     {
-                        currentProcessMessageSocket.sendMessage(new ExecuteProcessMessage(currentProcessFrom.getId(), executionStatus, unreadOutput, Instant.now().toString()));
+                        currentProcessMessageSocket.sendMessage(new CodeExecutionInfo(currentProcessFrom.getId(), executionStatus, unreadOutputs[ExecuteCodeProcess.STD_OUT], unreadOutputs[ExecuteCodeProcess.STD_ERR], Instant.now().toString()));
                     }
                     else if (currentProcess.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
                     {
-                        currentProcessMessageSocket.sendMessage(new ExecuteProcessMessage(currentProcessFrom.getId(), executionStatus, unreadOutput, currentProcess.getTimeExecutionEnded().toString()));
+                        currentProcessMessageSocket.sendMessage(new CodeExecutionInfo(currentProcessFrom.getId(), executionStatus, unreadOutputs[ExecuteCodeProcess.STD_OUT], unreadOutputs[ExecuteCodeProcess.STD_ERR], currentProcess.getTimeExecutionEnded().toString()));
                         currentProcessScheduledFuture.cancel(false);
                     }
                 }
@@ -121,6 +123,6 @@ public class CodeMessageExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Arrays.asList(ExecuteCodeMessage.class, TerminateExecutionMessage.class);
+        return Arrays.asList(ExecuteCodeRequest.class, TerminateExecutionRequest.class);
     }
 }

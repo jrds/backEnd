@@ -2,9 +2,9 @@ package org.github.jrds.server;
 
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
-import org.github.jrds.server.messages.FailureMessage;
+import org.github.jrds.server.messages.FailureResponse;
 import org.github.jrds.server.messages.Response;
-import org.github.jrds.server.messages.SuccessMessage;
+import org.github.jrds.server.messages.SuccessResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class HelpRequestTest extends ApplicationTest
         TestClient c2 = connect(l1Id, l1Name, lesson1);
 
         Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
-        Assert.assertTrue(state instanceof SuccessMessage);
+        Assert.assertTrue(state instanceof SuccessResponse);
 
         // wait for c1 to have received the message
         c1.getMessageReceived();
@@ -45,7 +45,7 @@ public class HelpRequestTest extends ApplicationTest
         Assert.assertEquals(1,c1.getHelpRequests().size());
 
         Response state = c2.cancelHelpRequest().get(10, TimeUnit.SECONDS);
-        Assert.assertTrue(state instanceof SuccessMessage);
+        Assert.assertTrue(state instanceof SuccessResponse);
 
         c1.getMessageReceived();
         Assert.assertEquals(0,c1.getHelpRequests().size());
@@ -86,8 +86,8 @@ public class HelpRequestTest extends ApplicationTest
         Assert.assertEquals(2,c1.getHelpRequests().size());
 
         Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
-        Assert.assertTrue(state instanceof FailureMessage);
-        Assert.assertEquals("Learners cannot create more than one active help request",((FailureMessage) state).getFailureReason());
+        Assert.assertTrue(state instanceof FailureResponse);
+        Assert.assertEquals("Learners cannot create more than one active help request",((FailureResponse) state).getFailureReason());
 
         c1.getMessageReceived();
         Assert.assertEquals(2,c1.getHelpRequests().size());
