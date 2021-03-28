@@ -32,9 +32,9 @@ public class CodeMessageExtension implements MessagingExtension
 
         if ( attendance != null)
         {
-            if (request instanceof CodeToCompileMessage)
+            if (request instanceof ExecuteCodeMessage)
             {
-                handleExecuteCodeMessage((CodeToCompileMessage) request, attendance, messageSocket);
+                handleExecuteCodeMessage((ExecuteCodeMessage) request, attendance, messageSocket);
             }
             else
             {
@@ -47,13 +47,13 @@ public class CodeMessageExtension implements MessagingExtension
         }
     }
 
-    private void handleExecuteCodeMessage(CodeToCompileMessage message, Attendance attendance, MessageSocket messageSocket)
+    private void handleExecuteCodeMessage(ExecuteCodeMessage message, Attendance attendance, MessageSocket messageSocket)
     {
-        String codeToCompile = message.getCodeToCompile();
+        String codeToExecute = message.getCodeToExecute();
         Code code = attendance.getCode();
         User from = attendance.getUser();
 
-        code.setCode(codeToCompile);
+        code.setCode(codeToExecute);
         code.executeCode();
 
         ExecuteCodeProcess process = attendance.getCode().getExecuteCodeProcess();
@@ -121,6 +121,6 @@ public class CodeMessageExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Arrays.asList(CodeToCompileMessage.class, TerminateExecutionMessage.class);
+        return Arrays.asList(ExecuteCodeMessage.class, TerminateExecutionMessage.class);
     }
 }

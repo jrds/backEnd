@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
-import org.github.jrds.server.extensions.code.CodeToCompileMessage;
+import org.github.jrds.server.extensions.code.ExecuteCodeMessage;
 import org.github.jrds.server.extensions.code.TerminateExecutionMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
 import org.github.jrds.server.extensions.help.RequestHelpMessage;
@@ -79,7 +79,7 @@ public class TestClient
 
     public Future<Response> executeCode(String code)
     {
-        CodeToCompileMessage m = new CodeToCompileMessage(id, code);
+        ExecuteCodeMessage m = new ExecuteCodeMessage(id, code);
         return clientWebSocket.sendMessage(m);
     }
 

@@ -4,21 +4,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.github.jrds.server.messages.Request;
 
-public class CodeToCompileMessage extends Request
+public class ExecuteCodeMessage extends Request
 {
-    private final String codeToCompile;
+    private final String codeToExecute;
 
     @JsonCreator
-    public CodeToCompileMessage(
+    public ExecuteCodeMessage(
             @JsonProperty("from") String from,
-            @JsonProperty("codeToCompile") String codeToCompile)
+            @JsonProperty("codeToExecute") String codeToExecute)
     {
         super(from, null);
-        this.codeToCompile = codeToCompile;
+        this.codeToExecute = codeToExecute;
     }
 
-    public String getCodeToCompile()
+    public String getCodeToExecute()
     {
-        return codeToCompile;
+        return codeToExecute;
     }
 }

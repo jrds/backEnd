@@ -3,7 +3,7 @@ package org.github.jrds.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
-import org.github.jrds.server.extensions.code.CodeToCompileMessage;
+import org.github.jrds.server.extensions.code.ExecuteCodeMessage;
 import org.github.jrds.server.extensions.code.ExecuteProcessMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
 import org.github.jrds.server.extensions.help.OpenHelpRequestsMessage;
@@ -49,7 +49,7 @@ public class ClientWebSocket extends Endpoint
                 InstructionMessage.class,
                 LessonStartMessage.class,
                 LearnerLessonStateMessage.class,
-                CodeToCompileMessage.class,
+                ExecuteCodeMessage.class,
                 ExecuteProcessMessage.class
         );
         this.userId = userId;
