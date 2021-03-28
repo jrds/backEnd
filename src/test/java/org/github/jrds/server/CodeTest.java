@@ -15,7 +15,6 @@ import java.util.concurrent.TimeoutException;
 
 public class CodeTest extends ApplicationTest
 {
-
     @Test
     public void learnersCodeCompilesAndExecutesToImmediateEnd()
     {
@@ -25,7 +24,7 @@ public class CodeTest extends ApplicationTest
 
         c1.executeCode(learnersCode);
         String output = waitForExecutionToComplete(c1)[0];
-        Assert.assertEquals("Hello World :)" + System.getProperty("line.separator"), output);
+        Assert.assertEquals("Hello World :)\n", output);
     }
 
     @Test
@@ -41,7 +40,7 @@ public class CodeTest extends ApplicationTest
 
         c1.executeCode(newCode);
         String output = waitForExecutionToComplete(c1)[0];
-        Assert.assertEquals(":)" + System.getProperty("line.separator"), output);
+        Assert.assertEquals(":)\n", output);
     }
 
     @Test
@@ -58,8 +57,61 @@ public class CodeTest extends ApplicationTest
 
         c1.executeCode(code);
         String[] outputs = waitForExecutionToComplete(c1);
-        Assert.assertEquals("Hello Standard Out" + System.getProperty("line.separator"), outputs[0]);
-        Assert.assertEquals("Hello Standard Err" + System.getProperty("line.separator"), outputs[1]);
+        Assert.assertEquals("Hello Standard Out\n", outputs[0]);
+        Assert.assertEquals("Hello Standard Err\n", outputs[1]);
+    }
+
+    @Test
+    public void processInputCanBeGiven()
+    {
+        TestClient c1 = connect(l1Id, l1Name, lesson1);
+
+        String code = "import java.util.Scanner;\n" +
+                "\n" +
+                "class Hello {\n" +
+                "    public static void main(String[] args) {\n" +
+                "       Scanner sc = new Scanner(System.in);\n" +
+                "       String input;\n" +
+                "       do\n" +
+                "       {\n" +
+                "           System.out.print(\"Enter name or quit: \");\n" +
+                "           input = sc.nextLine();\n" +
+                "           if (!input.equals(\"quit\"))\n" +
+                "           {\n" +
+                "               System.out.println(\"Hello \" + input);\n" +
+                "           }\n" +
+                "       }\n" +
+                "       while (!input.equals(\"quit\"));\n" +
+                "    }\n" +
+                "}";
+
+        c1.executeCode(code);
+
+        StringBuilder output = new StringBuilder();
+        do
+        {
+            CodeExecutionInfo m = (CodeExecutionInfo) c1.getMessageReceived();
+            output.append(m.getExecutionOutput());
+        } while (!output.toString().equals("Enter name or quit: "));
+
+        c1.sendCodeExecutionInput("Jordan\n");
+        output = new StringBuilder();
+        do
+        {
+            CodeExecutionInfo m = (CodeExecutionInfo) c1.getMessageReceived();
+            output.append(m.getExecutionOutput());
+        } while (!output.toString().equals("Hello Jordan\nEnter name or quit: "));
+
+        c1.sendCodeExecutionInput("Jack\n");
+        output = new StringBuilder();
+        do
+        {
+            CodeExecutionInfo m = (CodeExecutionInfo) c1.getMessageReceived();
+            output.append(m.getExecutionOutput());
+        } while (!output.toString().equals("Hello Jack\nEnter name or quit: "));
+
+        c1.sendCodeExecutionInput("quit\n");
+        waitForExecutionToComplete(c1);
     }
 
     @Test

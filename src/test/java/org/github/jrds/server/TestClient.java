@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
+import org.github.jrds.server.extensions.code.CodeExecutionInputRequest;
 import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
 import org.github.jrds.server.extensions.code.TerminateExecutionRequest;
 import org.github.jrds.server.extensions.help.CancelHelpRequest;
@@ -89,6 +90,12 @@ public class TestClient
         return clientWebSocket.sendMessage(m);
     }
 
+    public Future<Response> sendCodeExecutionInput(String input)
+    {
+        CodeExecutionInputRequest m = new CodeExecutionInputRequest(id, input);
+        return clientWebSocket.sendMessage(m);
+    }
+
     public Future<Response> sendSessionEndMessage()
     {
         SessionEndRequest m = new SessionEndRequest(id);
@@ -127,5 +134,4 @@ public class TestClient
     {
         return clientWebSocket.getOpenHelpRequests();
     }
-
 }

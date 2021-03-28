@@ -68,4 +68,12 @@ public class Code
             executeCodeProcess.terminate();
         }
     }
+
+    public void acceptInput(String input)
+    {
+        if (executeCodeProcess != null)
+        {
+            executeCodeProcess.acceptInput(input);
+        }
+    }
 }

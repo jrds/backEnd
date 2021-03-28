@@ -36,6 +36,10 @@ public class CodeMessageExtension implements MessagingExtension
             {
                 handleExecuteCodeMessage((ExecuteCodeRequest) request, attendance, messageSocket);
             }
+            else if (request instanceof CodeExecutionInputRequest)
+            {
+                handleCodeExecutionInput((CodeExecutionInputRequest) request, attendance, messageSocket);
+            }
             else
             {
                 handleTerminateExecutionMessage((TerminateExecutionRequest) request, attendance, messageSocket);
@@ -87,6 +91,11 @@ public class CodeMessageExtension implements MessagingExtension
         }
     }
 
+    private void handleCodeExecutionInput(CodeExecutionInputRequest request, Attendance attendance, MessageSocket messageSocket)
+    {
+        attendance.getCode().acceptInput(request.getInput());
+    }
+
     private void handleTerminateExecutionMessage(TerminateExecutionRequest message, Attendance attendance, MessageSocket messageSocket)
     {
         attendance.getCode().terminateExecutionProcess();
@@ -123,6 +132,6 @@ public class CodeMessageExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Arrays.asList(ExecuteCodeRequest.class, TerminateExecutionRequest.class);
+        return Arrays.asList(ExecuteCodeRequest.class, TerminateExecutionRequest.class, CodeExecutionInputRequest.class);
     }
 }

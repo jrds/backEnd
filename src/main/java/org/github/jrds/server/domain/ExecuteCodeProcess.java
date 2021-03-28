@@ -1,9 +1,6 @@
 package org.github.jrds.server.domain;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +15,7 @@ public class ExecuteCodeProcess
     public static final int STD_OUT = 0;
     public static final int STD_ERR = 1;
 
+    private static final String EOL = System.getProperty("line.separator");
     private static final Pattern CLASS = Pattern.compile(".*?class\\s+([A-Za-z_][A-Za-z_]*)\\s*\\{.*", Pattern.DOTALL);
     private static final Path JAVA_HOME = Paths.get(Objects.requireNonNull(System.getenv("JAVA_HOME"), "You must define JAVA_HOME environment variable"));
     private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows");
@@ -39,6 +37,7 @@ public class ExecuteCodeProcess
     private Process executionProcess;
     private Reader processStdOutReader;
     private Reader processStdErrReader;
+    private Writer processStdInWriter;
 
     ExecuteCodeProcess(String codeToExecute, Path codeDirectory)
     {
@@ -71,6 +70,7 @@ public class ExecuteCodeProcess
                 status = ExecutionStatus.EXECUTION_IN_PROGRESS;
                 processStdOutReader = new InputStreamReader(executionProcess.getInputStream());
                 processStdErrReader = new InputStreamReader(executionProcess.getErrorStream());
+                processStdInWriter = new OutputStreamWriter(executionProcess.getOutputStream());
                 executionProcess.onExit().thenRun(() -> {
                     synchronized (processLock) {
                         status = ExecutionStatus.EXECUTION_FINISHED;
@@ -172,7 +172,7 @@ public class ExecuteCodeProcess
                     }
                 }
             }
-            return new String[] {stdOut.toString(), stdErr.toString()};
+            return new String[] {stdOut.toString().replace(EOL, "\n"), stdErr.toString().replace(EOL, "\n")};
         }
         catch (IOException e)
         {
@@ -187,6 +187,25 @@ public class ExecuteCodeProcess
             if (executionProcess.isAlive())
             {
                 executionProcess.destroyForcibly();
+            }
+        }
+    }
+
+    public void acceptInput(String input)
+    {
+        synchronized (processLock)
+        {
+            if (executionProcess.isAlive())
+            {
+                try
+                {
+                    processStdInWriter.write(input.replace("\n", EOL));
+                    processStdInWriter.flush();
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
