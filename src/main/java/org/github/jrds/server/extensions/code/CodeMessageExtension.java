@@ -7,7 +7,7 @@ import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
 
 import java.time.Instant;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,12 +25,6 @@ public class CodeMessageExtension implements MessagingExtension
     private ScheduledFuture<?> currentProcessScheduledFuture;
 
     @Override
-    public boolean handles(Request request)
-    {
-        return request instanceof CodeToCompileMessage;
-    }
-
-    @Override
     public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
         User from = Main.defaultInstance.usersStore.getUser(request.getFrom());
@@ -38,44 +32,62 @@ public class CodeMessageExtension implements MessagingExtension
 
         if ( attendance != null)
         {
-            String codeToCompile = ((CodeToCompileMessage) request).getCodeToCompile();
-            Code code = attendance.getCode();
-
-            code.setCode(codeToCompile);
-            code.executeCode();
-
-            ExecuteCodeProcess process = attendance.getCode().getExecuteCodeProcess();
-            if (process != null)
+            if (request instanceof CodeToCompileMessage)
             {
-                if (process.getStatus() == ExecutionStatus.COMPILE_FAILED)
-                {
-                    messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getCompilationErrors(), process.getTimeCompiled().toString()));
-                }
-                else if (process.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
-                {
-                    messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), "", process.getTimeExecutionStarted().toString()));
-                }
-                else if (process.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS)
-                {
-                    messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionStarted().toString()));
-                    synchronized (currentProcessLock)
-                    {
-                        currentProcess = process;
-                        currentProcessMessageSocket = messageSocket;
-                        currentProcessFrom = from;
-                        currentProcessScheduledFuture = scheduler.scheduleAtFixedRate(this::checkProcess,1, 1, TimeUnit.SECONDS);
-                    }
-                }
-                else if (process.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
-                {
-                    messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionEnded().toString()));
-                }
+                handleExecuteCodeMessage((CodeToCompileMessage) request, attendance, messageSocket);
+            }
+            else
+            {
+                handleTerminateExecutionMessage((TerminateExecutionMessage) request, attendance, messageSocket);
             }
         }
         else
         {
             throw new IllegalStateException("No registered attendance for this user");
         }
+    }
+
+    private void handleExecuteCodeMessage(CodeToCompileMessage message, Attendance attendance, MessageSocket messageSocket)
+    {
+        String codeToCompile = message.getCodeToCompile();
+        Code code = attendance.getCode();
+        User from = attendance.getUser();
+
+        code.setCode(codeToCompile);
+        code.executeCode();
+
+        ExecuteCodeProcess process = attendance.getCode().getExecuteCodeProcess();
+        if (process != null)
+        {
+            if (process.getStatus() == ExecutionStatus.COMPILE_FAILED)
+            {
+                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getCompilationErrors(), process.getTimeCompiled().toString()));
+            }
+            else if (process.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
+            {
+                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), "", process.getTimeExecutionStarted().toString()));
+            }
+            else if (process.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS)
+            {
+                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionStarted().toString()));
+                synchronized (currentProcessLock)
+                {
+                    currentProcess = process;
+                    currentProcessMessageSocket = messageSocket;
+                    currentProcessFrom = from;
+                    currentProcessScheduledFuture = scheduler.scheduleAtFixedRate(this::checkProcess,1, 1, TimeUnit.SECONDS);
+                }
+            }
+            else if (process.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
+            {
+                messageSocket.sendMessage(new ExecuteProcessMessage(from.getId(), process.getStatus().toString(), process.getUnreadOutput(), process.getTimeExecutionEnded().toString()));
+            }
+        }
+    }
+
+    private void handleTerminateExecutionMessage(TerminateExecutionMessage message, Attendance attendance, MessageSocket messageSocket)
+    {
+        attendance.getCode().terminateExecutionProcess();
     }
 
     private void checkProcess()
@@ -109,6 +121,6 @@ public class CodeMessageExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Collections.singletonList(CodeToCompileMessage.class);
+        return Arrays.asList(CodeToCompileMessage.class, TerminateExecutionMessage.class);
     }
 }

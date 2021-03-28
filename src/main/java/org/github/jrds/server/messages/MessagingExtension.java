@@ -7,7 +7,10 @@ import java.util.List;
 
 public interface MessagingExtension
 {
-    boolean handles(Request request);
+    default boolean handles(Request request)
+    {
+        return getRequestTypes().contains(request.getClass());
+    }
 
     void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket);
 

@@ -61,4 +61,11 @@ public class Code
         executeCodeProcess.startExecution();
     }
 
+    public void terminateExecutionProcess()
+    {
+        if (executeCodeProcess != null)
+        {
+            executeCodeProcess.terminate();
+        }
+    }
 }

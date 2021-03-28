@@ -149,16 +149,31 @@ public class ExecuteCodeProcess
         {
             StringBuilder builder = new StringBuilder();
             char[] chars = new char[1024];
-            while (processStdOutReader.ready())
+            long t0 = System.currentTimeMillis();
+            synchronized (processLock)
             {
-                int read = processStdOutReader.read(chars);
-                builder.append(chars, 0, read);
+                while (processStdOutReader.ready() && (System.currentTimeMillis() - t0) < 800)
+                {
+                    int read = processStdOutReader.read(chars);
+                    builder.append(chars, 0, read);
+                }
             }
             return builder.toString();
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void terminate()
+    {
+        synchronized (processLock)
+        {
+            if (executionProcess.isAlive())
+            {
+                executionProcess.destroyForcibly();
+            }
         }
     }
 }

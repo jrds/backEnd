@@ -10,6 +10,7 @@ import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.code.CodeToCompileMessage;
+import org.github.jrds.server.extensions.code.TerminateExecutionMessage;
 import org.github.jrds.server.extensions.help.CancelHelpRequestMessage;
 import org.github.jrds.server.extensions.help.RequestHelpMessage;
 import org.github.jrds.server.extensions.help.UpdateHelpRequestStatusMessage;
@@ -79,6 +80,12 @@ public class TestClient
     public Future<Response> executeCode(String code)
     {
         CodeToCompileMessage m = new CodeToCompileMessage(id, code);
+        return clientWebSocket.sendMessage(m);
+    }
+
+    public Future<Response> terminateCode()
+    {
+        TerminateExecutionMessage m = new TerminateExecutionMessage(id);
         return clientWebSocket.sendMessage(m);
     }
 

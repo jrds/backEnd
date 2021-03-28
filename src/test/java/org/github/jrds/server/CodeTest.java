@@ -45,6 +45,35 @@ public class CodeTest extends ApplicationTest
     }
 
     @Test
+    public void aLongRunningProcessCanBeTerminated()
+    {
+        TestClient c1 = connect(l1Id, l1Name, lesson1);
+
+        String code = "class Hello { public static void main(String[] args) { while (true) { System.out.println(\"Hello World\"); } } }";
+
+        String status;
+
+        c1.executeCode(code);
+        for (int i=0; i<5; i++)
+        {
+            ExecuteProcessMessage m = (ExecuteProcessMessage) c1.getMessageReceived();
+            status = m.getExecutionStatus();
+            Assert.assertEquals(ExecutionStatus.EXECUTION_IN_PROGRESS.toString(), status);
+        }
+        c1.terminateCode();
+
+        long t0 = System.currentTimeMillis();
+        do
+        {
+            ExecuteProcessMessage m = (ExecuteProcessMessage) c1.getMessageReceived();
+            status = m.getExecutionStatus();
+        }
+        while ((System.currentTimeMillis() - t0) < 10000 && !status.equals(ExecutionStatus.EXECUTION_FINISHED.toString()));
+
+        Assert.assertEquals(ExecutionStatus.EXECUTION_FINISHED.toString(), status);
+    }
+
+    @Test
     public void invalidClassDefinitionFails() throws ExecutionException, InterruptedException, TimeoutException
     {
         TestClient c1 = connect(l1Id, l1Name, lesson1);
