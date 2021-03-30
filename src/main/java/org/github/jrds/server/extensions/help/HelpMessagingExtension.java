@@ -2,16 +2,19 @@ package org.github.jrds.server.extensions.help;
 
 import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.ActiveLesson;
+import org.github.jrds.server.domain.Attendance;
 import org.github.jrds.server.domain.Status;
+import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.messages.LearnerLessonStateInfo;
 import org.github.jrds.server.messages.MessageSocket;
 import org.github.jrds.server.messages.MessagingExtension;
 import org.github.jrds.server.messages.Request;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 public class HelpMessagingExtension implements MessagingExtension
 {
@@ -19,20 +22,24 @@ public class HelpMessagingExtension implements MessagingExtension
     @Override
     public boolean handles(Request request)
     {
-        return request instanceof HelpRequest || request instanceof CancelHelpRequest || request instanceof UpdateHelpStatusRequest;
+        return request instanceof NewHelpRequest || request instanceof CancelHelpRequest || request instanceof UpdateHelpStatusRequest;
     }
 
     @Override
     public void handle(Request request, ActiveLesson activeLesson, MessageSocket messageSocket)
     {
+        Attendance attendance = activeLesson.getAttendance(Main.defaultInstance.usersStore.getUser(request.getFrom()));
+        HelpRequest helpRequest = attendance.getHelpRequest();
+
         try
         {
-            if (request instanceof HelpRequest)
+            if (request instanceof NewHelpRequest)
             {
-                if (activeLesson.getOpenHelpRequests().stream().noneMatch(hr -> hr.getLearner().getId().equals(request.getFrom())))
+                if (helpRequest.getStatus() != Status.IN_PROGRESS || helpRequest.getStatus() != Status.NEW)
                 {
-                    org.github.jrds.server.domain.HelpRequest helpRequest = new org.github.jrds.server.domain.HelpRequest(Main.defaultInstance.usersStore.getUser(request.getFrom()));
+                    helpRequest.setStatus(Status.NEW);
                     activeLesson.addHelpRequest(helpRequest);
+                    messageSocket.sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
                 }
                 else
                 {
@@ -41,10 +48,9 @@ public class HelpMessagingExtension implements MessagingExtension
             }
             else if (request instanceof UpdateHelpStatusRequest)
             {
-                Optional<org.github.jrds.server.domain.HelpRequest> toUpdate = activeLesson.getOpenHelpRequests().stream()
-                        .filter(hr -> hr.getLearner().getId().equals(((UpdateHelpStatusRequest) request).getLearnerId()))
-                        .findFirst();
-                if (toUpdate.isEmpty())
+                HelpRequest learnerRequestToBeUpdated = activeLesson.getOpenHelpRequests().get(((UpdateHelpStatusRequest) request).getLearnerId())  ;
+
+                if (learnerRequestToBeUpdated.getStatus() == Status.COMPLETED || learnerRequestToBeUpdated.getStatus() == Status.NONE)
                 {
                     throw new IllegalStateException("No open help request found for this learner");
                 }
@@ -52,17 +58,15 @@ public class HelpMessagingExtension implements MessagingExtension
                 {
                     if (((UpdateHelpStatusRequest) request).getNewStatus().equals(Status.IN_PROGRESS))
                     {
-                        toUpdate.get().setStatus(((UpdateHelpStatusRequest) request).getNewStatus());
+                        learnerRequestToBeUpdated.setStatus(Status.IN_PROGRESS);
+                        messageSocket.sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
                     }
                     else if (((UpdateHelpStatusRequest) request).getNewStatus().equals(Status.COMPLETED))
                     {
-                        toUpdate.get().setStatus(((UpdateHelpStatusRequest) request).getNewStatus());
+                        learnerRequestToBeUpdated.setStatus(Status.COMPLETED);
                         //WOULD WRITE TO DB WHEN IT DEVELOPS BEYOND A PROTOTYPE
-                        if(toUpdate.isPresent())
-                        {
-                            org.github.jrds.server.domain.HelpRequest toDelete = toUpdate.get();
-                            activeLesson.removeHelpRequest(toDelete);
-                        }
+                        activeLesson.removeHelpRequest(learnerRequestToBeUpdated);
+                        messageSocket.sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
                     }
                     else
                         throw new IllegalStateException("Once a request has been created, it cannot be reset to a NEW request");
@@ -70,19 +74,16 @@ public class HelpMessagingExtension implements MessagingExtension
             }
             else
             {
-                Optional<org.github.jrds.server.domain.HelpRequest> toRemove = activeLesson.getOpenHelpRequests().stream()
-                        .filter(hr -> hr.getLearner().getId().equals(request.getFrom()))
-                        .findFirst();
-                if(toRemove.isPresent())
-                {
-                    org.github.jrds.server.domain.HelpRequest toDelete = toRemove.get();
-                    activeLesson.removeHelpRequest(toDelete);
-                }
+                helpRequest.setStatus(Status.NONE);
+                activeLesson.removeHelpRequest(helpRequest);
+                messageSocket.sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
             }
+
         }
         finally
         {
-            List<HelpRequestDto> dtos = activeLesson.getOpenHelpRequests().stream().map(HelpRequestDto::new).collect(Collectors.toList());
+            List<HelpRequestDto> dtos = new ArrayList<>();
+            activeLesson.getOpenHelpRequests().values().forEach(hr -> dtos.add(new HelpRequestDto(hr)));
             messageSocket.sendMessage(new OpenHelpRequestsInfo(activeLesson.getAssociatedLessonStructure().getEducator().getId(), dtos));
         }
     }
@@ -91,7 +92,7 @@ public class HelpMessagingExtension implements MessagingExtension
     public List<Class<?>> getRequestTypes()
     {
         return Arrays.asList(
-                HelpRequest.class,
+                NewHelpRequest.class,
                 CancelHelpRequest.class,
                 OpenHelpRequestsInfo.class,
                 UpdateHelpStatusRequest.class

@@ -14,12 +14,12 @@ public class UpdateHelpStatusRequest extends Request
     public UpdateHelpStatusRequest(
             @JsonProperty ("from") String from,
             @JsonProperty ("learnerId") String learnerId,
-            @JsonProperty ("status") Status newStatus
+            @JsonProperty ("status") Status status
     )
     {
         super(from,null);
         this.learnerId = learnerId;
-        this.newStatus = newStatus;
+        this.newStatus = status;
     }
 
     public String getLearnerId()

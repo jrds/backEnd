@@ -11,7 +11,7 @@ public class ActiveLesson
     private final String id;
     private final LessonStructure associatedLessonStructure;
     private final List<Attendance> activeLessonAttendance = new ArrayList<>();
-    private final SortedSet<HelpRequest> openHelpRequests = new ConcurrentSkipListSet<>();
+    private final Map<String, HelpRequest> openHelpRequests = new HashMap<>();
     private ActiveLessonState activeLessonState = ActiveLessonState.NOT_STARTED;
     private List<InstructionDto> instructionsSent = new ArrayList<>();
 
@@ -61,19 +61,24 @@ public class ActiveLesson
         }
     }
 
-    public Set<HelpRequest> getOpenHelpRequests()
+    public Map<String, HelpRequest> getOpenHelpRequests()
     {
-        return Collections.unmodifiableSet(openHelpRequests);
+        return Collections.unmodifiableMap(openHelpRequests);
     }
 
     public void addHelpRequest(HelpRequest helpRequest)
     {
-        openHelpRequests.add(helpRequest);
+        openHelpRequests.put(helpRequest.getLearner().getId(), helpRequest);
     }
 
-    public void removeHelpRequest(HelpRequest toUpdate)
+    public void removeHelpRequest(HelpRequest helpRequest)
     {
-        openHelpRequests.remove(toUpdate);
+        openHelpRequests.remove(helpRequest.getLearner().getId());
+    }
+
+    public void updateHelpRequest(HelpRequest helpRequest, Status newStatus)
+    {
+        openHelpRequests.get(helpRequest.getLearner()).setStatus(newStatus);
     }
 
     public ActiveLessonState getActiveLessonState()

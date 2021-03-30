@@ -1,3 +1,5 @@
+
+
 package org.github.jrds.server;
 
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -47,10 +49,10 @@ public class Main
     {
         defaultInstance = this;
         extensions = Arrays.asList(
-            new HelpMessagingExtension(),
-            new ChatMessagingExtension(),
-            new CodeMessageExtension(),
-            new LessonMessagingExtension(this));
+                new HelpMessagingExtension(),
+                new ChatMessagingExtension(),
+                new CodeMessageExtension(),
+                new LessonMessagingExtension(this));
     }
 
     public void setMessageStats(MessageStats messageStats)

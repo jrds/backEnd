@@ -14,6 +14,7 @@ public class Attendance
     private final Role role;
     private List<ChatMessage> chatHistory;
     private Code code;
+    private HelpRequest helpRequest;
 
     public Attendance(User user, LessonStructure lessonStructure)
     {
@@ -26,9 +27,28 @@ public class Attendance
         if (this.role == Role.NONE)
         {
             throw new IllegalArgumentException("User cannot attend this lesson");
+        } else if (this.role == Role.LEARNER)
+        {
+            this.helpRequest = new HelpRequest(user);
         }
+
         // TODO - Make tests for role.
 
+    }
+
+    public LessonStructure getLessonStructure()
+    {
+        return lessonStructure;
+    }
+
+    public Status getHelpRequestStatus()
+    {
+        return helpRequest.getStatus();
+    }
+
+    public HelpRequest getHelpRequest()
+    {
+        return helpRequest;
     }
 
     public Code getCode()
@@ -60,70 +80,6 @@ public class Attendance
         return chatHistory;
     }
 
-//    public void setCode(String code)
-//    {
-//        this.code = code;
-//    }
-
-//    public void compileCode()
-//    {
-//        long t0 = System.currentTimeMillis();
-//        Matcher matcher = CLASS.matcher(code);
-//        if (matcher.matches())
-//        {
-//            try
-//            {
-//                Path file = codeDirectory.resolve(matcher.group(1) + ".java");
-//                Files.writeString(file, code);
-//                // Path to javac should be an application configuration
-//                Process compile = new ProcessBuilder().command("c:\\Program Files\\AdoptOpenJDK\\jdk-11.0.9.101-hotspot\\bin\\javac", file.toString()).directory(codeDirectory.toFile()).start();
-//                int compileResult = compile.waitFor();
-//                if (compileResult == 0)
-//                {
-//                    System.out.println("Compile worked");
-//                    Process execute = new ProcessBuilder().command("c:\\Program Files\\AdoptOpenJDK\\jdk-11.0.9.101-hotspot\\bin\\java", matcher.group(1)).directory(codeDirectory.toFile()).start();
-//                    int executeResult = compile.waitFor();
-//                    if (executeResult == 0)
-//                    {
-//                        System.out.println("Execute worked");
-//                        String stdOut = new BufferedReader(new InputStreamReader(execute.getInputStream()))
-//                                .lines()
-//                                .collect(Collectors.joining("\n"));
-//                        System.out.println(stdOut);
-//                    }
-//                    else
-//                    {
-//                        System.out.println("Execute failed");
-//                        String stdErr = new BufferedReader(new InputStreamReader(compile.getErrorStream()))
-//                                .lines()
-//                                .collect(Collectors.joining("\n"));
-//                        System.out.println(stdErr);
-//                    }
-//                }
-//                else
-//                {
-//                    System.out.println("Compile failed");
-//                    String stdErr = new BufferedReader(new InputStreamReader(compile.getErrorStream()))
-//                            .lines()
-//                            .collect(Collectors.joining("\n"));
-//                    System.out.println(stdErr);
-//                }
-//            }
-//            catch (IOException e)
-//            {
-//                throw new RuntimeException(e);
-//            }
-//            catch (InterruptedException e)
-//            {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        else
-//        {
-//            throw new IllegalArgumentException("Not a valid class definition");
-//        }
-//        System.out.println("Time taken: " + (System.currentTimeMillis() - t0));
-//    }
 
     @Override
     public boolean equals(Object o)

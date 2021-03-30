@@ -1,11 +1,13 @@
 package org.github.jrds.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
@@ -13,7 +15,7 @@ import org.github.jrds.server.extensions.code.CodeExecutionInputRequest;
 import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
 import org.github.jrds.server.extensions.code.TerminateExecutionRequest;
 import org.github.jrds.server.extensions.help.CancelHelpRequest;
-import org.github.jrds.server.extensions.help.HelpRequest;
+import org.github.jrds.server.extensions.help.NewHelpRequest;
 import org.github.jrds.server.extensions.help.UpdateHelpStatusRequest;
 import org.github.jrds.server.extensions.lesson.LessonStartRequest;
 import org.github.jrds.server.messages.SessionEndRequest;
@@ -68,7 +70,7 @@ public class TestClient
 
     public Future<Response> requestHelp()
     {
-        HelpRequest m = new HelpRequest(id);
+        NewHelpRequest m = new NewHelpRequest(id);
         return clientWebSocket.sendMessage(m);
     }
 
@@ -108,9 +110,9 @@ public class TestClient
         return clientWebSocket.sendMessage(m);
     }
 
-    public Future<Response> updateHelpRequest(HelpRequestDto helpRequestToUpdate, Status newStatus)
+    public Future<Response> updateHelpRequest(HelpRequest helpRequestToUpdate, Status newStatus)
     {
-        UpdateHelpStatusRequest m = new UpdateHelpStatusRequest(id, helpRequestToUpdate.getLearnerId(), newStatus);
+        UpdateHelpStatusRequest m = new UpdateHelpStatusRequest(helpRequestToUpdate.getLearner().getId(), helpRequestToUpdate.getLearner().getId(), newStatus);
         return clientWebSocket.sendMessage(m);
     }
 
@@ -130,8 +132,8 @@ public class TestClient
     }
 
 
-    public List<HelpRequestDto> getHelpRequests()
+    public List<HelpRequest> getOpenHelpRequests()
     {
-        return clientWebSocket.getOpenHelpRequests();
+        return new ArrayList<>(Main.defaultInstance.activeLessonStore.getActiveLesson("2905").getOpenHelpRequests().values());
     }
 }

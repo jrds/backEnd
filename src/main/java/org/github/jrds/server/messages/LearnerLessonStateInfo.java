@@ -13,17 +13,18 @@ import java.util.List;
 public class LearnerLessonStateInfo extends Info
 {
     private List<InstructionDto> instructionsSent;
-    private boolean openHelpRequestForThisLearner;
     private ActiveLessonState activeLessonState;
     private List<ChatMessage> learnerChatMessages;
     private String educatorId;
+    private String helpRequestStatus;
+
 
     public LearnerLessonStateInfo(String to, ActiveLesson activeLesson)
     {
         super(to);
         this.activeLessonState = activeLesson.getActiveLessonState();
         this.instructionsSent = activeLesson.getInstructionsSent();
-        this.openHelpRequestForThisLearner = activeLesson.getOpenHelpRequests().stream().anyMatch(helpRequest -> helpRequest.getLearner().toString().equals(to));
+        this.helpRequestStatus = activeLesson.getAttendance(Main.defaultInstance.usersStore.getUser(to)).getHelpRequestStatus().toString();
         this.learnerChatMessages = activeLesson.getAttendance(Main.defaultInstance.usersStore.getUser(to)).getChatHistory();
         this.educatorId = activeLesson.getAssociatedLessonStructure().getEducator().getId();
     }
@@ -32,7 +33,7 @@ public class LearnerLessonStateInfo extends Info
     public LearnerLessonStateInfo(
             @JsonProperty("to") String to,
             @JsonProperty("activeLesson") ActiveLessonState activeLessonState,
-            @JsonProperty("openHelpRequestForThisLearner") boolean openHelpRequestForThisLearner,
+            @JsonProperty("helpRequestStatus") String helpRequestStatus,
             @JsonProperty("instructionsSent") List<InstructionDto> instructionsSent,
             @JsonProperty("learnerChatMessages") List<ChatMessage> learnerChatMessages,
             @JsonProperty("educatorId") String educatorId)
@@ -40,7 +41,7 @@ public class LearnerLessonStateInfo extends Info
         super(to);
         this.activeLessonState = activeLessonState;
         this.instructionsSent = instructionsSent;
-        this.openHelpRequestForThisLearner = openHelpRequestForThisLearner;
+        this.helpRequestStatus = helpRequestStatus;
         this.learnerChatMessages = learnerChatMessages;
         this.educatorId = educatorId;
     }
@@ -51,9 +52,9 @@ public class LearnerLessonStateInfo extends Info
         return instructionsSent;
     }
 
-    public boolean isOpenHelpRequestForThisLearner()
+    public String getHelpRequestStatus()
     {
-        return openHelpRequestForThisLearner;
+        return helpRequestStatus;
     }
 
     public ActiveLessonState getActiveLessonState()

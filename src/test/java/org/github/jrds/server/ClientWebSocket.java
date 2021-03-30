@@ -7,7 +7,7 @@ import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
 import org.github.jrds.server.extensions.code.CodeExecutionInfo;
 import org.github.jrds.server.extensions.help.CancelHelpRequest;
 import org.github.jrds.server.extensions.help.OpenHelpRequestsInfo;
-import org.github.jrds.server.extensions.help.HelpRequest;
+import org.github.jrds.server.extensions.help.NewHelpRequest;
 import org.github.jrds.server.extensions.lesson.InstructionInfo;
 import org.github.jrds.server.extensions.lesson.LessonStartRequest;
 import org.github.jrds.server.messages.*;
@@ -42,7 +42,7 @@ public class ClientWebSocket extends Endpoint
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         mapper.registerSubtypes(
-                HelpRequest.class,
+                NewHelpRequest.class,
                 CancelHelpRequest.class,
                 ChatMessage.class,
                 OpenHelpRequestsInfo.class,

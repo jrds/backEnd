@@ -2,6 +2,7 @@ package org.github.jrds.server.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.github.jrds.server.Main;
 import org.github.jrds.server.domain.HelpRequest;
 
 import java.time.Instant;
@@ -18,8 +19,6 @@ public class HelpRequestDto
             @JsonProperty("timeReceived") Instant timeReceived,
             @JsonProperty("status") String status)
     {
-
-
         this.learnerId = learnerId;
         this.timeReceived = timeReceived;
         this.status = status;
@@ -45,4 +44,8 @@ public class HelpRequestDto
         return status;
     }
 
+    public HelpRequest asHelpRequest(String LessonId)
+    {
+        return Main.defaultInstance.activeLessonStore.getActiveLesson(LessonId).getOpenHelpRequests().get(this.learnerId);
+    }
 }
