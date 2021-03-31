@@ -35,7 +35,7 @@ public class HelpMessagingExtension implements MessagingExtension
         {
             if (request instanceof NewHelpRequest)
             {
-                if (helpRequest.getStatus() != Status.IN_PROGRESS || helpRequest.getStatus() != Status.NEW)
+                if (helpRequest.getStatus() == Status.NONE || helpRequest.getStatus() == Status.COMPLETED)
                 {
                     helpRequest.setStatus(Status.NEW);
                     activeLesson.addHelpRequest(helpRequest);

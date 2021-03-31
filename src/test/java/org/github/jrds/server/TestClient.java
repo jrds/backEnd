@@ -132,8 +132,8 @@ public class TestClient
     }
 
 
-    public List<HelpRequest> getOpenHelpRequests()
+    public List<HelpRequest> getOpenHelpRequests(String lessonId)
     {
-        return new ArrayList<>(Main.defaultInstance.activeLessonStore.getActiveLesson("2905").getOpenHelpRequests().values());
+        return new ArrayList<>(Main.defaultInstance.activeLessonStore.getActiveLesson(lessonId).getOpenHelpRequests().values());
     }
 }

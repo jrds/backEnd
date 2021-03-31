@@ -9,7 +9,7 @@ import org.github.jrds.server.messages.SuccessResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,7 +28,7 @@ public class HelpRequestTest extends ApplicationTest
 
         // wait for c1 to have received the message
         c1.getMessageReceived();
-        List<HelpRequest> helpRequests = c1.getOpenHelpRequests();
+        List<HelpRequest> helpRequests = c1.getOpenHelpRequests(lesson1);
         Assert.assertEquals(1,helpRequests.size());
         Assert.assertEquals(c2.getId(), helpRequests.get(0).getLearner().getId());
     }
@@ -43,13 +43,13 @@ public class HelpRequestTest extends ApplicationTest
 
         // wait for c1 to have received the message
         c1.getMessageReceived();
-        Assert.assertEquals(1,c1.getOpenHelpRequests().size());
+        Assert.assertEquals(1,c1.getOpenHelpRequests(lesson1).size());
 
         Response state = c2.cancelHelpRequest().get(10, TimeUnit.SECONDS);
         Assert.assertTrue(state instanceof SuccessResponse);
 
         c1.getMessageReceived();
-        Assert.assertEquals(0,c1.getOpenHelpRequests().size());
+        Assert.assertEquals(0,c1.getOpenHelpRequests(lesson1).size());
 
     }
 
@@ -66,7 +66,7 @@ public class HelpRequestTest extends ApplicationTest
         c1.getMessageReceived();
         c1.getMessageReceived();
 
-        List<HelpRequest> helpRequests = c1.getOpenHelpRequests();
+        List<HelpRequest> helpRequests = c1.getOpenHelpRequests(lesson1);
         Assert.assertEquals(2,helpRequests.size());
         Assert.assertEquals(l2Id,helpRequests.get(0).getLearner().getId());
         Assert.assertEquals(l1Id,helpRequests.get(1).getLearner().getId());
@@ -84,14 +84,14 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
         c1.getMessageReceived();
-        Assert.assertEquals(2,c1.getOpenHelpRequests().size());
+        Assert.assertEquals(2,c1.getOpenHelpRequests(lesson1).size());
 
         Response state = c2.requestHelp().get(10, TimeUnit.SECONDS);
         Assert.assertTrue(state instanceof FailureResponse);
         Assert.assertEquals("Learners cannot create more than one active help request",((FailureResponse) state).getFailureReason());
 
         c1.getMessageReceived();
-        Assert.assertEquals(2,c1.getOpenHelpRequests().size());
+        Assert.assertEquals(2,c1.getOpenHelpRequests(lesson1).size());
 
     }
 
@@ -146,8 +146,8 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
 
-        Assert.assertEquals(1, c1.getOpenHelpRequests().size());  // TODO should I try to keep the original message id?
-        Assert.assertEquals(l2Id, c1.getOpenHelpRequests().get(0).getLearner().getId());
+        Assert.assertEquals(1, c1.getOpenHelpRequests(lesson1).size());  // TODO should I try to keep the original message id?
+        Assert.assertEquals(l2Id, c1.getOpenHelpRequests(lesson1).get(0).getLearner().getId());
         // TODO store time updated
     }
 
@@ -167,8 +167,11 @@ public class HelpRequestTest extends ApplicationTest
         c1.getMessageReceived();
         c1.getMessageReceived();
         c1.getMessageReceived();
-        List<HelpRequest> helpRequests = c1.getOpenHelpRequests();
+        List<HelpRequest> helpRequests = c1.getOpenHelpRequests(lesson2);
+
         Assert.assertEquals(3,helpRequests.size());
+
+        Collections.sort(helpRequests);
 
         Assert.assertEquals(l1Id,helpRequests.get(0).getLearner().getId());
         Assert.assertEquals(l2Id,helpRequests.get(1).getLearner().getId());
@@ -178,8 +181,8 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
 
-        List<HelpRequest> helpRequests2 = c1.getOpenHelpRequests();
-        Assert.assertEquals(2,c1.getOpenHelpRequests().size());
+        List<HelpRequest> helpRequests2 = c1.getOpenHelpRequests(lesson2);
+        Assert.assertEquals(2,c1.getOpenHelpRequests(lesson2).size());
 
         Assert.assertEquals(l1Id,helpRequests2.get(0).getLearner().getId());
         Assert.assertEquals(l99Id,helpRequests2.get(1).getLearner().getId());
@@ -200,8 +203,10 @@ public class HelpRequestTest extends ApplicationTest
         c1.getMessageReceived();
         c1.getMessageReceived();
         c1.getMessageReceived();
-        List<HelpRequest> helpRequests = c1.getOpenHelpRequests();
+        List<HelpRequest> helpRequests = c1.getOpenHelpRequests(lesson2);
         Assert.assertEquals(3,helpRequests.size());
+
+        //Collections.sort(helpRequests); //Todo - why does this fail, when included, but works for the test above **********************************
 
         Assert.assertEquals(l2Id,helpRequests.get(0).getLearner().getId());
         Assert.assertEquals(l1Id,helpRequests.get(1).getLearner().getId());
@@ -210,8 +215,8 @@ public class HelpRequestTest extends ApplicationTest
         c1.updateHelpRequest(helpRequests.get(1),Status.IN_PROGRESS);
         c1.getMessageReceived();
 
-        List<HelpRequest> helpRequests2 = c1.getOpenHelpRequests();
-        Assert.assertEquals(3,c1.getOpenHelpRequests().size());
+        List<HelpRequest> helpRequests2 = c1.getOpenHelpRequests(lesson2);
+        Assert.assertEquals(3,c1.getOpenHelpRequests(lesson2).size());
 
         Assert.assertEquals(l2Id,helpRequests2.get(0).getLearner().getId());
         Assert.assertEquals(l1Id,helpRequests2.get(1).getLearner().getId());
