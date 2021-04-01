@@ -1,10 +1,11 @@
 package org.github.jrds.server.domain;
 
 import org.github.jrds.server.dto.InstructionDto;
+import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.lesson.ActiveLessonState;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 public class ActiveLesson
 {
@@ -99,5 +100,20 @@ public class ActiveLesson
     public void addToInstructionSent(InstructionDto i)
     {
         instructionsSent.add(i);
+    }
+
+    public Map<String, ChatMessage> getChatMessageForEducator()
+    {
+//         for (message: messageStore)put intomap by key from or create a key with the from.
+        return null;
+    }
+
+    public List<String> getLearnersInAttendance()
+    {
+        List<String> learners = new ArrayList<>();
+        List<Attendance> learnerAttendances = activeLessonAttendance.stream().filter(attendance -> attendance.getRole()==Role.LEARNER).
+                collect(Collectors.toList());
+        learnerAttendances.stream().forEach(attendance -> learners.add(attendance.getUser().getId()));
+        return learners;
     }
 }

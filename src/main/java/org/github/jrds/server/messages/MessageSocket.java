@@ -78,6 +78,9 @@ public class MessageSocket
                 if (attendance.getRole() == Role.LEARNER){
                     sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
                 }
+                else {
+                    sendMessage(new EducatorLessonStateInfo(activeLesson.getAssociatedLessonStructure().getEducator().getId(), activeLesson));
+                }
             }
             else
             {
@@ -105,6 +108,7 @@ public class MessageSocket
                 {
                     extension.handle(request, activeLesson, this);
                     sendMessage(new SuccessResponse(request.getFrom(), request.getId()));
+                    sendMessage(new EducatorLessonStateInfo(activeLesson.getAssociatedLessonStructure().getEducator().getId(), activeLesson));
                 }
                 catch (Exception e)
                 {

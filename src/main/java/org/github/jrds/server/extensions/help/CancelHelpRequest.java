@@ -7,7 +7,7 @@ import org.github.jrds.server.messages.Request;
 public class CancelHelpRequest extends Request
 {
     @JsonCreator
-    public CancelHelpRequest(@JsonProperty ("leanerId") String leanerId)
+    public CancelHelpRequest(@JsonProperty ("learnerId") String leanerId)
     {
         super(leanerId, null);
     }
