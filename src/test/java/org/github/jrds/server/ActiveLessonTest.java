@@ -4,7 +4,7 @@ import org.eclipse.jetty.websocket.api.UpgradeException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class LessonStructureTest extends ApplicationTest
+public class ActiveLessonTest extends ApplicationTest
 {
 
     @Test

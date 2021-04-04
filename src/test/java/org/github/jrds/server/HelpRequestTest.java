@@ -73,7 +73,7 @@ public class HelpRequestTest extends ApplicationTest
     }
 
     @Test
-    public void learnerCantSubmit2HelpRequests() throws InterruptedException, ExecutionException, TimeoutException
+    public void learnerCantSubmit2ActiveHelpRequests() throws InterruptedException, ExecutionException, TimeoutException
     {
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
@@ -98,7 +98,6 @@ public class HelpRequestTest extends ApplicationTest
     @Test
     public void educatorMarksHelpRequestAsInProgress() throws InterruptedException, ExecutionException, TimeoutException
     {
-        // TODO if time - progress note idea, for changing status.
 
         TestClient c1 = connect(eduId, eduName, lesson1);
         TestClient c2 = connect(l1Id, l1Name, lesson1);
@@ -152,7 +151,7 @@ public class HelpRequestTest extends ApplicationTest
     }
 
     @Test
-    public void helpRequestOrderingIsNotImpactedWhenOnesAreRemoved() throws InterruptedException, ExecutionException, TimeoutException
+    public void helpRequestOrderingIsNotImpactedWhenOneIsRemoved() throws InterruptedException, ExecutionException, TimeoutException
     {
 
         TestClient c1 = connect(eduId, eduName, lesson2);

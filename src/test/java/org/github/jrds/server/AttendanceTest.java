@@ -51,7 +51,7 @@ public class AttendanceTest extends ApplicationTest
     }
 
     @Test
-    public void unregisteredStudentAttendanceNotRecorded()
+    public void unregisteredLearnerAttendanceNotRecorded()
     {
         try
         {

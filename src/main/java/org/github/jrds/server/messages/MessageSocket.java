@@ -56,7 +56,6 @@ public class MessageSocket
         userSessions.put(userId, sess);
         lessonId = sess.getPathParameters().get("lessonId");
         sessionLesson.put(userId, server.activeLessonStore.getActiveLesson(lessonId));
-        // TODO add to assumptions documentation that a user will not have 2 classes at the same time.
     }
 
     @OnMessage

@@ -70,7 +70,7 @@ public class InstructionsTest extends ApplicationTest
     }
 
     @Test
-    public void canReorderInstructions()
+    public void educatorCanReorderInstructions()
     {
         connect(eduId, eduName, lesson2);
         LessonStructure l = server.lessonStructureStore.getLessonStructure(lesson2);
@@ -294,15 +294,5 @@ public class InstructionsTest extends ApplicationTest
         Assert.assertTrue(startLessonResponse.isFailure());
         Assert.assertEquals("Learner cannot start a lesson", startLessonResponse.asFailure().getFailureReason());
     }
-
-    @Test
-    @Ignore
-    public void instructionsArePresentAfterEducatorDisconnectsAndReconnects()
-    {
-        // some sort of permanence needs to be tested, so the next time we come to that lesson, the lesson still has the instructions
-        // potentially add to the set up/initialisation ? // Needs more thought. 
-        fail();
-    }
-
 
 }

@@ -10,7 +10,6 @@ public class CodeExecutionInfo extends Info
     private String executionOutput;
     private String executionErrorOutput;
     private String executionEventTime;
-    // TODO - Write up Future feature for report, visualisation of number of compiler errors over time, and repeated errors.
 
     @JsonCreator
     public CodeExecutionInfo(

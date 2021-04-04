@@ -62,7 +62,7 @@ public class CodeTest extends ApplicationTest
     }
 
     @Test
-    public void processInputCanBeGiven()
+    public void processInputCanBeProvided()
     {
         TestClient c1 = connect(l1Id, l1Name, lesson1);
 
