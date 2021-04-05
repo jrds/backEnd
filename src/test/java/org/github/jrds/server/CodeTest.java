@@ -2,7 +2,9 @@ package org.github.jrds.server;
 
 import org.github.jrds.server.domain.ExecutionStatus;
 
+import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.code.CodeExecutionInfo;
+import org.github.jrds.server.extensions.code.LatestLearnerCodeInfo;
 import org.github.jrds.server.messages.FailureResponse;
 import org.github.jrds.server.messages.Message;
 import org.github.jrds.server.messages.Response;
@@ -10,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -176,6 +179,25 @@ public class CodeTest extends ApplicationTest
                 "1 error", codeExecutionInfo.getExecutionErrorOutput());
     }
 
+    @Test
+    public void liveCodeUpdatesAreSentToEducator() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        TestClient c1 = connect(eduId, eduName, lesson1);
+        TestClient c2 = connect(l1Id, l1Name, lesson1);
+
+        String learnersCode = "class Hello { public static void main(String[] args) { System.out.println(\"Hello World\"); }";
+
+        Future<Response> sentMessageFuture = c2.sendLiveCodeToEducatorRequest(learnersCode);
+        Response sentMessageResponse = sentMessageFuture.get(10, TimeUnit.SECONDS);
+
+        Assert.assertTrue(sentMessageResponse.isSuccess());
+
+        Message received = c1.getMessageReceived();
+
+        Assert.assertTrue(received instanceof LatestLearnerCodeInfo);
+        System.out.println(received);
+    }
+
     private String[] waitForExecutionToComplete(TestClient c1)
     {
         StringBuilder stdOut = new StringBuilder();
@@ -191,4 +213,6 @@ public class CodeTest extends ApplicationTest
         while (!isFinished);
         return new String[] {stdOut.toString(), stdErr.toString()};
     }
+
+
 }

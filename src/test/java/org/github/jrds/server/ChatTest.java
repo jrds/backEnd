@@ -77,13 +77,10 @@ public class ChatTest extends ApplicationTest
         Future<Response> sentMessageFuture2 = c1.sendChatMessage(response, c2.getId());
         Response sentMessageResponse2 = sentMessageFuture2.get(10, TimeUnit.SECONDS);
 
-        Message educatorReceived = c1.getMessageReceived();
-        Assert.assertTrue(educatorReceived instanceof ChatMessage);
+        Message educatorReceived = c1.getMessageReceived(ChatMessage.class);
         Assert.assertTrue(messageContentAsExpected(c2.getId(), c1.getId(), msg, (ChatMessage) educatorReceived ));
 
-        Message learnerReceived = c2.getMessageReceived();
-        System.out.println(learnerReceived);
-        Assert.assertTrue(learnerReceived instanceof ChatMessage);
+        Message learnerReceived = c2.getMessageReceived(ChatMessage.class);
         Assert.assertTrue(messageContentAsExpected(c1.getId(), c2.getId(), response, (ChatMessage) learnerReceived ));
     }
 

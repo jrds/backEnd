@@ -40,6 +40,10 @@ public class CodeMessageExtension implements MessagingExtension
             {
                 handleCodeExecutionInput((CodeExecutionInputRequest) request, attendance, messageSocket);
             }
+            else if (request instanceof UpdateLiveCodeRequest)
+            {
+                handleLiveCodeRequest((UpdateLiveCodeRequest) request, attendance, messageSocket);
+            }
             else
             {
                 handleTerminateExecutionMessage((TerminateExecutionRequest) request, attendance, messageSocket);
@@ -49,6 +53,16 @@ public class CodeMessageExtension implements MessagingExtension
         {
             throw new IllegalStateException("No registered attendance for this user");
         }
+    }
+
+    private void handleLiveCodeRequest(UpdateLiveCodeRequest message, Attendance attendance, MessageSocket messageSocket)
+    {
+        String latestCode = message.getlatestCode();
+        User learner = attendance.getUser();
+        User educator = attendance.getLessonStructure().getEducator();
+
+        messageSocket.sendMessage(new LatestLearnerCodeInfo(educator.getId(), learner.getId(), latestCode));
+
     }
 
     private void handleExecuteCodeMessage(ExecuteCodeRequest message, Attendance attendance, MessageSocket messageSocket)
@@ -132,6 +146,18 @@ public class CodeMessageExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Arrays.asList(ExecuteCodeRequest.class, TerminateExecutionRequest.class, CodeExecutionInputRequest.class);
+        return Arrays.asList(ExecuteCodeRequest.class, TerminateExecutionRequest.class, CodeExecutionInputRequest.class, UpdateLiveCodeRequest.class);
+    }
+
+    @Override
+    public void userJoined(User user, Role userRole, MessageSocket messageSocket)
+    {
+
+    }
+
+    @Override
+    public void userLeft(User user, Role userRole)
+    {
+
     }
 }

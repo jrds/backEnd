@@ -54,4 +54,16 @@ public class ChatMessagingExtension implements MessagingExtension
     {
         return Collections.singletonList(ChatMessage.class);
     }
+
+    @Override
+    public void userJoined(User user, Role userRole, MessageSocket messageSocket)
+    {
+
+    }
+
+    @Override
+    public void userLeft(User user, Role userRole)
+    {
+
+    }
 }

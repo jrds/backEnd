@@ -1,10 +1,7 @@
 package org.github.jrds.server.extensions.help;
 
 import org.github.jrds.server.Main;
-import org.github.jrds.server.domain.ActiveLesson;
-import org.github.jrds.server.domain.Attendance;
-import org.github.jrds.server.domain.Status;
-import org.github.jrds.server.domain.HelpRequest;
+import org.github.jrds.server.domain.*;
 import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.messages.LearnerLessonStateInfo;
 import org.github.jrds.server.messages.MessageSocket;
@@ -97,5 +94,17 @@ public class HelpMessagingExtension implements MessagingExtension
                 OpenHelpRequestsInfo.class,
                 UpdateHelpStatusRequest.class
         );
+    }
+
+    @Override
+    public void userJoined(User user, Role userRole, MessageSocket messageSocket)
+    {
+
+    }
+
+    @Override
+    public void userLeft(User user, Role userRole)
+    {
+
     }
 }

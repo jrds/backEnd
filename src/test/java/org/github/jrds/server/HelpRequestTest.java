@@ -50,7 +50,6 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.getMessageReceived();
         Assert.assertEquals(0,c1.getOpenHelpRequests(lesson1).size());
-
     }
 
     @Test

@@ -9,10 +9,10 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.domain.Status;
-import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.code.CodeExecutionInputRequest;
 import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
+import org.github.jrds.server.extensions.code.UpdateLiveCodeRequest;
 import org.github.jrds.server.extensions.code.TerminateExecutionRequest;
 import org.github.jrds.server.extensions.help.CancelHelpRequest;
 import org.github.jrds.server.extensions.help.NewHelpRequest;
@@ -121,6 +121,17 @@ public class TestClient
         return clientWebSocket.nextMessageFromQueue();
     }
 
+
+    public Message getMessageReceived(Class messageClass)
+    {
+        Message nextMessage;
+        do
+        {
+            nextMessage = clientWebSocket.nextMessageFromQueue();
+        } while (!messageClass.isInstance(nextMessage));
+        return nextMessage;
+    }
+
     public String getId()
     {
         return id;
@@ -135,5 +146,11 @@ public class TestClient
     public List<HelpRequest> getOpenHelpRequests(String lessonId)
     {
         return new ArrayList<>(Main.defaultInstance.activeLessonStore.getActiveLesson(lessonId).getOpenHelpRequests().values());
+    }
+
+    public Future<Response> sendLiveCodeToEducatorRequest(String learnersCode)
+    {
+        UpdateLiveCodeRequest m = new UpdateLiveCodeRequest(id, learnersCode);
+        return clientWebSocket.sendMessage(m);
     }
 }

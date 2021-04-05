@@ -5,6 +5,7 @@ import org.github.jrds.server.dto.HelpRequestDto;
 import org.github.jrds.server.extensions.chat.ChatMessage;
 import org.github.jrds.server.extensions.code.ExecuteCodeRequest;
 import org.github.jrds.server.extensions.code.CodeExecutionInfo;
+import org.github.jrds.server.extensions.code.LatestLearnerCodeInfo;
 import org.github.jrds.server.extensions.help.CancelHelpRequest;
 import org.github.jrds.server.extensions.help.OpenHelpRequestsInfo;
 import org.github.jrds.server.extensions.help.NewHelpRequest;
@@ -50,7 +51,8 @@ public class ClientWebSocket extends Endpoint
                 LessonStartRequest.class,
                 LearnerLessonStateInfo.class,
                 ExecuteCodeRequest.class,
-                CodeExecutionInfo.class
+                CodeExecutionInfo.class,
+                LatestLearnerCodeInfo.class
         );
         this.userId = userId;
     }
