@@ -2,13 +2,10 @@ package org.github.jrds.server;
 
 import org.eclipse.jetty.websocket.api.UpgradeException;
 import org.github.jrds.server.dto.UserDto;
-import org.github.jrds.server.extensions.lesson.LearnersInAttendanceInfo;
+import org.github.jrds.server.extensions.lesson.LearnersInfo;
 import org.github.jrds.server.messages.Message;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 public class ActiveLessonTest extends ApplicationTest
 {
@@ -91,17 +88,26 @@ public class ActiveLessonTest extends ApplicationTest
         c1.getMessageReceived();
         Message m1 = c1.getMessageReceived();
 
-        Assert.assertTrue(m1 instanceof LearnersInAttendanceInfo);
-        Assert.assertTrue(((LearnersInAttendanceInfo) m1).getLearners().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+        Assert.assertTrue(m1 instanceof LearnersInfo);
+        Assert.assertTrue(((LearnersInfo) m1).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+        Assert.assertFalse(((LearnersInfo) m1).getLearnersExpected().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+
+        Assert.assertFalse(((LearnersInfo) m1).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
+        Assert.assertTrue(((LearnersInfo) m1).getLearnersExpected().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
+
 
         TestClient c3 = connect(l2Id, l2Name, lesson1);
 
         Message m2 = c1.getMessageReceived();
 
-        Assert.assertTrue(m2 instanceof LearnersInAttendanceInfo);
-        Assert.assertTrue(((LearnersInAttendanceInfo) m2).getLearners().size() == 2);
-        Assert.assertTrue(((LearnersInAttendanceInfo) m2).getLearners().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
+        Assert.assertTrue(m2 instanceof LearnersInfo);
+        Assert.assertTrue(((LearnersInfo) m2).getLearnersInAttendance().size() == 2);
+        Assert.assertTrue(((LearnersInfo) m2).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+        Assert.assertTrue(((LearnersInfo) m2).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
+        Assert.assertFalse(((LearnersInfo) m2).getLearnersExpected().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+        Assert.assertFalse(((LearnersInfo) m2).getLearnersExpected().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
 
+        //TODO apply to other tests
     }
 
 
@@ -114,10 +120,10 @@ public class ActiveLessonTest extends ApplicationTest
 
         Message m = c3.getMessageReceived();
 
-        Assert.assertTrue(m instanceof LearnersInAttendanceInfo);
-        Assert.assertTrue(((LearnersInAttendanceInfo) m).getLearners().size() == 2);
-        Assert.assertTrue(((LearnersInAttendanceInfo) m).getLearners().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
-        Assert.assertTrue(((LearnersInAttendanceInfo) m).getLearners().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
+        Assert.assertTrue(m instanceof LearnersInfo);
+        Assert.assertTrue(((LearnersInfo) m).getLearnersInAttendance().size() == 2);
+        Assert.assertTrue(((LearnersInfo) m).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l1Id))));
+        Assert.assertTrue(((LearnersInfo) m).getLearnersInAttendance().contains(new UserDto(Main.defaultInstance.usersStore.getUser(l2Id))));
 
 
     }

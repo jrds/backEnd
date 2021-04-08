@@ -150,13 +150,13 @@ public class CodeMessageExtension implements MessagingExtension
     }
 
     @Override
-    public void userJoined(User user, Role userRole, MessageSocket messageSocket)
+    public void userJoined(User user, ActiveLesson activeLesson, Role userRole, MessageSocket messageSocket)
     {
 
     }
 
     @Override
-    public void userLeft(User user, Role userRole)
+    public void userLeft(User user, ActiveLesson activeLesson, Role userRole)
     {
 
     }

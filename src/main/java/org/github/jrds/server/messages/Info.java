@@ -2,7 +2,7 @@ package org.github.jrds.server.messages;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.github.jrds.server.extensions.lesson.LearnersInAttendanceInfo;
+import org.github.jrds.server.extensions.lesson.LearnersInfo;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -10,7 +10,7 @@ import org.github.jrds.server.extensions.lesson.LearnersInAttendanceInfo;
 
 @JsonSubTypes({
         @JsonSubTypes.Type(value = LearnerLessonStateInfo.class),
-        @JsonSubTypes.Type(value = LearnersInAttendanceInfo.class)
+        @JsonSubTypes.Type(value = LearnersInfo.class)
 })
 
 public abstract class Info extends Message

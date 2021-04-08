@@ -74,7 +74,7 @@ public class MessageSocket
                 Attendance attendance = activeLesson.registerAttendance(user);
                 mockDB.add("JOINED - " + attendance.toString()); //TODO - mock DB only be @ store level not Message socket.
                 sendMessage(new SessionStartResponse(request.getFrom(), request.getId(), attendance.getRole().toString(), activeLesson.getActiveLessonState().toString()));
-                messagingExtensions.forEach(ext -> ext.userJoined(user, attendance.getRole(), this));
+                messagingExtensions.forEach(ext -> ext.userJoined(user, activeLesson, attendance.getRole(), this));
                 if (attendance.getRole() == Role.LEARNER){
                     sendMessage(new LearnerLessonStateInfo(request.getFrom(), activeLesson));
 
@@ -95,7 +95,7 @@ public class MessageSocket
                 mockDB.add("LEFT - " + attendance.toString());
                 userSessions.remove(sess.getUserPrincipal().getName());
                 server.activeLessonStore.getActiveLesson(lessonId).removeAttendance(attendance);
-                messagingExtensions.forEach(ext -> ext.userLeft(user, attendance.getRole()));
+                messagingExtensions.forEach(ext -> ext.userLeft(user, activeLesson, attendance.getRole()));
             }
             else
             {

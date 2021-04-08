@@ -12,12 +12,15 @@ import org.github.jrds.server.messages.Request;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class LessonMessagingExtension implements MessagingExtension
 {
     private final Main server;
-    private final List<UserDto> learners = new ArrayList<>();
+    private final List<UserDto> learnersInAttendance = new ArrayList<>();
     private User educator;
+    private Object lock = new Object();
 
     public LessonMessagingExtension(Main server)
     {
@@ -70,29 +73,47 @@ public class LessonMessagingExtension implements MessagingExtension
     }
 
     @Override
-    public void userJoined(User user, Role userRole, MessageSocket messageSocket)
+    public void userJoined(User user, ActiveLesson activeLesson, Role userRole, MessageSocket messageSocket)
     {
+        List<UserDto> learnersAttending;
+
         if (userRole.equals(Role.LEARNER))
         {
-            learners.add(new UserDto(user));
+            UserDto learner = new UserDto(user);
+            synchronized (lock)
+            {
+                learnersInAttendance.add(learner);
+                learnersAttending = new ArrayList<>(this.learnersInAttendance);
+            }
         }
         else
         {
             educator = user;
+            synchronized (lock)
+            {
+                learnersAttending = new ArrayList<>(this.learnersInAttendance);
+            }
         }
+
         if (educator != null)
         {
-            LearnersInAttendanceInfo m = new LearnersInAttendanceInfo(educator.getId(),learners);
+            List<UserDto> learnersExpected = activeLesson.getAssociatedLessonStructure().getLearners().stream().map(UserDto::new).collect(Collectors.toList());
+            learnersExpected.removeAll(learnersAttending);
+            LearnersInfo m = new LearnersInfo(educator.getId(), learnersAttending, learnersExpected);
             messageSocket.sendMessage(m);
         }
     }
 
     @Override
-    public void userLeft(User user, Role userRole)
+    public void userLeft(User user, ActiveLesson activeLesson, Role userRole)
     {
         if (userRole.equals(Role.LEARNER))
         {
-            learners.remove(new UserDto(user));
+            UserDto learner = new UserDto(user);
+            synchronized (lock)
+            {
+                learnersInAttendance.remove(learner);
+            }
         }
         else
         {
