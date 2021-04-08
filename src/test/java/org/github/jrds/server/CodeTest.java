@@ -192,7 +192,7 @@ public class CodeTest extends ApplicationTest
 
         Assert.assertTrue(sentMessageResponse.isSuccess());
 
-        Message received = c1.getMessageReceived();
+        Message received = c1.getMessageReceived(LatestLearnerCodeInfo.class);
 
         Assert.assertTrue(received instanceof LatestLearnerCodeInfo);
         System.out.println(received);

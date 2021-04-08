@@ -112,7 +112,7 @@ public class TestClient
 
     public Future<Response> updateHelpRequest(HelpRequest helpRequestToUpdate, Status newStatus)
     {
-        UpdateHelpStatusRequest m = new UpdateHelpStatusRequest(helpRequestToUpdate.getLearner().getId(), helpRequestToUpdate.getLearner().getId(), newStatus);
+        UpdateHelpStatusRequest m = new UpdateHelpStatusRequest(id, helpRequestToUpdate.getLearner().getId(), newStatus);
         return clientWebSocket.sendMessage(m);
     }
 

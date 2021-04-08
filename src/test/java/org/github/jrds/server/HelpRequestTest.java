@@ -3,6 +3,7 @@ package org.github.jrds.server;
 import org.github.jrds.server.domain.HelpRequest;
 import org.github.jrds.server.domain.Status;
 import org.github.jrds.server.dto.HelpRequestDto;
+import org.github.jrds.server.extensions.help.OpenHelpRequestsInfo;
 import org.github.jrds.server.messages.FailureResponse;
 import org.github.jrds.server.messages.Response;
 import org.github.jrds.server.messages.SuccessResponse;
@@ -104,7 +105,7 @@ public class HelpRequestTest extends ApplicationTest
         c2.requestHelp().get(10, TimeUnit.SECONDS);
 
         // wait for c1 to have received the message
-        c1.getMessageReceived();
+        c1.getMessageReceived(OpenHelpRequestsInfo.class);
 
         HelpRequest requestToChangeStatus = Main.defaultInstance.activeLessonStore.getActiveLesson("2905").getOpenHelpRequests().get(l1Id);
 
@@ -113,7 +114,7 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.updateHelpRequest(requestToChangeStatus, Status.IN_PROGRESS);
 
-        c1.getMessageReceived();
+        c1.getMessageReceived(OpenHelpRequestsInfo.class);
 
         HelpRequest changedRequest = Main.defaultInstance.activeLessonStore.getActiveLesson("2905").getOpenHelpRequests().get(l1Id);
         Assert.assertEquals(Status.IN_PROGRESS,changedRequest.getStatus());
@@ -133,8 +134,8 @@ public class HelpRequestTest extends ApplicationTest
         c3.requestHelp().get(10, TimeUnit.SECONDS);
 
         // wait for c1 to have received the message
-        c1.getMessageReceived();
-        c1.getMessageReceived();
+        c1.getMessageReceived(OpenHelpRequestsInfo.class);
+        c1.getMessageReceived(OpenHelpRequestsInfo.class);
 
         HelpRequest requestToChangeStatus = Main.defaultInstance.activeLessonStore.getActiveLesson("2905").getOpenHelpRequests().get(c2.getId());
 
@@ -142,7 +143,7 @@ public class HelpRequestTest extends ApplicationTest
 
         c1.updateHelpRequest(requestToChangeStatus, Status.COMPLETED);
 
-        c1.getMessageReceived();
+        c1.getMessageReceived(OpenHelpRequestsInfo.class);
 
         Assert.assertEquals(1, c1.getOpenHelpRequests(lesson1).size());  // TODO should I try to keep the original message id?
         Assert.assertEquals(l2Id, c1.getOpenHelpRequests(lesson1).get(0).getLearner().getId());

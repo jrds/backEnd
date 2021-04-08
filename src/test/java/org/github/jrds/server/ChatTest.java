@@ -29,9 +29,8 @@ public class ChatTest extends ApplicationTest
 
         Assert.assertTrue(sentMessageResponse.isSuccess());
 
-        Message received = c1.getMessageReceived();
+        Message received = c1.getMessageReceived(ChatMessage.class);
 
-        Assert.assertTrue(received instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c2.getId(), c1.getId(), msg, (ChatMessage) received));
     }
 
@@ -54,12 +53,10 @@ public class ChatTest extends ApplicationTest
         Assert.assertTrue(sentMessageResponse1.isSuccess());
         Assert.assertTrue(sentMessageResponse2.isSuccess());
 
-        List<Message> messagesReceived = Arrays.asList(c1.getMessageReceived(), c1.getMessageReceived());
+        List<Message> messagesReceived = Arrays.asList(c1.getMessageReceived(ChatMessage.class), c1.getMessageReceived(ChatMessage.class));
 
-        Assert.assertTrue(messagesReceived.get(0) instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c2.getId(), c1.getId(), msg1, (ChatMessage) messagesReceived.get(0)));
 
-        Assert.assertTrue(messagesReceived.get(1) instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c3.getId(), c1.getId(), msg2, (ChatMessage) messagesReceived.get(1)));
     }
 
@@ -108,28 +105,23 @@ public class ChatTest extends ApplicationTest
         Future<Response> sentMessageFuture4 = c1.sendChatMessage(response2, c2.getId());
         Response sentMessageResponse4 = sentMessageFuture4.get(10, TimeUnit.SECONDS);
 
-        Message firstMessageReceivedByEducator = c1.getMessageReceived();
-        Message secondMessageReceivedByEducator = c1.getMessageReceived();
-        Message learner2ResponseMessage = c3.getMessageReceived();
-        Message learner1ResponseMessage = c2.getMessageReceived();
+        Message firstMessageReceivedByEducator = c1.getMessageReceived(ChatMessage.class);
+        Message secondMessageReceivedByEducator = c1.getMessageReceived(ChatMessage.class);
+        Message learner2ResponseMessage = c3.getMessageReceived(ChatMessage.class);
+        Message learner1ResponseMessage = c2.getMessageReceived(ChatMessage.class);
 
         Assert.assertTrue(sentMessageResponse1.isSuccess());
         Assert.assertTrue(sentMessageResponse2.isSuccess());
         Assert.assertTrue(sentMessageResponse3.isSuccess());
         Assert.assertTrue(sentMessageResponse4.isSuccess());
 
-        Assert.assertTrue(firstMessageReceivedByEducator instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c3.getId(), c1.getId(), msg1, (ChatMessage) firstMessageReceivedByEducator));
 
-        Assert.assertTrue(secondMessageReceivedByEducator instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c2.getId(), c1.getId(), msg2, (ChatMessage) secondMessageReceivedByEducator));
 
-        Assert.assertTrue(learner2ResponseMessage instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c1.getId(), c3.getId(), response1, (ChatMessage) learner2ResponseMessage));
 
-        Assert.assertTrue(learner1ResponseMessage instanceof ChatMessage);
         Assert.assertTrue(messageContentAsExpected(c1.getId(), c2.getId(), response2, (ChatMessage) learner1ResponseMessage));
-
     }
 
     private boolean messageContentAsExpected(String from, String to, String text, ChatMessage cM)

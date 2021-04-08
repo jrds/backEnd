@@ -195,7 +195,7 @@ public class InstructionsTest extends ApplicationTest
     }
 
     @Test
-    public void startLessonSendsOneInstructionToAllLearners()
+    public void startLessonSendsOneInstructionToAllLearners() throws InterruptedException, ExecutionException, TimeoutException
     {
         TestClient c1 = connect(eduId, eduName, lesson2);
         TestClient c2 = connect(l1Id, l1Name, lesson2);
@@ -207,16 +207,13 @@ public class InstructionsTest extends ApplicationTest
         l.createInstruction(testTitle1, testBody1, u);
 
         Assert.assertEquals(ActiveLessonState.NOT_STARTED, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson2).getActiveLessonState());
-        c1.startLesson();
+        c1.startLesson().get(10, TimeUnit.SECONDS);
 
-        c1.getMessageReceived();
         Assert.assertEquals(ActiveLessonState.IN_PROGRESS, Main.defaultInstance.activeLessonStore.getActiveLesson(lesson2).getActiveLessonState());
 
-        Message received1 = c2.getMessageReceived();
-        Message received2 = c3.getMessageReceived();
+        Message received1 = c2.getMessageReceived(InstructionInfo.class);
+        Message received2 = c3.getMessageReceived(InstructionInfo.class);
 
-        Assert.assertTrue(received1 instanceof InstructionInfo);
-        Assert.assertTrue(received2 instanceof InstructionInfo);
 
         Assert.assertEquals(testTitle1, ((InstructionInfo) received1).getInstruction().getTitle());
         Assert.assertEquals(testBody1, ((InstructionInfo) received1).getInstruction().getBody());
