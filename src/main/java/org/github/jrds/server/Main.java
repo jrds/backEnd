@@ -12,6 +12,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.github.jrds.server.extensions.av.AVMessagingExtension;
 import org.github.jrds.server.extensions.chat.ChatMessagingExtension;
 import org.github.jrds.server.extensions.code.CodeMessageExtension;
 import org.github.jrds.server.extensions.help.HelpMessagingExtension;
@@ -51,6 +52,7 @@ public class Main
         extensions = Arrays.asList(
                 new HelpMessagingExtension(),
                 new ChatMessagingExtension(),
+                new AVMessagingExtension(),
                 new CodeMessageExtension(),
                 new LessonMessagingExtension(this));
     }
@@ -71,6 +73,7 @@ public class Main
         server.setRequestLog(new CustomRequestLog(s -> LOGGER.info(s), CustomRequestLog.EXTENDED_NCSA_FORMAT));
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8080);
+        //connector.setHost("0.0.0.0");
         server.addConnector(connector);
 
         // Setup the basic application "context" for this application at "/"
