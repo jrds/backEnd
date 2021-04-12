@@ -2,6 +2,7 @@
 
 package org.github.jrds.server;
 
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -11,6 +12,7 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.github.jrds.server.extensions.av.AVMessagingExtension;
 import org.github.jrds.server.extensions.chat.ChatMessagingExtension;
@@ -71,10 +73,36 @@ public class Main
     {
         server = new Server();
         server.setRequestLog(new CustomRequestLog(s -> LOGGER.info(s), CustomRequestLog.EXTENDED_NCSA_FORMAT));
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8080);
-        //connector.setHost("0.0.0.0");
-        server.addConnector(connector);
+
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setSecureScheme("https");
+        http_config.setSecurePort(8443);
+
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        https_config.addCustomizer(new SecureRequestCustomizer());
+
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath("C:\\Users\\jordan.r.wathen\\projects\\synoptic\\src\\main\\resources\\codi.jrds.jks");
+        sslContextFactory.setKeyStorePassword("CodiSecret");
+
+        ServerConnector wsConnector = new ServerConnector(server);
+        wsConnector.setHost("0.0.0.0");
+        wsConnector.setPort(8080);
+        server.addConnector(wsConnector);
+
+        ServerConnector wssConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,
+                        HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(https_config));
+
+        wssConnector.setHost("0.0.0.0");
+        wssConnector.setPort(8443);
+        server.addConnector(wssConnector);
+
+//        ServerConnector connector = new ServerConnector(server);
+//        connector.setPort(8080);
+//        //connector.setHost("0.0.0.0");
+//        server.addConnector(connector);
 
         // Setup the basic application "context" for this application at "/"
         // This is also known as the handler tree (in jetty speak)
@@ -94,7 +122,6 @@ public class Main
         try
         {
             server.start();
-
         }
         catch (Exception e)
         {

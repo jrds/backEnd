@@ -27,9 +27,8 @@ public class LessonStructureStore
         storeLessonStructure(l1);
         storeLessonStructure(l2);
 
-        l1.createInstruction("The Circle App", "In today's practical we will be developing a small java application. \n" +
-                                                         "This application will be used to calculate the diameter and area of a circle, when given it's radius. \n" +
-                                                         "Remember: \n" +
+        l1.createInstruction("The Circle App", "In today's practical we will be developing a small java application. This application will be used to calculate the diameter and area of a circle, when given it's radius. \n" +
+                                                         "Things to remember: \n" +
                                                          "    Diameter of a circle = 2 x Radius \n" +
                                                          "    Area of a circle = \u03C0r\u00B2 \n" +
                                                          "    Use a value of 3.142 for pi(\u03C0).", usersStore.getUser("e0001"));
