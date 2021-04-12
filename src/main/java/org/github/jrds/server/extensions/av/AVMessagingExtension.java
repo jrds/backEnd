@@ -21,7 +21,7 @@ public class AVMessagingExtension implements MessagingExtension
     @Override
     public List<Class<?>> getRequestTypes()
     {
-        return Arrays.asList(AVOffer.class, AVAnswer.class, AVReject.class, AVIceCandidate.class);
+        return Arrays.asList(AVOffer.class, AVAnswer.class, AVReject.class, AVIceCandidate.class, AVClose.class);
     }
 
     @Override
