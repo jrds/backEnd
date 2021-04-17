@@ -1,6 +1,0 @@
-package org.github.jrds.server.domain;
-
-public enum ExecutionStatus
-{
-    NEW, COMPILE_SUCCEEDED, COMPILE_FAILED, EXECUTION_IN_PROGRESS, EXECUTION_FAILED_TO_START, EXECUTION_FINISHED, EXECUTION_ERROR
-}
