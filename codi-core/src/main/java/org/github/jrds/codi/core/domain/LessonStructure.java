@@ -9,12 +9,14 @@ public class LessonStructure
     private final User educator;
     private final Set<User> learners;
     private final List<Instruction> instructions = new ArrayList<>();
+    private final String language;
 
-    public LessonStructure(String id, User educator, Set<User> learners)
+    public LessonStructure(String id, User educator, Set<User> learners, String lanugauge)
     {
         this.id = Objects.requireNonNull(id);
         this.educator = Objects.requireNonNull(educator);
         this.learners = learners == null ? new HashSet<>() : learners;
+        this.language = lanugauge;
     }
 
     public String getId()
@@ -61,6 +63,11 @@ public class LessonStructure
         {
             return Role.NONE;
         }
+    }
+
+    public String getLanguage()
+    {
+        return language;
     }
 
     public Instruction createInstruction(String title, String body, User author)

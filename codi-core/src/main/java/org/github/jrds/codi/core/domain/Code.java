@@ -9,38 +9,22 @@ import java.util.regex.Pattern;
 
 public class Code
 {
-    private static final Pattern CLASS = Pattern.compile(".*?class\\s+([A-Za-z_][A-Za-z_]*)\\s*\\{.*");
     private String code = "";
-    private Path codeDirectory;
     private List<CompiledCode> allCompiledCode = new ArrayList();
-    private ExecuteCodeProcess executeCodeProcess;
-
-    public Code()
-    {
-        try
-        {
-            codeDirectory = Files.createTempDirectory("codi");
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-    }
 
     public void setCode(String code)
     {
         this.code = code;
     }
 
+    public void addCompiledCode(CompiledCode compiledCode)
+    {
+        allCompiledCode.add(compiledCode);
+    }
+
     public List<CompiledCode> getAllCompiledCode()
     {
         return allCompiledCode;
-    }
-
-    public ExecuteCodeProcess getExecuteCodeProcess()
-    {
-        return executeCodeProcess;
     }
 
     public CompiledCode getLatestCompiledCode(){
@@ -51,29 +35,6 @@ public class Code
         else
         {
             return null;
-        }
-    }
-
-    public void executeCode()
-    {
-        // TODO check existing
-        executeCodeProcess = new ExecuteCodeProcess(code, codeDirectory);
-        executeCodeProcess.startExecution();
-    }
-
-    public void terminateExecutionProcess()
-    {
-        if (executeCodeProcess != null)
-        {
-            executeCodeProcess.terminate();
-        }
-    }
-
-    public void acceptInput(String input)
-    {
-        if (executeCodeProcess != null)
-        {
-            executeCodeProcess.acceptInput(input);
         }
     }
 }

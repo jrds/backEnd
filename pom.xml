@@ -13,6 +13,7 @@
 
     <modules>
         <module>codi-core</module>
+        <module>codi-language-java</module>
         <module>codi-messaging-av</module>
         <module>codi-messaging-chat</module>
         <module>codi-messaging-code</module>
@@ -79,6 +80,17 @@
             <dependency>
                 <groupId>org.github.jrds</groupId>
                 <artifactId>codi-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.github.jrds</groupId>
+                <artifactId>codi-messaging-code</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.github.jrds</groupId>
+                <artifactId>codi-messaging-code</artifactId>
+                <classifier>tests</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

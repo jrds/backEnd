@@ -1,4 +1,7 @@
-package org.github.jrds.codi.core.domain;
+package org.github.jrds.codi.language.java;
+
+import org.github.jrds.codi.core.domain.ExecutionStatus;
+import org.github.jrds.codi.core.language.ExecuteCodeOutputs;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ExecuteCodeProcess
+public class JavaExecuteCodeProcess
 {
     public static final int STD_OUT = 0;
     public static final int STD_ERR = 1;
@@ -39,7 +42,7 @@ public class ExecuteCodeProcess
     private Reader processStdErrReader;
     private Writer processStdInWriter;
 
-    ExecuteCodeProcess(String codeToExecute, Path codeDirectory)
+    JavaExecuteCodeProcess(String codeToExecute, Path codeDirectory)
     {
         this.codeToExecute = codeToExecute;
         this.codeDirectory = codeDirectory;
@@ -148,7 +151,7 @@ public class ExecuteCodeProcess
         return timeExecutionEnded;
     }
 
-    public String[] getUnreadOutput()
+    public ExecuteCodeOutputs getUnreadOutputs()
     {
         try
         {
@@ -172,7 +175,21 @@ public class ExecuteCodeProcess
                     }
                 }
             }
-            return new String[] {stdOut.toString().replace(EOL, "\n"), stdErr.toString().replace(EOL, "\n")};
+
+            return new ExecuteCodeOutputs()
+            {
+                @Override
+                public String stdOut()
+                {
+                    return stdOut.toString().replace(EOL, "\n");
+                }
+
+                @Override
+                public String stdErr()
+                {
+                    return stdErr.toString().replace(EOL, "\n");
+                }
+            };
         }
         catch (IOException e)
         {

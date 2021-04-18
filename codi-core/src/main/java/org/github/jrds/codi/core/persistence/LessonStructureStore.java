@@ -20,8 +20,8 @@ public class LessonStructureStore
         Set<User> learners5029 = new HashSet<>(Arrays.asList(usersStore.getUser("u1900"), usersStore.getUser("u1901"), usersStore.getUser("u9999")));
 
 
-        LessonStructure l1 = new LessonStructure("2905", usersStore.getUser("e0001"), learners2905);
-        LessonStructure l2 = new LessonStructure("5029", usersStore.getUser("e0001"), learners5029);
+        LessonStructure l1 = new LessonStructure("2905", usersStore.getUser("e0001"), learners2905, "java");
+        LessonStructure l2 = new LessonStructure("5029", usersStore.getUser("e0001"), learners5029, "java");
 
         storeLessonStructure(l1);
         storeLessonStructure(l2);

@@ -9,32 +9,19 @@
         <artifactId>codi</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>codi-messaging-code</artifactId>
+    <artifactId>codi-language-java</artifactId>
     <packaging>jar</packaging>
 
-    <name>Codi Messaging Code</name>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <name>Codi Language Java</name>
 
     <dependencies>
         <dependency>
             <groupId>org.github.jrds</groupId>
             <artifactId>codi-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.github.jrds</groupId>
+            <artifactId>codi-messaging-code</artifactId>
         </dependency>
 
         <dependency>
@@ -46,6 +33,12 @@
             <groupId>org.github.jrds</groupId>
             <artifactId>codi-server-testing</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.jrds</groupId>
+            <artifactId>codi-messaging-code</artifactId>
+            <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
     </dependencies>
 </project>

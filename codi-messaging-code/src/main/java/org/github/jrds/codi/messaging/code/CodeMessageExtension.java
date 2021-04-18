@@ -1,31 +1,39 @@
 package org.github.jrds.codi.messaging.code;
 
 import org.github.jrds.codi.core.domain.*;
+import org.github.jrds.codi.core.language.CodeExecutor;
+import org.github.jrds.codi.core.language.ExecuteCodeOutputs;
+import org.github.jrds.codi.core.language.LanguageExtension;
 import org.github.jrds.codi.core.messages.MessageSocket;
 import org.github.jrds.codi.core.messages.MessagingExtension;
 import org.github.jrds.codi.core.messages.Request;
 import org.github.jrds.codi.core.persistence.PersistenceServices;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CodeMessageExtension implements MessagingExtension
 {
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
+    private static Map<String, LanguageExtension> languageExtensions = ServiceLoader.load(LanguageExtension.class)
+            .stream()
+            .map(ServiceLoader.Provider::get)
+            .collect(Collectors.toMap(LanguageExtension::getLanguage, Function.identity()));
+
     private final PersistenceServices persistenceServices;
 
     private Object currentProcessLock = new Object();
-    private ExecuteCodeProcess currentProcess;
-    private MessageSocket currentProcessMessageSocket;
-    private User currentProcessFrom;
-    private ScheduledFuture<?> currentProcessScheduledFuture;
+    private CodeExecutor currentExecutor;
+    private MessageSocket currentExecutorMessageSocket;
+    private User currentExecutorFrom;
+    private ScheduledFuture<?> currentExecutorScheduledFuture;
 
     public CodeMessageExtension()
     {
@@ -37,12 +45,14 @@ public class CodeMessageExtension implements MessagingExtension
     {
         User from = persistenceServices.getUsersStore().getUser(request.getFrom());
         Attendance attendance = activeLesson.getAttendance(from);
+        String language = activeLesson.getAssociatedLessonStructure().getLanguage();
+        LanguageExtension languageExtension = Objects.requireNonNull(languageExtensions.get(language), language + " not supported");
 
         if ( attendance != null)
         {
             if (request instanceof ExecuteCodeRequest)
             {
-                handleExecuteCodeMessage((ExecuteCodeRequest) request, attendance, messageSocket);
+                handleExecuteCodeMessage((ExecuteCodeRequest) request, attendance, messageSocket, languageExtension);
             }
             else if (request instanceof CodeExecutionInputRequest)
             {
@@ -70,77 +80,73 @@ public class CodeMessageExtension implements MessagingExtension
         User educator = attendance.getLessonStructure().getEducator();
 
         messageSocket.sendMessage(new LatestLearnerCodeInfo(educator.getId(), learner.getId(), latestCode));
-
     }
 
-    private void handleExecuteCodeMessage(ExecuteCodeRequest message, Attendance attendance, MessageSocket messageSocket)
+    private void handleExecuteCodeMessage(ExecuteCodeRequest message, Attendance attendance, MessageSocket messageSocket, LanguageExtension languageExtension)
     {
         String codeToExecute = message.getCodeToExecute();
         Code code = attendance.getCode();
         User from = attendance.getUser();
 
         code.setCode(codeToExecute);
-        code.executeCode();
+        CodeExecutor executor = languageExtension.getCodeExecutor(codeToExecute);
+        executor.execute();
 
-        ExecuteCodeProcess process = attendance.getCode().getExecuteCodeProcess();
-        if (process != null)
+        if (executor.getStatus() == ExecutionStatus.COMPILE_FAILED)
         {
-            if (process.getStatus() == ExecutionStatus.COMPILE_FAILED)
+            messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), executor.getStatus().toString(), "", executor.getCompilationErrors(), executor.getTimeCompiled().toString()));
+        }
+        else if (executor.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
+        {
+            messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), executor.getStatus().toString(), "", "", executor.getTimeExecutionStarted().toString()));
+        }
+        else if (executor.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS)
+        {
+            ExecuteCodeOutputs outputs = executor.getUnreadOutputs();
+            messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), executor.getStatus().toString(), outputs.stdOut(), outputs.stdErr(), executor.getTimeExecutionStarted().toString()));
+            synchronized (currentProcessLock)
             {
-                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), "", process.getCompilationErrors(), process.getTimeCompiled().toString()));
+                currentExecutor = executor;
+                currentExecutorMessageSocket = messageSocket;
+                currentExecutorFrom = from;
+                currentExecutorScheduledFuture = scheduler.scheduleAtFixedRate(this::checkExecution,1, 1, TimeUnit.SECONDS);
             }
-            else if (process.getStatus() == ExecutionStatus.EXECUTION_FAILED_TO_START)
-            {
-                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), "", "", process.getTimeExecutionStarted().toString()));
-            }
-            else if (process.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS)
-            {
-                String[] outputs = process.getUnreadOutput();
-                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), outputs[ExecuteCodeProcess.STD_OUT], outputs[ExecuteCodeProcess.STD_ERR], process.getTimeExecutionStarted().toString()));
-                synchronized (currentProcessLock)
-                {
-                    currentProcess = process;
-                    currentProcessMessageSocket = messageSocket;
-                    currentProcessFrom = from;
-                    currentProcessScheduledFuture = scheduler.scheduleAtFixedRate(this::checkProcess,1, 1, TimeUnit.SECONDS);
-                }
-            }
-            else if (process.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
-            {
-                String[] outputs = process.getUnreadOutput();
-                messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), process.getStatus().toString(), outputs[ExecuteCodeProcess.STD_OUT], outputs[ExecuteCodeProcess.STD_ERR], process.getTimeExecutionEnded().toString()));
-            }
+        }
+        else if (executor.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
+        {
+            ExecuteCodeOutputs outputs = executor.getUnreadOutputs();
+            messageSocket.sendMessage(new CodeExecutionInfo(from.getId(), executor.getStatus().toString(), outputs.stdOut(), outputs.stdErr(), executor.getTimeExecutionEnded().toString()));
         }
     }
 
     private void handleCodeExecutionInput(CodeExecutionInputRequest request, Attendance attendance, MessageSocket messageSocket)
     {
-        attendance.getCode().acceptInput(request.getInput());
+        currentExecutor.input(request.getInput());
     }
 
     private void handleTerminateExecutionMessage(TerminateExecutionRequest message, Attendance attendance, MessageSocket messageSocket)
     {
-        attendance.getCode().terminateExecutionProcess();
+        currentExecutor.terminate();
     }
 
-    private void checkProcess()
+    private void checkExecution()
     {
         synchronized (currentProcessLock)
         {
             try
             {
-                if (!currentProcessScheduledFuture.isCancelled())
+                if (!currentExecutorScheduledFuture.isCancelled())
                 {
-                    String executionStatus = currentProcess.getStatus().toString();
-                    String[] unreadOutputs = currentProcess.getUnreadOutput();
-                    if (currentProcess.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS && (!unreadOutputs[ExecuteCodeProcess.STD_OUT].isEmpty() || !unreadOutputs[ExecuteCodeProcess.STD_ERR].isEmpty()))
+                    String executionStatus = currentExecutor.getStatus().toString();
+                    ExecuteCodeOutputs outputs = currentExecutor.getUnreadOutputs();
+                    if (currentExecutor.getStatus() == ExecutionStatus.EXECUTION_IN_PROGRESS && (!outputs.stdOut().isEmpty() || !outputs.stdErr().isEmpty()))
                     {
-                        currentProcessMessageSocket.sendMessage(new CodeExecutionInfo(currentProcessFrom.getId(), executionStatus, unreadOutputs[ExecuteCodeProcess.STD_OUT], unreadOutputs[ExecuteCodeProcess.STD_ERR], Instant.now().toString()));
+                        currentExecutorMessageSocket.sendMessage(new CodeExecutionInfo(currentExecutorFrom.getId(), executionStatus, outputs.stdOut(), outputs.stdErr(), Instant.now().toString()));
                     }
-                    else if (currentProcess.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
+                    else if (currentExecutor.getStatus() == ExecutionStatus.EXECUTION_FINISHED)
                     {
-                        currentProcessMessageSocket.sendMessage(new CodeExecutionInfo(currentProcessFrom.getId(), executionStatus, unreadOutputs[ExecuteCodeProcess.STD_OUT], unreadOutputs[ExecuteCodeProcess.STD_ERR], currentProcess.getTimeExecutionEnded().toString()));
-                        currentProcessScheduledFuture.cancel(false);
+                        currentExecutorMessageSocket.sendMessage(new CodeExecutionInfo(currentExecutorFrom.getId(), executionStatus, outputs.stdOut(), outputs.stdErr(), currentExecutor.getTimeExecutionEnded().toString()));
+                        currentExecutorScheduledFuture.cancel(false);
                     }
                 }
             }
