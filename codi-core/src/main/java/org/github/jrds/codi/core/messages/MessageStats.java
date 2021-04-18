@@ -6,13 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MessageStats
 {
-    public static MessageStats instance;
-
-    public static void setInstance(MessageStats stats)
-    {
-        instance = stats;
-    }
-
     private final Map<String, UserStats> stats = new ConcurrentHashMap<>();
 
     void incrementSent(String userId)

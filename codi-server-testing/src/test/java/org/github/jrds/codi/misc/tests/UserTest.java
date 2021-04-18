@@ -1,7 +1,9 @@
-package org.github.jrds.codi.server.testing;
+package org.github.jrds.codi.misc.tests;
 
 import org.github.jrds.codi.core.domain.Role;
 import org.github.jrds.codi.core.messages.SessionStartResponse;
+import org.github.jrds.codi.server.testing.ApplicationTest;
+import org.github.jrds.codi.server.testing.TestClient;
 import org.junit.Assert;
 import org.junit.Test;
 

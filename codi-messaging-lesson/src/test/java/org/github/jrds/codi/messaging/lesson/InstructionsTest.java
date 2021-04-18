@@ -1,12 +1,15 @@
-package org.github.jrds.codi.server.testing;
+package org.github.jrds.codi.messaging.lesson;
 
+import org.github.jrds.codi.core.domain.ActiveLessonState;
 import org.github.jrds.codi.core.domain.Instruction;
 import org.github.jrds.codi.core.domain.LessonStructure;
 import org.github.jrds.codi.core.domain.User;
-import org.github.jrds.codi.core.extensions.lesson.ActiveLessonState;
-import org.github.jrds.codi.core.extensions.lesson.InstructionInfo;
 import org.github.jrds.codi.core.messages.*;
+import org.github.jrds.codi.server.testing.ApplicationTest;
+import org.github.jrds.codi.server.testing.ClientWebSocket;
+import org.github.jrds.codi.server.testing.TestClient;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
@@ -16,6 +19,14 @@ import java.util.concurrent.TimeoutException;
 
 public class InstructionsTest extends ApplicationTest
 {
+
+    @BeforeClass
+    public static void registerMessageSubtypes()
+    {
+        ClientWebSocket.registerMessageSubtype(InstructionInfo.class);
+    }
+
+
     private final String testTitle1 = "Instruction Test 1";
     private final String testBody1 = "Body of Test Instruction 1";
     private final String testTitle2 = "Instruction Test 2";
@@ -203,7 +214,7 @@ public class InstructionsTest extends ApplicationTest
         l.createInstruction(testTitle1, testBody1, u);
 
         Assert.assertEquals(ActiveLessonState.NOT_STARTED, persistenceServices.getActiveLessonStore().getActiveLesson(lesson2).getActiveLessonState());
-        c1.startLesson().get(10, TimeUnit.SECONDS);
+        startLesson(c1).get(10, TimeUnit.SECONDS);
 
         Assert.assertEquals(ActiveLessonState.IN_PROGRESS, persistenceServices.getActiveLessonStore().getActiveLesson(lesson2).getActiveLessonState());
 
@@ -231,7 +242,7 @@ public class InstructionsTest extends ApplicationTest
         l.createInstruction(testTitle1, testBody1, u);
         l.createInstruction(testTitle2, testBody2, u);
 
-        c1.startLesson();
+        startLesson(c1);
         Message received1 = c2.getMessageReceived();
         Message received2 = c2.getMessageReceived();
 
@@ -261,11 +272,11 @@ public class InstructionsTest extends ApplicationTest
 
         l.createInstruction(testTitle1, testBody1, u);
 
-        c1.startLesson();
+        startLesson(c1);
         c1.getMessageReceived();
 
         Assert.assertNotNull(c2.getMessageReceived());
-        Assert.assertEquals(0, MessageStats.instance.forUser(l99Id).getSent());
+        Assert.assertEquals(0, MessagingContext.messageStats.forUser(l99Id).getSent());
     }
 
     //TODO how does the educator see the instructions, he's able to access, edit and create, but isn't sent the instruction message
@@ -281,11 +292,20 @@ public class InstructionsTest extends ApplicationTest
 
         l.createInstruction(testTitle1, testBody1, u);
 
-        Future<Response> startLessonFuture = c2.startLesson();
+        Future<Response> startLessonFuture = startLesson(c2);
         Response startLessonResponse = startLessonFuture.get(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(startLessonResponse.isFailure());
         Assert.assertEquals("Learner cannot start a lesson", startLessonResponse.asFailure().getFailureReason());
     }
+
+
+    private Future<Response> startLesson(TestClient client)
+    {
+        LessonStartRequest request = new LessonStartRequest(client.getId());
+        return client.sendRequest(request);
+    }
+
+
 
 }

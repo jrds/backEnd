@@ -87,7 +87,6 @@ public class Main
         context.addFilter(new FilterHolder(new AuthorisationFilter(this)), "/lesson/*", EnumSet.allOf(DispatcherType.class));
         server.setHandler(context);
 
-
         WebSocketServerContainerInitializer.configure(context, (servletContext, wsContainer) -> {
             wsContainer.setDefaultMaxTextMessageBufferSize(65535);
             wsContainer.setDefaultMaxSessionIdleTimeout(60 * 60 * 1000);

@@ -2,8 +2,6 @@ package org.github.jrds.codi.server.testing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.github.jrds.codi.core.dto.HelpRequestDto;
-import org.github.jrds.codi.core.extensions.lesson.InstructionInfo;
-import org.github.jrds.codi.core.extensions.lesson.LessonStartRequest;
 import org.github.jrds.codi.core.messages.*;
 
 import javax.websocket.*;
@@ -42,8 +40,6 @@ public class ClientWebSocket extends Endpoint
         mapper.findAndRegisterModules();
         mapper.registerSubtypes(messageSubtypes);
         mapper.registerSubtypes(
-                InstructionInfo.class,
-                LessonStartRequest.class,
                 LearnerLessonStateInfo.class
         );
         this.userId = userId;

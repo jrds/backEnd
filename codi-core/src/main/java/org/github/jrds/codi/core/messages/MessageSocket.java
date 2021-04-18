@@ -25,8 +25,8 @@ public class MessageSocket
     private final CountDownLatch closureLatch = new CountDownLatch(1);
     private final ObjectMapper mapper;
     private final Map<String, ActiveLesson> sessionLesson = new HashMap<>();
-    private final List<MessagingExtension> messagingExtensions = new ArrayList<>();
-    private final MessageStats messageStats = new MessageStats();
+    private final List<MessagingExtension> messagingExtensions = MessagingContext.messagingExtensions;
+    private final MessageStats messageStats = MessagingContext.messageStats;
     private final List<String> mockDB = new ArrayList<>();
     private final PersistenceServices persistenceServices;
 
@@ -35,11 +35,6 @@ public class MessageSocket
 
     public MessageSocket()
     {
-        MessageStats.setInstance(messageStats);
-        for (MessagingExtension extension: ServiceLoader.load(MessagingExtension.class))
-        {
-            messagingExtensions.add(extension);
-        }
         persistenceServices = ServiceLoader.load(PersistenceServices.class).findFirst().orElseThrow();
         mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
@@ -125,6 +120,7 @@ public class MessageSocket
         {
             Session to = userSessions.get(message.getTo());
             String json = mapper.writeValueAsString(message);
+            LOGGER.info("Sending: " + json);
             to.getAsyncRemote().sendText(json);
             messageStats.incrementSent(to.getId());
         }

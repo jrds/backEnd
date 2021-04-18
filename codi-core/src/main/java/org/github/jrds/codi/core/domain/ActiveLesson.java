@@ -1,7 +1,6 @@
 package org.github.jrds.codi.core.domain;
 
 import org.github.jrds.codi.core.dto.InstructionDto;
-import org.github.jrds.codi.core.extensions.lesson.ActiveLessonState;
 
 import java.util.*;
 import java.util.stream.Collectors;

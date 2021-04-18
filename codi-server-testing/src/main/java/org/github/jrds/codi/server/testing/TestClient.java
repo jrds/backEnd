@@ -1,6 +1,5 @@
 package org.github.jrds.codi.server.testing;
 
-import org.github.jrds.codi.core.extensions.lesson.LessonStartRequest;
 import org.github.jrds.codi.core.messages.Message;
 import org.github.jrds.codi.core.messages.Request;
 import org.github.jrds.codi.core.messages.Response;
@@ -48,11 +47,6 @@ public class TestClient
         return clientWebSocket.sendMessage(request);
     }
 
-    public Future<Response> startLesson()
-    {
-        LessonStartRequest m = new LessonStartRequest(id);
-        return clientWebSocket.sendMessage(m);
-    }
 
     public Future<Response> sendSessionEndMessage()
     {
@@ -72,7 +66,7 @@ public class TestClient
         do
         {
             nextMessage = clientWebSocket.nextMessageFromQueue();
-        } while (!messageClass.isInstance(nextMessage));
+        } while (nextMessage != null && !messageClass.isInstance(nextMessage));
         return nextMessage;
     }
 

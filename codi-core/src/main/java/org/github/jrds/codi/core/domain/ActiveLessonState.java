@@ -1,4 +1,4 @@
-package org.github.jrds.codi.core.extensions.lesson;
+package org.github.jrds.codi.core.domain;
 
 public enum ActiveLessonState
 {

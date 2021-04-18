@@ -1,6 +1,7 @@
 package org.github.jrds.codi.server.testing;
 
 import org.github.jrds.codi.core.domain.Attendance;
+import org.github.jrds.codi.core.messages.MessagingContext;
 import org.github.jrds.codi.core.persistence.PersistenceServices;
 import org.github.jrds.codi.core.persistence.StaticPersistenceServices;
 import org.github.jrds.codi.server.Main;
@@ -30,6 +31,7 @@ public abstract class ApplicationTest
     public void setUp()
     {
         StaticPersistenceServices.reset();
+        MessagingContext.reset();
         server = new Main();
         server.start();
     }

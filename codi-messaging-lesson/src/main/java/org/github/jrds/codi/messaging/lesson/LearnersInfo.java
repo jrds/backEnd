@@ -1,4 +1,4 @@
-package org.github.jrds.codi.core.extensions.lesson;
+package org.github.jrds.codi.messaging.lesson;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

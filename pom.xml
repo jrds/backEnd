@@ -17,6 +17,7 @@
         <module>codi-messaging-chat</module>
         <module>codi-messaging-code</module>
         <module>codi-messaging-help</module>
+        <module>codi-messaging-lesson</module>
         <module>codi-server</module>
         <module>codi-server-testing</module>
     </modules>

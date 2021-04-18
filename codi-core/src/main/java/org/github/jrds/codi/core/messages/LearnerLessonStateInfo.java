@@ -6,7 +6,6 @@ import org.github.jrds.codi.core.persistence.PersistenceServices;
 import org.github.jrds.codi.core.persistence.UsersStore;
 import org.github.jrds.codi.core.domain.*;
 import org.github.jrds.codi.core.dto.InstructionDto;
-import org.github.jrds.codi.core.extensions.lesson.ActiveLessonState;
 import java.util.List;
 import java.util.ServiceLoader;
 

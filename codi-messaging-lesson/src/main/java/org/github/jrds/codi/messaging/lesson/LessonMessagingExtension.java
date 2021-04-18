@@ -1,4 +1,4 @@
-package org.github.jrds.codi.core.extensions.lesson;
+package org.github.jrds.codi.messaging.lesson;
 
 import org.github.jrds.codi.core.domain.*;
 import org.github.jrds.codi.core.dto.InstructionDto;
@@ -54,7 +54,6 @@ public class LessonMessagingExtension implements MessagingExtension
                     messageSocket.sendMessage(llsm);
 
                 }
-                // TODO send educator lesson state message to a.getEducator()
             }
 
         }
