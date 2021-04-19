@@ -9,66 +9,46 @@
         <artifactId>codi</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>codi-language-java</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>codi-runtime</artifactId>
+    <packaging>pom</packaging>
 
-    <name>Codi Language Java</name>
+    <name>Codi Runtime</name>
 
     <dependencies>
         <dependency>
             <groupId>org.github.jrds</groupId>
-            <artifactId>codi-core</artifactId>
+            <artifactId>codi-server</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.github.jrds</groupId>
             <artifactId>codi-messaging-code</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.github.jrds</groupId>
-            <artifactId>codi-server-testing</artifactId>
-            <scope>test</scope>
+            <artifactId>codi-messaging-av</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.github.jrds</groupId>
-            <artifactId>codi-messaging-code</artifactId>
-            <scope>test</scope>
-            <classifier>tests</classifier>
+            <artifactId>codi-messaging-chat</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.jrds</groupId>
+            <artifactId>codi-messaging-help</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.jrds</groupId>
+            <artifactId>codi-messaging-lesson</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.github.jrds</groupId>
+            <artifactId>codi-language-java</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
